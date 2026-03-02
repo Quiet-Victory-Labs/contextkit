@@ -4,6 +4,7 @@ import { parseFile } from '../parser/parse.js';
 import { validate } from './validate.js';
 import { buildGraph } from './graph.js';
 import { resolveReferences } from './resolve.js';
+import { computeAllTiers } from '../tier/compute.js';
 
 export interface CompileResult {
   graph: ContextGraph;
@@ -39,6 +40,9 @@ export async function compile(options: {
   const refDiagnostics = resolveReferences(graph);
   allDiagnostics.push(...refDiagnostics);
 
-  // 6. Return graph + all diagnostics
+  // 6. Compute tier scores
+  computeAllTiers(graph);
+
+  // 7. Return graph + all diagnostics
   return { graph, diagnostics: allDiagnostics };
 }
