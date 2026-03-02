@@ -1,0 +1,3 @@
+id: BadCamelCaseId
+definition: This concept has a bad ID format.
+owner: some-team

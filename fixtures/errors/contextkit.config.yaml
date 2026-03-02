@@ -1,0 +1,4 @@
+project:
+  id: error-test
+  displayName: Error Test
+  version: 0.1.0

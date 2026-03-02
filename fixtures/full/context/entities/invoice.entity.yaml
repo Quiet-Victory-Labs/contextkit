@@ -1,0 +1,14 @@
+id: invoice
+definition: An invoice issued to a customer for goods or services.
+owner: finance-team
+tags: [finance]
+fields:
+  - name: invoice_id
+    description: Unique invoice identifier.
+    type: string
+  - name: amount
+    description: Total invoice amount.
+    type: number
+  - name: issued_date
+    description: Date the invoice was issued.
+    type: date

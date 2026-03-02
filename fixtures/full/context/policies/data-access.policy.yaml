@@ -1,0 +1,9 @@
+id: data-access
+description: Data access policy for finance data.
+owner: finance-team
+rules:
+  - priority: 100
+    when:
+      tags_any: [finance]
+    then:
+      require_role: finance_viewer
