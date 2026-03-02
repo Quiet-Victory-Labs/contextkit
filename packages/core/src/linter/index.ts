@@ -1,6 +1,15 @@
 export { LintEngine } from './engine.js';
 export type { LintRule } from './rule.js';
+export { ALL_RULES } from './rules/index.js';
 export { schemaValidYaml } from './rules/schema-valid-yaml.js';
 export { namingIdKebabCase } from './rules/naming-id-kebab-case.js';
 export { ownershipRequired } from './rules/ownership-required.js';
 export { descriptionsRequired } from './rules/descriptions-required.js';
+export { referencesResolvable } from './rules/references-resolvable.js';
+export { glossaryNoDuplicateTerms } from './rules/glossary-no-duplicate-terms.js';
+export { conceptsCertifiedRequiresEvidence } from './rules/concepts-certified-requires-evidence.js';
+export { policiesUnknownSubject } from './rules/policies-unknown-subject.js';
+export { policiesDenyOverridesAllow } from './rules/policies-deny-overrides-allow.js';
+export { docsExamplesRequired } from './rules/docs-examples-required.js';
+export { deprecationRequireSunset } from './rules/deprecation-require-sunset.js';
+export { packagingNoSecrets } from './rules/packaging-no-secrets.js';
