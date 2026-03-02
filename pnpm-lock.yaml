@@ -27,13 +27,13 @@ importers:
   packages/cli:
     dependencies:
       '@contextkit/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@contextkit/mcp':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../mcp
       '@contextkit/site':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../site
       chalk:
         specifier: ^5.4.0
@@ -86,7 +86,7 @@ importers:
   packages/mcp:
     dependencies:
       '@contextkit/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@modelcontextprotocol/sdk':
         specifier: ^1.12.0
@@ -117,7 +117,7 @@ importers:
   packages/site:
     dependencies:
       '@contextkit/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       ejs:
         specifier: ^3.1.10

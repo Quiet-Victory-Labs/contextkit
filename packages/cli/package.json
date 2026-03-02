@@ -1,21 +1,29 @@
 {
   "name": "@contextkit/cli",
   "version": "0.1.0",
+  "description": "CLI for ContextKit — lint, build, fix, and serve institutional context",
+  "license": "MIT",
+  "author": "Eric Kittelson",
+  "homepage": "https://github.com/erickittelson/ContextKit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erickittelson/ContextKit.git",
+    "directory": "packages/cli"
+  },
+  "keywords": ["contextkit", "cli", "lint", "build", "yaml", "mcp"],
   "type": "module",
   "bin": {
     "context": "./dist/index.js"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@contextkit/core": "workspace:*",
-    "@contextkit/mcp": "workspace:*",
-    "@contextkit/site": "workspace:*",
+    "@contextkit/core": "workspace:^",
+    "@contextkit/mcp": "workspace:^",
+    "@contextkit/site": "workspace:^",
     "chalk": "^5.4.0",
     "chokidar": "^4.0.0",
     "commander": "^14.0.0"

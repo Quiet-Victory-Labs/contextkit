@@ -1,6 +1,16 @@
 {
   "name": "@contextkit/mcp",
   "version": "0.1.0",
+  "description": "MCP server for exposing ContextKit context to AI agents",
+  "license": "MIT",
+  "author": "Eric Kittelson",
+  "homepage": "https://github.com/erickittelson/ContextKit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erickittelson/ContextKit.git",
+    "directory": "packages/mcp"
+  },
+  "keywords": ["contextkit", "mcp", "model-context-protocol", "ai", "llm"],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -17,15 +27,13 @@
       }
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@contextkit/core": "workspace:*",
+    "@contextkit/core": "workspace:^",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "express": "^5.1.0",
     "zod": "^3.24.0"

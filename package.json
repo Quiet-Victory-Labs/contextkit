@@ -5,7 +5,8 @@
     "build": "pnpm -r run build",
     "test": "vitest",
     "typecheck": "tsc -b",
-    "clean": "pnpm -r run clean"
+    "clean": "pnpm -r run clean",
+    "release": "pnpm build && pnpm -r publish --no-git-checks"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

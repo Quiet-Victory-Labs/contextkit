@@ -1,6 +1,16 @@
 {
   "name": "@contextkit/site",
   "version": "0.1.0",
+  "description": "Static documentation site generator for ContextKit",
+  "license": "MIT",
+  "author": "Eric Kittelson",
+  "homepage": "https://github.com/erickittelson/ContextKit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erickittelson/ContextKit.git",
+    "directory": "packages/site"
+  },
+  "keywords": ["contextkit", "site-generator", "documentation", "ejs"],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -17,15 +27,13 @@
       }
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@contextkit/core": "workspace:*",
+    "@contextkit/core": "workspace:^",
     "ejs": "^3.1.10",
     "minisearch": "^7.1.0"
   },
