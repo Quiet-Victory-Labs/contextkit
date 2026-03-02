@@ -1,0 +1,23 @@
+model: example-model
+owner: example-team
+trust: endorsed
+security: internal
+tags: [orders, revenue]
+
+datasets:
+  orders:
+    grain: "One row per order"
+    refresh: daily
+    table_type: fact
+
+fields:
+  orders.amount:
+    semantic_role: metric
+    default_aggregation: SUM
+    additive: true
+  orders.order_id:
+    semantic_role: identifier
+  orders.customer_id:
+    semantic_role: identifier
+  orders.order_date:
+    semantic_role: date

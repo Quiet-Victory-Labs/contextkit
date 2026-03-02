@@ -1,0 +1,19 @@
+model: example-model
+
+golden_queries:
+  - question: "What is total revenue?"
+    sql: |
+      SELECT SUM(amount) AS total_revenue
+      FROM orders
+    dialect: ANSI_SQL
+    tags: [revenue]
+
+business_rules:
+  - name: positive-amounts
+    definition: "Only include orders with positive amounts in revenue calculations"
+    enforcement:
+      - "Filter to amount > 0 when calculating revenue"
+    avoid:
+      - "Do not include negative or zero amounts in revenue totals"
+    tables: [orders]
+    applied_always: true

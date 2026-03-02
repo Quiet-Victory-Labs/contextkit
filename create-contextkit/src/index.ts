@@ -75,13 +75,6 @@ function main(): void {
   const createdFiles: string[] = [];
   copyDir(templatesDir, projectDir, createdFiles, projectDir, projectName, displayName);
 
-  // Create empty directories that may not have been created by copyDir
-  const emptyDirs = ['context/entities', 'context/terms'];
-  for (const dir of emptyDirs) {
-    const dirPath = path.join(projectDir, dir);
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-
   // Print created files
   for (const file of createdFiles) {
     console.log(`  Created ${file}`);
@@ -90,8 +83,9 @@ function main(): void {
   console.log('');
   console.log('Done! Next steps:');
   console.log(`  cd ${projectName}`);
-  console.log('  pnpm add -D @runcontext/cli');
-  console.log('  npx context lint');
+  console.log('  pnpm add -D @contextkit/cli');
+  console.log('  npx contextkit lint');
+  console.log('  npx contextkit tier');
 }
 
 main();

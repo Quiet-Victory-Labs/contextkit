@@ -1,0 +1,5 @@
+id: revenue
+definition: "Total value of completed orders before refunds"
+synonyms: [sales, order revenue]
+owner: example-team
+tags: [finance]
