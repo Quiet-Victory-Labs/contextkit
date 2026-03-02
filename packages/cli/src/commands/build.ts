@@ -7,8 +7,8 @@ import {
   emitManifest,
   LintEngine,
   ALL_RULES,
-} from '@contextkit/core';
-import type { Diagnostic, Severity } from '@contextkit/core';
+} from '@runcontext/core';
+import type { Diagnostic, Severity } from '@runcontext/core';
 import { formatDiagnostics } from '../formatters/pretty.js';
 import { formatDiagnosticsJson } from '../formatters/json.js';
 

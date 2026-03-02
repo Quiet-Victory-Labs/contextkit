@@ -1,4 +1,4 @@
-import type { Manifest, ManifestConcept } from '@contextkit/core';
+import type { Manifest, ManifestConcept } from '@runcontext/core';
 import type { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 
 /**

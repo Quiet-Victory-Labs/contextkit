@@ -1,6 +1,6 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import type { Manifest } from '@contextkit/core';
+import type { Manifest } from '@runcontext/core';
 
 import { readManifest } from './resources/manifest.js';
 import { readConcept, listConcepts } from './resources/concept.js';

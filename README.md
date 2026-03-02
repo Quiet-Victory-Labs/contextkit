@@ -12,7 +12,7 @@ pnpm create contextkit my-context
 cd my-context
 
 # Install the CLI
-pnpm add -D @contextkit/cli
+pnpm add -D @runcontext/cli
 
 # Edit your context files in context/
 # Then lint, build, and explore:
@@ -25,10 +25,10 @@ npx context explain example-concept
 
 | Package | Description |
 |---------|-------------|
-| `@contextkit/core` | Compiler, linter, type system, and fixer |
-| `@contextkit/cli` | CLI with lint, build, fix, dev, site, serve, explain commands |
-| `@contextkit/site` | Static documentation site generator |
-| `@contextkit/mcp` | MCP server for AI agent access |
+| `@runcontext/core` | Compiler, linter, type system, and fixer |
+| `@runcontext/cli` | CLI with lint, build, fix, dev, site, serve, explain commands |
+| `@runcontext/site` | Static documentation site generator |
+| `@runcontext/mcp` | MCP server for AI agent access |
 | `create-contextkit` | Project scaffolder (`pnpm create contextkit`) |
 
 ## Context Files

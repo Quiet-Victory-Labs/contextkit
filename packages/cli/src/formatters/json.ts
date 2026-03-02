@@ -1,4 +1,4 @@
-import type { Diagnostic } from '@contextkit/core';
+import type { Diagnostic } from '@runcontext/core';
 
 /**
  * Format diagnostics as a JSON string with 2-space indentation.

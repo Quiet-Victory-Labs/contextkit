@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Manifest } from '@contextkit/core';
+import type { Manifest } from '@runcontext/core';
 
 export const serveCommand = new Command('serve')
   .description('Start the MCP server')
@@ -21,7 +21,7 @@ export const serveCommand = new Command('serve')
       const manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf-8')) as Manifest;
 
       // Dynamic import to avoid loading MCP deps when not needed
-      const { createContextMcpServer } = await import('@contextkit/mcp');
+      const { createContextMcpServer } = await import('@runcontext/mcp');
 
       const server = createContextMcpServer(manifestData);
 

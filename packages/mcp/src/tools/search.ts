@@ -1,4 +1,4 @@
-import type { Manifest } from '@contextkit/core';
+import type { Manifest } from '@runcontext/core';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 interface SearchableItem {

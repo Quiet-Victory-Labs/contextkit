@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Command } from 'commander';
-import { generateSite } from '@contextkit/site';
-import type { Manifest } from '@contextkit/core';
+import { generateSite } from '@runcontext/site';
+import type { Manifest } from '@runcontext/core';
 
 export const siteCommand = new Command('site')
   .description('Site generator commands');

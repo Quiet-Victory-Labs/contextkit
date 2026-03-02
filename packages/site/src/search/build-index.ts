@@ -1,5 +1,5 @@
 import MiniSearch from 'minisearch';
-import type { Manifest } from '@contextkit/core';
+import type { Manifest } from '@runcontext/core';
 
 export interface SearchDocument {
   id: string;

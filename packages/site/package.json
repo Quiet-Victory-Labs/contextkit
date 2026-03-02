@@ -1,5 +1,5 @@
 {
-  "name": "@contextkit/site",
+  "name": "@runcontext/site",
   "version": "0.1.0",
   "description": "Static documentation site generator for ContextKit",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@contextkit/core": "workspace:^",
+    "@runcontext/core": "workspace:^",
     "ejs": "^3.1.10",
     "minisearch": "^7.1.0"
   },

@@ -2,7 +2,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ejs from 'ejs';
-import type { Manifest, ManifestConcept } from '@contextkit/core';
+import type { Manifest, ManifestConcept } from '@runcontext/core';
 import {
   layoutTemplate,
   indexTemplate,

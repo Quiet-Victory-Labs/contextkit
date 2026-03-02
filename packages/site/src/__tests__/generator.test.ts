@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtemp, readFile, rm, access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import type { Manifest } from '@contextkit/core';
+import type { Manifest } from '@runcontext/core';
 import { generateSite } from '../generator.js';
 import { buildSearchIndex } from '../search/build-index.js';
 

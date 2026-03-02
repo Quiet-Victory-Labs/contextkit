@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
 import chalk from 'chalk';
-import type { Manifest } from '@contextkit/core';
+import type { Manifest } from '@runcontext/core';
 
 export const explainCommand = new Command('explain')
   .description('Look up a node by ID in the manifest')

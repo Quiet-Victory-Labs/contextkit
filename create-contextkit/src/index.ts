@@ -90,7 +90,7 @@ function main(): void {
   console.log('');
   console.log('Done! Next steps:');
   console.log(`  cd ${projectName}`);
-  console.log('  pnpm add -D @contextkit/cli');
+  console.log('  pnpm add -D @runcontext/cli');
   console.log('  npx context lint');
 }
 

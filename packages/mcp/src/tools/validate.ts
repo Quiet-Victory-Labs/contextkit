@@ -6,7 +6,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 export async function validateContext(rootDir?: string): Promise<CallToolResult> {
   try {
     // Dynamic import to avoid circular dependency issues at load time
-    const { compile, LintEngine, ALL_RULES } = await import('@contextkit/core');
+    const { compile, LintEngine, ALL_RULES } = await import('@runcontext/core');
 
     const contextDir = rootDir ?? process.cwd();
 

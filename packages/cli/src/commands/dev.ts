@@ -7,8 +7,8 @@ import {
   compile,
   LintEngine,
   ALL_RULES,
-} from '@contextkit/core';
-import type { Diagnostic, Severity } from '@contextkit/core';
+} from '@runcontext/core';
+import type { Diagnostic, Severity } from '@runcontext/core';
 
 export const devCommand = new Command('dev')
   .description('Watch context files and rebuild on change')

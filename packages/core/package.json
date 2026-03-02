@@ -1,5 +1,5 @@
 {
-  "name": "@contextkit/core",
+  "name": "@runcontext/core",
   "version": "0.1.0",
   "description": "Core compiler, linter, and type system for ContextKit",
   "license": "MIT",

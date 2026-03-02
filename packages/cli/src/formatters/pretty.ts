@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { Diagnostic } from '@contextkit/core';
+import type { Diagnostic } from '@runcontext/core';
 
 /**
  * Format diagnostics as human-readable colored terminal output.

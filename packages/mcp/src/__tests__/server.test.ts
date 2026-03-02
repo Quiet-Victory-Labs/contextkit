@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Manifest } from '@contextkit/core';
+import type { Manifest } from '@runcontext/core';
 
 import { readManifest } from '../resources/manifest.js';
 import { readConcept, listConcepts } from '../resources/concept.js';
