@@ -1,0 +1,8 @@
+id: example-policy
+description: An example policy.
+rules:
+  - priority: 100
+    when:
+      tags_any: [sensitive]
+    then:
+      require_role: admin

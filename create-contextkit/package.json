@@ -1,0 +1,12 @@
+{
+  "name": "create-contextkit",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": { "create-contextkit": "./dist/index.js" },
+  "files": ["dist", "templates"],
+  "scripts": { "build": "tsup", "clean": "rm -rf dist" },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0"
+  }
+}

@@ -1,0 +1,4 @@
+project:
+  id: {{PROJECT_NAME}}
+  displayName: "{{PROJECT_DISPLAY_NAME}}"
+  version: "0.1.0"
