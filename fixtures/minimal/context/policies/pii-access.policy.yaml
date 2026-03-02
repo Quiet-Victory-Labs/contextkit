@@ -1,0 +1,8 @@
+id: pii-access
+description: PII requires elevated role.
+rules:
+  - priority: 100
+    when:
+      tags_any: [pii]
+    then:
+      require_role: data_admin
