@@ -1,0 +1,14 @@
+{
+  "name": "contextkit",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "vitest",
+    "typecheck": "tsc -b",
+    "clean": "pnpm -r run clean"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0"
+  }
+}

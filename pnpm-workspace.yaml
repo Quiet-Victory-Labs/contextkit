@@ -1,0 +1,6 @@
+packages:
+  - packages/*
+  - create-contextkit
+
+onlyBuiltDependencies:
+  - esbuild
