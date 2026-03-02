@@ -1,9 +1,0 @@
-id: gross-revenue
-definition: Revenue before any deductions such as refunds, discounts, or allowances.
-synonyms:
-  - top-line revenue
-  - total revenue
-maps_to:
-  - revenue
-owner: finance-team
-tags: [finance, glossary]

@@ -1,5 +1,0 @@
-id: unresolvable-concept
-definition: This concept depends on something that doesn't exist.
-owner: some-team
-depends_on:
-  - nonexistent-concept
