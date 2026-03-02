@@ -1,1 +1,3 @@
-export const SITE_VERSION = '0.1.0';
+export { generateSite } from './generator.js';
+export type { GenerateSiteOptions } from './generator.js';
+export { buildSearchIndex } from './search/build-index.js';
