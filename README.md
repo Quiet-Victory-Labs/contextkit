@@ -1,109 +1,87 @@
 # ContextKit
 
-Git-native compiler, linter, and MCP server for institutional context.
+AI-ready metadata governance toolkit built on [OSI v1.0](https://github.com/Open-Model-Initiative/OMI). Define governance, lineage, glossary, and query rules alongside your semantic models -- then lint, tier, explain, and expose them to AI agents via MCP.
 
-ContextKit lets you define your organization's concepts, data products, policies, ownership, and glossary as YAML files in your repo. It compiles them into a typed manifest, lints for quality, generates documentation sites, and exposes everything to AI agents via MCP.
+## Key Features
+
+- **OSI-native** -- models use the Open Semantic Interface specification
+- **Bronze / Silver / Gold tiers** -- automated maturity scoring for every model
+- **25 lint rules** -- covering schema validation, naming, ownership, descriptions, references, security, glossary, governance, lineage, query rules, and tier requirements
+- **MCP server** -- expose your full context graph to AI agents via the Model Context Protocol
+- **Static site generator** -- build browsable documentation from your context files
+- **Scaffolder** -- `pnpm create contextkit my-project` to get started
 
 ## Quick Start
 
 ```bash
 # Scaffold a new project
-pnpm create contextkit my-context
-cd my-context
+pnpm create contextkit my-project
+cd my-project
 
-# Install the CLI
-pnpm add -D @runcontext/cli
-
-# Edit your context files in context/
-# Then lint, build, and explore:
+# Lint, build, and explore
 npx context lint
 npx context build
-npx context explain example-concept
+npx context tier
+npx context explain retail-sales
 ```
 
 ## Packages
 
 | Package | Description |
 |---------|-------------|
-| `@runcontext/core` | Compiler, linter, type system, and fixer |
-| `@runcontext/cli` | CLI with lint, build, fix, dev, site, serve, explain commands |
+| `@runcontext/core` | Parser, compiler, linter (25 rules), tier engine, fixer, schema validation |
+| `@runcontext/cli` | CLI with 10 commands (see below) |
+| `@runcontext/mcp` | MCP server -- resources, tools, and prompts for AI agents |
 | `@runcontext/site` | Static documentation site generator |
-| `@runcontext/mcp` | MCP server for AI agent access |
-| `create-contextkit` | Project scaffolder (`pnpm create contextkit`) |
-
-## Context Files
-
-Define your institutional knowledge as YAML in a `context/` directory:
-
-```
-context/
-  concepts/       # Business concepts and definitions
-  products/       # Data products
-  policies/       # Access and governance policies
-  entities/       # Data entities and schemas
-  terms/          # Glossary terms
-  owners/         # Team ownership
-```
-
-Example concept (`context/concepts/gross-revenue.ctx.yaml`):
-
-```yaml
-id: gross-revenue
-definition: Total invoiced revenue before refunds or adjustments.
-owner: finance-team
-status: certified
-certified: true
-tags: [finance, metric]
-evidence:
-  - type: decision
-    ref: "context://evidence/decisions/2026-03-revenue"
-examples:
-  - label: Correct usage
-    content: "SUM(invoice_amount)"
-    kind: do
-```
+| `create-contextkit` | Project scaffolder |
 
 ## CLI Commands
 
 ```bash
-npx context init              # Initialize a new project
-npx context lint              # Lint context files
-npx context build             # Compile manifest
+npx context lint              # Lint all context files
+npx context build             # Compile and emit manifest JSON
+npx context tier [model]      # Show Bronze/Silver/Gold scorecard
+npx context explain <name>    # Look up a model, term, or owner
 npx context fix --write       # Auto-fix lint issues
-npx context dev               # Watch mode
-npx context explain <id>      # Look up a concept
-npx context site build        # Generate docs site
-npx context serve --stdio     # Start MCP server
+npx context dev               # Watch mode -- re-lint on changes
+npx context init              # Scaffold a new project structure
+npx context site              # Generate a static docs site
+npx context serve --stdio     # Start the MCP server
+npx context validate-osi <f>  # Validate a single OSI file
+```
+
+## File Structure
+
+ContextKit projects use a set of YAML file types organized by convention:
+
+```
+context/
+  models/
+    retail-sales.osi.yaml           # OSI semantic model (datasets, fields, metrics)
+  governance/
+    retail-sales.governance.yaml    # Owner, trust, security, field-level governance
+  rules/
+    retail-sales.rules.yaml         # Golden queries, business rules, guardrails, hierarchies
+  lineage/
+    retail-sales.lineage.yaml       # Upstream/downstream lineage
+  glossary/
+    revenue.term.yaml               # Glossary terms and synonyms
+  owners/
+    analytics-team.owner.yaml       # Team ownership records
+  contextkit.config.yaml            # Project configuration
 ```
 
 ## MCP Server
 
-Expose your context to AI agents via the Model Context Protocol:
+Expose your context graph to AI agents:
 
 ```bash
 npx context serve --stdio
 ```
 
-**Resources:** `context://manifest`, `context://concept/{id}`, `context://product/{id}`, `context://policy/{id}`, `context://glossary`
+**Resources:** `context://manifest`, `context://model/{name}`, `context://glossary`, `context://tier/{name}`
 
-**Tools:** `context_search`, `context_explain`, `context_validate`
-
-## Lint Rules
-
-ContextKit includes 12 built-in lint rules:
-
-- `schema/valid-yaml` — YAML schema validation
-- `naming/id-kebab-case` — IDs must be kebab-case
-- `ownership/required` — Concepts, products, entities need owners
-- `descriptions/required` — All nodes need descriptions
-- `references/resolvable` — All references must resolve
-- `glossary/no-duplicate-terms` — No duplicate term definitions
-- `concepts/certified-requires-evidence` — Certified concepts need evidence
-- `policies/unknown-subject` — Policy selectors must reference known items
-- `policies/deny-overrides-allow` — Deny rules need higher priority
-- `docs/examples-required` — Certified concepts need examples
-- `deprecation/require-sunset` — Deprecated nodes need sunset dates
-- `packaging/no-secrets` — No secrets in context files
+**Tools:** `context_search`, `context_explain`, `context_validate`, `context_tier`, `context_golden_queries`, `context_guardrails`
 
 ## License
 
