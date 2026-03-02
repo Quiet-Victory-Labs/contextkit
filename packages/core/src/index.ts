@@ -5,3 +5,4 @@ export * from './parser/index.js';
 export * from './compiler/index.js';
 export * from './linter/index.js';
 export * from './tier/index.js';
+export * from './config/index.js';
