@@ -1,0 +1,5 @@
+semantic_model:
+  - name: bad-model
+    datasets:
+      - name: test
+        source: db.test

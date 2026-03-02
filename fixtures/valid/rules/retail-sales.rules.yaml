@@ -1,0 +1,46 @@
+model: retail-sales
+
+golden_queries:
+  - question: "What is total revenue by region?"
+    sql: |
+      SELECT c.region, SUM(t.amount) AS total_revenue
+      FROM transactions t
+      JOIN customers c ON t.customer_id = c.customer_id
+      GROUP BY c.region
+      ORDER BY total_revenue DESC
+    dialect: ANSI_SQL
+    tags: [revenue, regional]
+  - question: "What is the average order value by customer segment?"
+    sql: |
+      SELECT c.segment, AVG(t.amount) AS avg_order_value
+      FROM transactions t
+      JOIN customers c ON t.customer_id = c.customer_id
+      GROUP BY c.segment
+    dialect: ANSI_SQL
+  - question: "How many unique customers purchased in the last 30 days?"
+    sql: |
+      SELECT COUNT(DISTINCT customer_id)
+      FROM transactions
+      WHERE txn_date >= CURRENT_DATE - INTERVAL '30 days'
+    dialect: ANSI_SQL
+
+business_rules:
+  - name: count-distinct-customers
+    definition: "Always use COUNT(DISTINCT customer_id) when counting customers"
+    enforcement:
+      - "Use COUNT(DISTINCT customer_id) for customer counts"
+    avoid:
+      - "Never use COUNT(*) to count customers"
+    tables: [transactions]
+    applied_always: true
+
+guardrail_filters:
+  - name: positive-amounts-only
+    filter: "amount > 0"
+    tables: [transactions]
+    reason: "Exclude refunds and adjustments from revenue calculations"
+
+hierarchies:
+  - name: geography
+    levels: [region, segment]
+    dataset: customers

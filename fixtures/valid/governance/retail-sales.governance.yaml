@@ -1,0 +1,38 @@
+model: retail-sales
+owner: analytics-team
+trust: endorsed
+security: internal
+tags: [finance, revenue, kpi]
+
+datasets:
+  transactions:
+    grain: "One row per transaction line item"
+    refresh: daily
+    table_type: fact
+    security: confidential
+  customers:
+    grain: "One row per registered customer"
+    refresh: hourly
+    table_type: dimension
+
+fields:
+  transactions.amount:
+    semantic_role: metric
+    default_aggregation: SUM
+    additive: true
+    default_filter: "amount > 0"
+  transactions.txn_id:
+    semantic_role: identifier
+  transactions.customer_id:
+    semantic_role: identifier
+    default_filter: "customer_id IS NOT NULL"
+  transactions.txn_date:
+    semantic_role: date
+  customers.customer_id:
+    semantic_role: identifier
+  customers.region:
+    semantic_role: dimension
+    sample_values: [NA, EMEA, APAC, LATAM]
+  customers.segment:
+    semantic_role: dimension
+    sample_values: [Enterprise, SMB, Consumer]

@@ -1,0 +1,104 @@
+version: "1.0"
+
+semantic_model:
+  - name: retail-sales
+    description: Retail sales analytics model
+    ai_context:
+      instructions: "Use for sales revenue and customer analysis"
+      synonyms: ["sales model", "revenue model"]
+
+    datasets:
+      - name: transactions
+        source: warehouse.public.transactions
+        primary_key: [txn_id]
+        description: "Sales transactions fact table"
+        fields:
+          - name: txn_id
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: txn_id
+            description: Unique transaction identifier
+          - name: customer_id
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: customer_id
+            description: Foreign key to customers
+            dimension:
+              is_time: false
+          - name: amount
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: amount
+            description: Transaction amount in USD
+            ai_context:
+              synonyms: ["revenue", "sales amount"]
+          - name: txn_date
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: txn_date
+            description: Transaction date
+            dimension:
+              is_time: true
+
+      - name: customers
+        source: warehouse.public.customers
+        primary_key: [customer_id]
+        description: "Customer dimension table"
+        fields:
+          - name: customer_id
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: customer_id
+            description: Unique customer identifier
+          - name: region
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: region
+            description: Customer region
+            dimension:
+              is_time: false
+            ai_context:
+              synonyms: ["geography", "area"]
+          - name: segment
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: segment
+            description: Customer segment
+            dimension:
+              is_time: false
+
+    relationships:
+      - name: txn_to_customer
+        from: transactions
+        to: customers
+        from_columns: [customer_id]
+        to_columns: [customer_id]
+
+    metrics:
+      - name: total_revenue
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: "SUM(transactions.amount)"
+        description: Total revenue across all transactions
+        ai_context:
+          synonyms: ["total sales", "gross revenue"]
+      - name: avg_order_value
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: "AVG(transactions.amount)"
+        description: Average transaction amount
+      - name: customer_count
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: "COUNT(DISTINCT transactions.customer_id)"
+        description: Unique customer count

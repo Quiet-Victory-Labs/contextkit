@@ -1,0 +1,5 @@
+id: revenue
+definition: "Total value of completed transactions before refunds"
+synonyms: [sales, gross revenue, top-line]
+owner: analytics-team
+tags: [finance, kpi]

@@ -1,0 +1,13 @@
+model: retail-sales
+
+upstream:
+  - source: erp.orders
+    type: pipeline
+    pipeline: dbt-daily
+    refresh: daily
+    notes: "Raw orders transformed into transactions"
+
+downstream:
+  - target: executive-dashboard
+    type: dashboard
+    tool: tableau
