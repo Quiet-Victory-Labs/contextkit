@@ -143,7 +143,7 @@ describe('osiDocumentSchema', () => {
     const result = osiDocumentSchema.safeParse(input);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.semantic_model[0].ai_context).toBe('This is a string context');
+      expect(result.data.semantic_model[0]!.ai_context).toBe('This is a string context');
     }
   });
 
@@ -161,7 +161,7 @@ describe('osiDocumentSchema', () => {
     const result = osiDocumentSchema.safeParse(input);
     expect(result.success).toBe(true);
     if (result.success) {
-      const ctx = result.data.semantic_model[0].ai_context;
+      const ctx = result.data.semantic_model[0]!.ai_context;
       expect(typeof ctx).toBe('object');
     }
   });

@@ -1,0 +1,12 @@
+model: example-model
+
+upstream:
+  - source: source-system.raw-data
+    type: pipeline
+    refresh: daily
+    notes: Raw data ingested daily via ETL pipeline
+
+downstream:
+  - target: analytics-dashboard
+    type: dashboard
+    notes: Executive KPI dashboard

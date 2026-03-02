@@ -9,7 +9,8 @@ import {
   computeTier,
   computeAllTiers,
 } from '../index.js';
-import type { ContextGraph, Diagnostic, Manifest } from '../types/index.js';
+import type { ContextGraph, Diagnostic } from '../types/index.js';
+import type { Manifest } from '../compiler/emit.js';
 
 const FIXTURES_VALID = path.resolve(__dirname, '../../../../fixtures/valid');
 const FIXTURES_INVALID = path.resolve(__dirname, '../../../../fixtures/invalid');
@@ -162,7 +163,7 @@ describe('integration: manifest emit', () => {
     expect(manifest.terms['revenue']).toBeDefined();
     expect(manifest.owners['analytics-team']).toBeDefined();
     expect(manifest.tiers['retail-sales']).toBeDefined();
-    expect(manifest.tiers['retail-sales'].tier).toBe('gold');
+    expect(manifest.tiers['retail-sales']!.tier).toBe('gold');
 
     // JSON round-trip should succeed without errors
     const json = JSON.stringify(manifest);
@@ -309,10 +310,10 @@ describe('integration: relationships and metrics', () => {
     expect(lineage).toBeDefined();
     expect(lineage!.upstream).toBeDefined();
     expect(lineage!.upstream!.length).toBe(1);
-    expect(lineage!.upstream![0].source).toBe('erp.orders');
+    expect(lineage!.upstream![0]!.source).toBe('erp.orders');
     expect(lineage!.downstream).toBeDefined();
     expect(lineage!.downstream!.length).toBe(1);
-    expect(lineage!.downstream![0].target).toBe('executive-dashboard');
+    expect(lineage!.downstream![0]!.target).toBe('executive-dashboard');
 
     // Glossary term
     const term = graph.terms.get('revenue');

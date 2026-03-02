@@ -136,20 +136,20 @@ describe('emitManifest', () => {
     const manifest = emitManifest(graph, defaultConfig);
 
     expect(manifest.models['sales']).toBeDefined();
-    expect(manifest.models['sales'].name).toBe('sales');
-    expect(manifest.models['sales'].description).toBe('Sales model');
+    expect(manifest.models['sales']!.name).toBe('sales');
+    expect(manifest.models['sales']!.description).toBe('Sales model');
   });
 
   it('preserves governance, rules, lineage, terms, owners, tiers data', () => {
     const graph = buildTestGraph();
     const manifest = emitManifest(graph, defaultConfig);
 
-    expect(manifest.governance['sales'].owner).toBe('data-team');
-    expect(manifest.rules['sales'].golden_queries).toHaveLength(1);
-    expect(manifest.lineage['sales'].upstream).toHaveLength(1);
-    expect(manifest.terms['revenue'].definition).toBe('Total sales');
-    expect(manifest.owners['data-team'].email).toBe('data@co.com');
-    expect(manifest.tiers['sales'].tier).toBe('silver');
+    expect(manifest.governance['sales']!.owner).toBe('data-team');
+    expect(manifest.rules['sales']!.golden_queries).toHaveLength(1);
+    expect(manifest.lineage['sales']!.upstream).toHaveLength(1);
+    expect(manifest.terms['revenue']!.definition).toBe('Total sales');
+    expect(manifest.owners['data-team']!.email).toBe('data@co.com');
+    expect(manifest.tiers['sales']!.tier).toBe('silver');
   });
 
   it('includes a valid ISO generatedAt timestamp', () => {

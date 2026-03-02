@@ -12,6 +12,7 @@ import {
 
 export interface ValidateResult {
   kind: FileKind;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- validated data varies by FileKind
   data?: any;
   diagnostics: Diagnostic[];
 }

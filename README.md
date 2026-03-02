@@ -1,5 +1,9 @@
 # ContextKit
 
+[![CI](https://github.com/erickittelson/ContextKit/actions/workflows/ci.yml/badge.svg)](https://github.com/erickittelson/ContextKit/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm](https://img.shields.io/npm/v/@runcontext/core)](https://www.npmjs.com/package/@runcontext/core)
+
 AI-ready metadata governance toolkit built on [OSI v1.0](https://github.com/Open-Model-Initiative/OMI). Define governance, lineage, glossary, and query rules alongside your semantic models -- then lint, tier, explain, and expose them to AI agents via MCP.
 
 ## Key Features
@@ -10,6 +14,16 @@ AI-ready metadata governance toolkit built on [OSI v1.0](https://github.com/Open
 - **MCP server** -- expose your full context graph to AI agents via the Model Context Protocol
 - **Static site generator** -- build browsable documentation from your context files
 - **Scaffolder** -- `pnpm create contextkit my-project` to get started
+
+## Installation
+
+```bash
+# Scaffold a new project
+pnpm create contextkit my-project
+
+# Or add to an existing project
+npm install -D @runcontext/cli
+```
 
 ## Quick Start
 
@@ -82,6 +96,10 @@ npx context serve --stdio
 **Resources:** `context://manifest`, `context://model/{name}`, `context://glossary`, `context://tier/{name}`
 
 **Tools:** `context_search`, `context_explain`, `context_validate`, `context_tier`, `context_golden_queries`, `context_guardrails`
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ## License
 

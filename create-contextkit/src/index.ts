@@ -83,9 +83,9 @@ function main(): void {
   console.log('');
   console.log('Done! Next steps:');
   console.log(`  cd ${projectName}`);
-  console.log('  pnpm add -D @contextkit/cli');
-  console.log('  npx contextkit lint');
-  console.log('  npx contextkit tier');
+  console.log('  pnpm add -D @runcontext/cli');
+  console.log('  npx context lint');
+  console.log('  npx context tier');
 }
 
 main();

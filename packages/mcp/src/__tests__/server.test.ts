@@ -240,7 +240,7 @@ describe('MCP Server', () => {
   describe('Resource: glossary', () => {
     it('manifest terms contain the test terms', () => {
       expect(manifest.terms['revenue']).toBeDefined();
-      expect(manifest.terms['revenue'].definition).toBe('Total value of completed transactions');
+      expect(manifest.terms['revenue']!.definition).toBe('Total value of completed transactions');
       expect(manifest.terms['customer']).toBeDefined();
     });
   });
@@ -248,7 +248,7 @@ describe('MCP Server', () => {
   describe('Resource: tier', () => {
     it('manifest tiers contain the retail-sales tier', () => {
       expect(manifest.tiers['retail-sales']).toBeDefined();
-      expect(manifest.tiers['retail-sales'].tier).toBe('gold');
+      expect(manifest.tiers['retail-sales']!.tier).toBe('gold');
     });
   });
 
@@ -344,8 +344,8 @@ describe('MCP Server', () => {
     it('finds golden queries matching a question', () => {
       const results = findGoldenQueries(manifest, 'total revenue by region');
       expect(results.length).toBeGreaterThan(0);
-      expect(results[0].model).toBe('retail-sales');
-      expect(results[0].score).toBeGreaterThan(0);
+      expect(results[0]!.model).toBe('retail-sales');
+      expect(results[0]!.score).toBeGreaterThan(0);
     });
 
     it('returns empty for non-matching question', () => {
@@ -356,7 +356,7 @@ describe('MCP Server', () => {
     it('results are sorted by score descending', () => {
       const results = findGoldenQueries(manifest, 'transactions customers region');
       if (results.length >= 2) {
-        expect(results[0].score).toBeGreaterThanOrEqual(results[1].score);
+        expect(results[0]!.score).toBeGreaterThanOrEqual(results[1]!.score);
       }
     });
   });

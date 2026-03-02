@@ -20,7 +20,8 @@ export const siteCommand = new Command('site')
       const manifest = emitManifest(graph, config);
 
       // Try to import the site generator
-      let buildSite: ((manifest: unknown, config: unknown, outputDir: string) => Promise<void>) | undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic import
+      let buildSite: ((...args: any[]) => Promise<void>) | undefined;
       try {
         const siteModule = await import('@runcontext/site');
         buildSite = siteModule.buildSite;
