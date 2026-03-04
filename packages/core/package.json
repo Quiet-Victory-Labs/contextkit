@@ -46,16 +46,22 @@
     "zod": "^3.24.0"
   },
   "peerDependencies": {
-    "duckdb": "^1.0.0"
+    "duckdb": "^1.0.0",
+    "pg": "^8.0.0"
   },
   "peerDependenciesMeta": {
     "duckdb": {
+      "optional": true
+    },
+    "pg": {
       "optional": true
     }
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
+    "@types/pg": "^8.18.0",
     "duckdb": "^1.4.4",
+    "pg": "^8.19.0",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0",
     "vitest": "^3.2.0"
