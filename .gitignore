@@ -3,3 +3,4 @@ dist/
 .contextkit-cache/
 *.tsbuildinfo
 .DS_Store
+.worktrees/
