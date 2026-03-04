@@ -1,5 +1,6 @@
 import type { MetadataTier } from './tier.js';
 import type { Severity } from './diagnostics.js';
+import type { DataSourceConfig } from '../adapters/types.js';
 
 export interface LintConfig {
   severity_overrides?: Record<string, Severity | 'off'>;
@@ -22,4 +23,5 @@ export interface ContextKitConfig {
   lint?: LintConfig;
   site?: SiteConfig;
   mcp?: McpConfig;
+  data_sources?: Record<string, DataSourceConfig>;
 }

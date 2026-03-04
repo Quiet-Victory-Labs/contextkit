@@ -18,6 +18,12 @@ export const mcpConfigSchema = z.object({
   port: z.number().optional(),
 });
 
+export const dataSourceConfigSchema = z.object({
+  adapter: z.enum(['duckdb', 'postgres']),
+  path: z.string().optional(),
+  connection: z.string().optional(),
+});
+
 export const contextKitConfigSchema = z.object({
   context_dir: z.string().default('context'),
   output_dir: z.string().default('dist'),
@@ -25,4 +31,5 @@ export const contextKitConfigSchema = z.object({
   lint: lintConfigSchema.optional(),
   site: siteConfigSchema.optional(),
   mcp: mcpConfigSchema.optional(),
+  data_sources: z.record(z.string(), dataSourceConfigSchema).optional(),
 });
