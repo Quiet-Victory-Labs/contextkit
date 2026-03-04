@@ -7,3 +7,5 @@ export * from './linter/index.js';
 export * from './tier/index.js';
 export * from './config/index.js';
 export * from './fixer/index.js';
+export * from './adapters/index.js';
+export * from './introspect/index.js';
