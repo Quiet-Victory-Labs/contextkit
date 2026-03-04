@@ -10,7 +10,13 @@
     "url": "https://github.com/erickittelson/ContextKit.git",
     "directory": "packages/core"
   },
-  "keywords": ["context", "compiler", "linter", "yaml", "institutional-knowledge"],
+  "keywords": [
+    "context",
+    "compiler",
+    "linter",
+    "yaml",
+    "institutional-knowledge"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -27,7 +33,9 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"
@@ -37,8 +45,17 @@
     "yaml": "^2.7.0",
     "zod": "^3.24.0"
   },
+  "peerDependencies": {
+    "duckdb": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "duckdb": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/node": "^25.3.3",
+    "duckdb": "^1.4.4",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0",
     "vitest": "^3.2.0"
