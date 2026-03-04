@@ -28,7 +28,7 @@ export function inferGrain(tableName: string, columns: ColumnInfo[]): string {
   const pkCols = columns.filter((c) => c.is_primary_key);
 
   if (pkCols.length === 1) {
-    return `one row per ${tableName} identified by ${pkCols[0].name}`;
+    return `one row per ${tableName} identified by ${pkCols[0]!.name}`;
   }
   if (pkCols.length > 1) {
     return `one row per unique combination of ${pkCols.map((c) => c.name).join(', ')}`;

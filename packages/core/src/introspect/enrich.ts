@@ -49,7 +49,7 @@ export function suggestEnrichments(
     if (failedLabels.some((label) => label.includes('tags'))) {
       result.governance = result.governance ?? {};
       result.governance.tags = datasetNames.length > 0
-        ? [datasetNames[0].replace(/_/g, '-'), 'analytics']
+        ? [datasetNames[0]!.replace(/_/g, '-'), 'analytics']
         : ['analytics', 'data'];
     }
 

@@ -12,6 +12,8 @@ import { siteCommand } from './commands/site.js';
 import { serveCommand } from './commands/serve.js';
 import { validateOsiCommand } from './commands/validate-osi.js';
 import { introspectCommand } from './commands/introspect.js';
+import { verifyCommand } from './commands/verify.js';
+import { enrichCommand } from './commands/enrich.js';
 
 const program = new Command();
 
@@ -32,5 +34,7 @@ program.addCommand(siteCommand);
 program.addCommand(serveCommand);
 program.addCommand(validateOsiCommand);
 program.addCommand(introspectCommand);
+program.addCommand(verifyCommand);
+program.addCommand(enrichCommand);
 
 program.parse();
