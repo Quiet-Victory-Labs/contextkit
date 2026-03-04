@@ -5,4 +5,4 @@ export {
   inferSemanticRole,
   inferAggregation,
 } from './heuristics.js';
-// enrich.js will be added in Task 10
+export { suggestEnrichments, type EnrichResult } from './enrich.js';
