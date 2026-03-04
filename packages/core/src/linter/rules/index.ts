@@ -28,6 +28,16 @@ import { rulesBusinessRulesExist } from './rules-business-rules-exist.js';
 import { rulesGuardrailsExist } from './rules-guardrails-exist.js';
 import { rulesHierarchiesExist } from './rules-hierarchies-exist.js';
 
+// Data-aware rules (require dataValidation on the graph)
+import { dataSourceExists } from './data-source-exists.js';
+import { dataFieldsExist } from './data-fields-exist.js';
+import { dataFieldTypesCompatible } from './data-field-types-compatible.js';
+import { dataSampleValuesAccurate } from './data-sample-values-accurate.js';
+import { dataGoldenQueriesExecute } from './data-golden-queries-execute.js';
+import { dataGoldenQueriesNonempty } from './data-golden-queries-nonempty.js';
+import { dataGuardrailsValidSql } from './data-guardrails-valid-sql.js';
+import { dataRowCountsNonzero } from './data-row-counts-nonzero.js';
+
 // Composite tier rules
 import { tierBronze } from './tier-bronze.js';
 import { tierSilver } from './tier-silver.js';
@@ -59,6 +69,15 @@ export {
   rulesBusinessRulesExist,
   rulesGuardrailsExist,
   rulesHierarchiesExist,
+  // Data-aware
+  dataSourceExists,
+  dataFieldsExist,
+  dataFieldTypesCompatible,
+  dataSampleValuesAccurate,
+  dataGoldenQueriesExecute,
+  dataGoldenQueriesNonempty,
+  dataGuardrailsValidSql,
+  dataRowCountsNonzero,
   // Composite tier
   tierBronze,
   tierSilver,
@@ -91,6 +110,15 @@ export const ALL_RULES: LintRule[] = [
   rulesBusinessRulesExist,
   rulesGuardrailsExist,
   rulesHierarchiesExist,
+  // Data-aware (8)
+  dataSourceExists,
+  dataFieldsExist,
+  dataFieldTypesCompatible,
+  dataSampleValuesAccurate,
+  dataGoldenQueriesExecute,
+  dataGoldenQueriesNonempty,
+  dataGuardrailsValidSql,
+  dataRowCountsNonzero,
   // Composite tier (3)
   tierBronze,
   tierSilver,
