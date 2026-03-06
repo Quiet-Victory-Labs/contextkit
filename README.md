@@ -5,169 +5,189 @@
 <h1 align="center">ContextKit</h1>
 
 <p align="center">
-  <strong>Open-source semantic layer governance for AI agents</strong>
+  <strong>Tell your AI agent to build your semantic layer. It uses ContextKit to do it.</strong>
 </p>
 
 <p align="center">
   <a href="https://github.com/erickittelson/ContextKit/actions/workflows/ci.yml"><img src="https://github.com/erickittelson/ContextKit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://www.npmjs.com/package/@runcontext/cli"><img src="https://img.shields.io/npm/v/@runcontext/cli" alt="npm" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
-  <a href="https://img.shields.io/badge/OSI-Open_Semantic_Interchange-c9a55a"><img src="https://img.shields.io/badge/OSI-Open_Semantic_Interchange-c9a55a" alt="OSI" /></a>
+  <a href="https://github.com/open-semantic-interchange/OSI"><img src="https://img.shields.io/badge/OSI-Open_Semantic_Interchange-c9a55a" alt="OSI" /></a>
 </p>
 
 <p align="center">
-  <a href="https://contextkit.dev"><strong>Documentation</strong></a> · <a href="https://contextkit.dev/getting-started/quick-start/"><strong>Getting Started</strong></a> · <a href="https://contextkit.dev/cli/overview/"><strong>CLI Reference</strong></a>
+  <a href="https://contextkit.dev"><strong>Documentation</strong></a> · <a href="https://contextkit.dev/getting-started/quick-start/"><strong>Quick Start</strong></a> · <a href="https://contextkit.dev/cli/overview/"><strong>CLI Reference</strong></a> · <a href="https://github.com/open-semantic-interchange/OSI"><strong>OSI Spec</strong></a>
 </p>
 
 ---
 
-**Your data already has a schema. ContextKit gives it meaning.**
+## The Problem
 
-ContextKit transforms raw database schemas into **AI-ready semantic layers** built on the [Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI) specification. It provides end-to-end metadata governance — from database introspection and smart driver detection, to interactive table selection, AI-guided metadata curation, and serving enriched context to AI agents via a built-in [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server.
+AI agents querying databases today see table and column names — but they don't understand what the data *means*. They don't know which filters are required, how metrics should be aggregated, or which joins are safe. Every query is a guess.
 
-Point it at any database and ContextKit scaffolds structured, OSI-compliant metadata — descriptions, ownership, lineage, business rules, golden queries, guardrails — then lints, scores (Bronze → Silver → Gold), and serves that semantic layer to LLMs, copilots, and autonomous agents.
+## The Solution
 
----
-
-## Why ContextKit?
-
-AI agents querying databases today face a fundamental problem: they can see table and column names, but they don't understand what the data *means*. They don't know which filters are required, how metrics should be aggregated, or which joins are safe.
-
-ContextKit solves this by creating a governance layer between your database and your AI tools:
+ContextKit is a CLI that any AI agent can use to build and serve a semantic layer for your database. The agent connects to your data, introspects the schema, and works with you to curate the metadata — descriptions, business rules, golden queries, guardrails — until it reaches Gold tier. Then it serves that semantic layer to other AI agents via [MCP](https://modelcontextprotocol.io), so they generate correct SQL instead of guessing.
 
 ```
-Database  →  ContextKit  →  AI Agent
-(schema)     (meaning)      (correct SQL)
+You: "Build my semantic layer for this DuckDB"
+Agent: runs context setup → introspects → scaffolds metadata
+Agent: runs context enrich → auto-fills descriptions, types, lineage
+Agent: runs context tier → "You're at Silver. Gold needs semantic roles and golden queries."
+You: "The revenue field should always be SUM'd, never AVG'd"
+Agent: updates governance YAML → runs context lint → "3 issues remaining"
+Agent: runs context tier → "Gold ✓"
+Agent: runs context serve → MCP server live, all agents get curated context
 ```
 
-Without ContextKit, an agent guesses. With it, the agent knows:
-- That `revenue` should be `SUM`'d, never `AVG`'d
-- That queries on `transactions` must filter `WHERE status = 'completed'`
-- That `customer_id` joins `orders` to `customers` as a many-to-one
-- That "demand signal" means review keywords like *wait*, *crowded*, *busy*
+Built on the [Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI) specification.
 
 ---
 
 ## Quick Start
 
-### From scratch — point at any database
+### Let an AI agent do it
+
+Add ContextKit as an MCP server in Claude Code, Cursor, or any agentic coding platform:
+
+```json
+{
+  "mcpServers": {
+    "contextkit": {
+      "command": "npx",
+      "args": ["@runcontext/cli", "serve", "--stdio"]
+    }
+  }
+}
+```
+
+Then tell the agent: *"Use ContextKit to build a semantic layer for my database."*
+
+The agent has access to `context_search`, `context_explain`, `context_validate`, `context_tier`, `context_golden_queries`, and `context_guardrails` — everything it needs to build and verify the metadata with you.
+
+### Or do it yourself
 
 ```bash
 npm install -g @runcontext/cli
 
 # Interactive wizard: introspect → scaffold → enrich
 context setup
-```
 
-### From a new project
-
-```bash
-npx create-contextkit my-project
-cd my-project
-context lint
-context tier
-```
-
-### From an existing project
-
-```bash
-npm install -D @runcontext/cli
-
-# Scaffold metadata from a database
+# Or step by step:
 context introspect --db duckdb://warehouse.duckdb
-
-# Enrich to Silver automatically
 context enrich --target silver --apply --source default
-
-# See what Gold requires
 context tier
 ```
+
+### Or edit visually
+
+```bash
+# Open the interactive metadata editor in your browser
+context dev --studio
+```
+
+The visual editor lets you curate descriptions, semantic roles, golden queries, and business rules without touching YAML. Changes save back to disk and update the tier scorecard live.
 
 ---
 
-## The Tier System
+## How It Works
 
-ContextKit scores metadata maturity on three tiers. Each tier unlocks new capabilities:
+```
+Database  →  context introspect  →  YAML metadata (Bronze)
+                                        ↓
+                              context enrich (Silver)
+                                        ↓
+                          Human/agent curation (Gold)
+                                        ↓
+                              context serve (MCP)
+                                        ↓
+                        AI agents get curated context
+```
 
-### Bronze — Discoverable
+### The Tier System
 
-The minimum for catalog entry. Data is findable, described, and owned.
+ContextKit scores metadata maturity on three tiers:
 
-| Requirement | What it means |
-|---|---|
-| Descriptions | Every model, dataset, and field has a human-readable description |
-| Ownership | A team or person is accountable |
-| Security | Classification level is set |
-| Grain | Each dataset declares what a single row represents |
-| Table type | Fact, Dimension, Bridge, Snapshot, Event, Aggregate, or View |
+**Bronze — Discoverable.** Every model, dataset, and field has a description, an owner, and a security classification. The minimum for catalog entry.
 
-### Silver — Trusted
+**Silver — Trusted.** Adds trust status, glossary links, lineage, sample values, refresh cadence, and tags. Bridges raw tables to business concepts. `context enrich` gets you here automatically.
 
-Adds business context and reliability signals. Bridges raw tables to business concepts.
+**Gold — AI-Ready.** Semantic roles on every field, aggregation rules for metrics, guardrail filters, golden queries, business rules, hierarchies, explicit relationships, and AI context. This is what makes agents generate correct SQL. It requires human curation — and that's where the real value is.
 
-| Requirement | What it means |
-|---|---|
-| Trust status | Endorsed, Warning, or Deprecated |
-| Glossary links | Key columns linked to defined business terms |
-| Lineage | Upstream source systems documented |
-| Sample values | Representative values for dimension fields |
-| Refresh cadence | How often the data updates |
-| Tags | Domain and project classification |
+---
 
-### Gold — AI-Ready
+## What Gold Metadata Gives an Agent
 
-Metadata is structured enough for AI agents to autonomously generate correct SQL.
+Without ContextKit, an agent guesses. With it, the agent knows:
 
-| Requirement | What it means |
-|---|---|
-| Semantic roles | Every field classified: Dimension, Metric, Identifier, or Date |
-| Aggregation rules | Default `SUM`, `AVG`, `COUNT`, or `COUNT DISTINCT` per metric |
-| Guardrail filters | Required `WHERE` clauses for correct interpretation |
-| Golden queries | Curated SQL templates for common business questions |
-| Business rules | Enforcement rules (must-do) and avoid patterns (must-not-do) |
-| Hierarchies | Drill paths (e.g., Region → City → Zip) |
-| Relationships | Explicit joins with cardinality and nullability |
-| AI context | Natural language instructions for AI agents |
-
-**Key insight:** `context introspect` + `context enrich` gets you to Silver automatically. Gold requires human curation — that's where the real value is.
+- That `revenue` should be `SUM`'d, never `AVG`'d
+- That queries on `transactions` must filter `WHERE status = 'completed'`
+- That `customer_id` joins `orders` to `customers` as a many-to-one
+- That "demand signal" means review keywords like *wait*, *crowded*, *busy*
+- Exactly which SQL to use for "show me top customers by revenue last quarter"
 
 ---
 
 ## CLI Reference
 
-ContextKit ships 15 commands:
-
-### Core Workflow
+15 commands — one package, everything included:
 
 ```bash
+# Build the semantic layer
 context setup                    # Interactive wizard — database to metadata in one flow
 context introspect               # Scan a database → scaffold Bronze-level OSI metadata
 context enrich --target silver   # Auto-enrich metadata toward a target tier
-context enrich --target gold     # Suggest Gold-level enrichments
 context lint                     # Run all lint rules against context files
 context fix --write              # Auto-fix lint issues where possible
 context build                    # Compile context files → emit manifest JSON
 context tier [model]             # Show Bronze/Silver/Gold scorecard
-```
 
-### Exploration
-
-```bash
+# Explore and verify
 context explain <name>           # Look up any model, term, or owner
-context rules                    # List all lint rules with tier, severity, fixability
-context validate-osi <file>      # Validate a single OSI file against the schema
+context rules                    # List all 40 lint rules with tier, severity, fixability
+context validate-osi <file>      # Validate a single OSI file against the spec
 context verify                   # Check metadata accuracy against a live database
-```
 
-### Serving
-
-```bash
+# Serve to agents and humans
 context serve --stdio            # Start MCP server over stdio (for Claude, Cursor, etc.)
 context serve --http --port 3000 # Start MCP server over HTTP
 context site                     # Generate a static documentation site
 context dev                      # Watch mode — re-lint on file changes
+context dev --studio             # Interactive visual editor in the browser
 context init                     # Scaffold a new project structure
 ```
+
+---
+
+## MCP Server
+
+The MCP server is how AI agents consume your semantic layer. Start it, and any MCP-compatible agent gets full access to your curated metadata.
+
+```bash
+context serve --stdio            # for Claude Code, Cursor, Windsurf
+context serve --http --port 3000 # for multi-agent or remote setups
+```
+
+**Resources** — context an agent can pull:
+
+| Resource | Description |
+|---|---|
+| `context://manifest` | Full compiled manifest with all models, governance, and rules |
+| `context://model/{name}` | Single model with datasets, fields, relationships, metrics |
+| `context://glossary` | All business term definitions and synonyms |
+| `context://tier/{name}` | Tier scorecard for a model |
+| `context://data-product/{name}` | Export a model as a portable data product YAML |
+
+**Tools** — actions an agent can invoke:
+
+| Tool | Description |
+|---|---|
+| `context_search` | Full-text search across models, fields, terms, and owners |
+| `context_explain` | Look up any entity by name and get full details |
+| `context_validate` | Run lint rules and return diagnostics |
+| `context_tier` | Get the current tier scorecard |
+| `context_golden_queries` | Retrieve curated SQL templates for a model |
+| `context_guardrails` | Get required filters and business rules for safe queries |
 
 ---
 
@@ -194,94 +214,13 @@ context/
 contextkit.config.yaml               # Project configuration and data source connections
 ```
 
-**Separation of concerns:** The OSI model file (`*.osi.yaml`) defines the schema. Governance, rules, lineage, and glossary are companion files that ContextKit merges at build time. OSI files are never modified by ContextKit tools.
-
----
-
-## MCP Server
-
-Expose your entire context graph to AI agents via the [Model Context Protocol](https://modelcontextprotocol.io):
-
-```bash
-# stdio transport (for Claude Code, Cursor, etc.)
-context serve --stdio
-
-# HTTP transport (for multi-agent or remote setups)
-context serve --http --port 3000
-```
-
-### Configure in Claude Code
-
-Add to your project's `.claude/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "contextkit": {
-      "command": "npx",
-      "args": ["@runcontext/cli", "serve", "--stdio"]
-    }
-  }
-}
-```
-
-Or for HTTP mode:
-
-```json
-{
-  "mcpServers": {
-    "contextkit": {
-      "url": "http://localhost:3000/mcp"
-    }
-  }
-}
-```
-
-### What the MCP Server Exposes
-
-**Resources** — read-only context an agent can pull:
-
-| Resource | Description |
-|---|---|
-| `context://manifest` | Full compiled manifest with all models, governance, and rules |
-| `context://model/{name}` | Single model with datasets, fields, relationships, metrics |
-| `context://glossary` | All business term definitions and synonyms |
-| `context://tier/{name}` | Tier scorecard for a model |
-| `context://data-product/template` | Blank OSI data product YAML template |
-| `context://data-product/{name}` | Export a model as a portable data product YAML |
-
-**Tools** — actions an agent can invoke:
-
-| Tool | Description |
-|---|---|
-| `context_search` | Full-text search across models, fields, terms, and owners |
-| `context_explain` | Look up any entity by name and get full details |
-| `context_validate` | Run lint rules and return diagnostics |
-| `context_tier` | Get the current tier scorecard |
-| `context_golden_queries` | Retrieve curated SQL templates for a model |
-| `context_guardrails` | Get required filters and business rules for safe queries |
-
----
-
-## 40 Lint Rules
-
-ContextKit ships 40 rules across schema validation, governance, security, data accuracy, and tier requirements:
-
-| Tier | Count | Examples |
-|---|---|---|
-| **Bronze** | 12 | Descriptions required, ownership required, grain statements, security classification, valid schema, no secrets |
-| **Silver** | 3 | Trust status set, refresh cadence, upstream lineage exists |
-| **Gold** | 14 | Semantic roles on all fields, aggregation rules for metrics, golden query minimum, relationship coverage, description quality |
-| **Data** | 8 | Source tables exist, fields exist, types compatible, sample values accurate, golden queries execute, guardrails valid SQL |
-| **Composite** | 3 | Bronze/Silver/Gold tier requirement checks |
-
-Run `context rules` to see the full list with severity and auto-fix support.
+The OSI model file defines the schema per the [OSI specification](https://github.com/open-semantic-interchange/OSI). Governance, rules, lineage, and glossary are companion files that ContextKit merges at build time.
 
 ---
 
 ## Database Support
 
-ContextKit connects to 9 database engines for introspection, enrichment, and verification:
+9 database engines — install only the drivers you need:
 
 | Adapter | Connection |
 |---|---|
@@ -295,40 +234,19 @@ ContextKit connects to 9 database engines for introspection, enrichment, and ver
 | **ClickHouse** | `--db clickhouse://host:8123` |
 | **Databricks** | Config file only |
 
-Each adapter uses optional peer dependencies — install only the drivers you need. If a driver is missing, the setup wizard offers to install it automatically. The setup wizard also auto-detects databases from your MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop).
-
-Configure in `contextkit.config.yaml`:
-
-```yaml
-context_dir: context
-data_sources:
-  default:
-    adapter: duckdb
-    path: ./warehouse.duckdb
-  production:
-    adapter: postgres
-    connection: postgres://user:pass@host:5432/analytics
-```
+The setup wizard auto-detects databases from your MCP server configs and offers to install missing drivers automatically.
 
 ---
 
-## Static Documentation Site
+## 40 Lint Rules
 
-Generate a browsable site from your context files:
-
-```bash
-context build && context site
-```
-
-Produces a `site/` directory with:
-- **Sidebar navigation** — browse all models with tier badges at a glance
-- **Model pages** — datasets, fields, schema browser, rules, lineage, tier scorecard
-- **Glossary** — all business terms with filterable definitions and linked fields
-- **Owner pages** — team ownership with governed models
-- **Search** — full-text search across all entities
-- **Docs link** — links back to the full ContextKit documentation site
-
-Serve locally or deploy anywhere static files are hosted.
+| Tier | Count | Examples |
+|---|---|---|
+| **Bronze** | 12 | Descriptions required, ownership required, grain, security classification, valid schema |
+| **Silver** | 3 | Trust status set, refresh cadence, upstream lineage |
+| **Gold** | 14 | Semantic roles, aggregation rules, golden queries, relationship coverage, description quality |
+| **Data** | 8 | Source tables exist, fields exist, types match, golden queries execute, guardrails valid SQL |
+| **Composite** | 3 | Bronze/Silver/Gold tier requirement checks |
 
 ---
 
@@ -338,62 +256,12 @@ Serve locally or deploy anywhere static files are hosted.
 npm install @runcontext/cli
 ```
 
-That's it — one package, everything included: compiler, linter, tier engine, MCP server, site generator, introspector, enricher, and all 15 CLI commands.
+One package — compiler, linter, tier engine, MCP server, site generator, introspector, enricher, visual editor, and all 15 CLI commands.
 
 | Package | Description |
 |---|---|
 | [`@runcontext/cli`](https://www.npmjs.com/package/@runcontext/cli) | The full toolkit — install this |
 | [`create-contextkit`](https://www.npmjs.com/package/create-contextkit) | Project scaffolder (`npx create-contextkit my-project`) |
-
----
-
-## End-to-End Example
-
-```bash
-# 1. Start with a database
-context setup
-# → Detects your DuckDB, introspects tables, scaffolds metadata
-
-# 2. Check where you are
-context tier
-# → my-model: BRONZE
-
-# 3. Auto-enrich to Silver
-context enrich --target silver --apply --source default
-context tier
-# → my-model: SILVER
-
-# 4. Enrich toward Gold (suggests what's missing)
-context enrich --target gold --apply --source default
-context tier
-# → my-model: SILVER (Gold needs human curation)
-
-# 5. Curate: add semantic roles, golden queries, business rules
-#    (edit YAML files or let an AI agent do it)
-context lint    # see what's still missing
-context fix     # auto-fix what it can
-
-# 6. Verify against the live database
-context verify
-# → ✓ 18 tables exist, ✓ 247 fields match, ✓ 7 golden queries execute
-
-# 7. Build and serve
-context build
-context site                           # static docs
-context serve --http --port 3000       # MCP for AI agents
-
-# 8. Your AI agent now has full semantic context
-```
-
----
-
-## New in v0.3
-
-- **Smart driver detection** — the setup wizard detects which database driver you need and offers to install it automatically if missing
-- **Interactive table selection** — for large databases, choose which tables to introspect instead of pulling everything
-- **User intent capture** — the setup wizard asks what you plan to do with your metadata, enabling AI-guided curation tailored to your goals
-- **`.claude/CLAUDE.md` generation** — automatically generates agent instructions so Claude Code understands your semantic layer out of the box
-- **40 lint rules** — up from 25, with new rules for description quality, relationship coverage, and guardrail SQL validation
 
 ---
 
