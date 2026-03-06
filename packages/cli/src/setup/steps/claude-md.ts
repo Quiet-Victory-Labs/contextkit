@@ -30,13 +30,26 @@ function buildClaudeMd(ctx: SetupContext): string {
       ? `### Failing Checks\n\n${failingChecks.join('\n')}`
       : 'All checks passing.';
 
+  // Build intent section if user provided goals
+  const intentSection = ctx.intent
+    ? `## Project Goals
+
+${ctx.intent.goals}
+${ctx.intent.metrics ? `\n**Key metrics/outcomes:** ${ctx.intent.metrics}` : ''}
+${ctx.intent.audience ? `\n**Audience:** ${ctx.intent.audience}` : ''}
+
+Use these goals to prioritize which datasets, fields, and metrics to curate first. Focus metadata curation on the tables and columns most relevant to these outcomes.
+
+`
+    : '';
+
   return `# ContextKit Agent Instructions
 
 You have two MCP servers: **duckdb** (query data) and **contextkit** (query metadata).
 
 Model: **${modelName}** | Current Tier: **${tier}**
 
-## The Cardinal Rule: Never Fabricate Metadata
+${intentSection}## The Cardinal Rule: Never Fabricate Metadata
 
 **Every piece of metadata you write must be grounded in evidence from the actual data.**
 

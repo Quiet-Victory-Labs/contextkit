@@ -8,6 +8,7 @@ import { runEnrichGoldStep } from '../setup/steps/enrich-gold.js';
 import { runVerifyStep } from '../setup/steps/verify.js';
 import { runAutofixStep } from '../setup/steps/autofix.js';
 import { runClaudeMdStep } from '../setup/steps/claude-md.js';
+import { runProjectClaudeMdStep } from '../setup/steps/project-claude-md.js';
 import { displayTierScore } from '../setup/display.js';
 
 export const setupCommand = new Command('setup')
@@ -35,6 +36,7 @@ export const setupCommand = new Command('setup')
         { name: 'Verify data', fn: runVerifyStep },
         { name: 'Auto-fix', fn: runAutofixStep },
         { name: 'Generate agent instructions', fn: runClaudeMdStep },
+        { name: 'Generate project config', fn: runProjectClaudeMdStep },
       );
 
       // Run each step

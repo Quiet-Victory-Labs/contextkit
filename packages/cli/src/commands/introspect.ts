@@ -2,10 +2,12 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import path from 'node:path';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import * as p from '@clack/prompts';
 import {
   loadConfig,
   createAdapter,
   scaffoldFromSchema,
+  MissingDriverError,
 } from '@runcontext/core';
 import type { DataSourceConfig } from '@runcontext/core';
 
@@ -74,6 +76,7 @@ export const introspectCommand = new Command('introspect')
     'Use a named data_source from contextkit.config.yaml',
   )
   .option('--tables <glob>', 'Filter tables by glob pattern (e.g., "vw_*")')
+  .option('--select', 'Interactively select which tables to include')
   .option(
     '--model-name <name>',
     'Name for the generated model (default: derived from source)',
@@ -136,6 +139,27 @@ export const introspectCommand = new Command('introspect')
 
       console.log(`Discovered ${tables.length} tables/views`);
 
+      // Interactive table selection
+      if (opts.select && tables.length > 1) {
+        const selection = await p.multiselect({
+          message: `Select tables to include (${tables.length} found)`,
+          options: tables.map((t) => ({
+            value: t.name,
+            label: t.name,
+            hint: `${t.row_count.toLocaleString()} rows`,
+          })),
+          initialValues: tables.map((t) => t.name),
+          required: true,
+        });
+        if (p.isCancel(selection)) {
+          await adapter.disconnect();
+          process.exit(0);
+        }
+        const selected = new Set(selection as string[]);
+        tables = tables.filter((t) => selected.has(t.name));
+        console.log(`Selected ${tables.length} tables`);
+      }
+
       const columns: Record<string, any[]> = {};
       for (const table of tables) {
         columns[table.name] = await adapter.listColumns(table.name);
@@ -191,9 +215,14 @@ export const introspectCommand = new Command('introspect')
         chalk.cyan('Run `context verify` to validate against data.'),
       );
     } catch (err) {
-      console.error(
-        chalk.red(`Introspect failed: ${(err as Error).message}`),
-      );
+      if (err instanceof MissingDriverError) {
+        console.error(chalk.yellow(`\nMissing driver: "${err.driverPackage}" is required for ${err.adapter}.\n`));
+        console.error(chalk.white(`Install it with:\n  npm install ${err.driverPackage}\n`));
+      } else {
+        console.error(
+          chalk.red(`Introspect failed: ${(err as Error).message}`),
+        );
+      }
       process.exit(1);
     }
   });

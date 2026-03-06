@@ -88,7 +88,7 @@ export function formatSarif(diagnostics: Diagnostic[]): string {
         tool: {
           driver: {
             name: 'ContextKit',
-            version: '0.2.1',
+            version: '0.3.5',
             informationUri: 'https://github.com/erickittelson/ContextKit',
             rules: Array.from(ruleMap.values()),
           },

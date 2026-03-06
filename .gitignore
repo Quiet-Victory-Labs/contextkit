@@ -4,3 +4,9 @@ dist/
 *.tsbuildinfo
 .DS_Store
 .worktrees/
+coverage/
+.env.local
+.env.*.local
+*.log
+.cache/
+.claude/

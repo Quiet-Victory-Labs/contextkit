@@ -16,7 +16,7 @@ Claude Code uses a `.claude/mcp.json` file in your project root for MCP server c
   "mcpServers": {
     "contextkit": {
       "command": "npx",
-      "args": ["contextkit", "serve"],
+      "args": ["@runcontext/cli", "serve"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -34,7 +34,7 @@ For shared or remote setups, start the server in HTTP mode and point clients at 
 **Start the server:**
 
 ```bash
-npx contextkit serve --transport http --port 4040
+npx @runcontext/cli serve --transport http --port 4040
 ```
 
 **Client configuration (generic):**
@@ -60,7 +60,7 @@ Cursor reads MCP configuration from its settings. Add the ContextKit server unde
   "mcpServers": {
     "contextkit": {
       "command": "npx",
-      "args": ["contextkit", "serve"],
+      "args": ["@runcontext/cli", "serve"],
       "cwd": "/path/to/your/project"
     }
   }

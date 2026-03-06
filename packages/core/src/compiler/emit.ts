@@ -36,7 +36,7 @@ function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
  */
 export function emitManifest(graph: ContextGraph, _config: ContextKitConfig): Manifest {
   return {
-    version: '0.2.0',
+    version: '0.3.5',
     generatedAt: new Date().toISOString(),
     models: mapToRecord(graph.models),
     governance: mapToRecord(graph.governance),

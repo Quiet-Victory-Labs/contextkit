@@ -242,8 +242,8 @@ describe('MCP Server', () => {
       expect(manifest.tiers).toBeDefined();
     });
 
-    it('manifest has version 0.2.0', () => {
-      expect(manifest.version).toBe('0.2.0');
+    it('manifest has version 0.3.5', () => {
+      expect(manifest.version).toBe('0.3.5');
     });
   });
 

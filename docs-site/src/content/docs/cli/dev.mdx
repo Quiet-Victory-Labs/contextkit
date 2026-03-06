@@ -1,0 +1,54 @@
+---
+title: context dev
+description: Watch mode that re-runs lint on file changes for live feedback during metadata authoring.
+---
+
+The `dev` command starts a file watcher that re-runs the linter every time you save a context file. This gives you instant feedback while editing metadata YAML.
+
+## Usage
+
+```bash
+context dev
+```
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--context-dir <path>` | Path to context directory | `./context` |
+| `--fix` | Auto-fix problems on each re-lint | Off |
+
+## Examples
+
+### Watch with live linting
+
+```bash
+context dev
+```
+
+Edit any `.yaml` file in `context/` and the linter runs automatically on save.
+
+### Watch with auto-fix
+
+```bash
+context dev --fix
+```
+
+Fixable lint violations are corrected automatically each time a file changes.
+
+## Typical workflow
+
+```bash
+# Terminal 1: Start dev mode
+context dev
+
+# Terminal 2: Edit metadata files
+# (lint results appear in Terminal 1 on every save)
+```
+
+This is especially useful when curating metadata toward Gold tier — edit a governance file, see the lint results instantly, fix issues, repeat.
+
+## Next steps
+
+- Run a one-time lint check with [`context lint`](/cli/lint/)
+- Check your tier score with [`context tier`](/cli/build/)

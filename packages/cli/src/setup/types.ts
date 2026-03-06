@@ -9,6 +9,12 @@ import type {
 
 export type TargetTier = 'bronze' | 'silver' | 'gold';
 
+export interface UserIntent {
+  goals: string;
+  metrics?: string;
+  audience?: string;
+}
+
 export interface SetupContext {
   cwd: string;
   contextDir: string;
@@ -18,6 +24,7 @@ export interface SetupContext {
   columns: Record<string, ColumnInfo[]>;
   modelName: string;
   targetTier: TargetTier;
+  intent?: UserIntent;
   graph?: ContextGraph;
   tierScore?: TierScore;
 }

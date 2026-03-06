@@ -10,6 +10,8 @@
     "url": "https://github.com/erickittelson/ContextKit.git",
     "directory": "packages/cli"
   },
+  "bugs": "https://github.com/erickittelson/ContextKit/issues",
+  "engines": { "node": ">=18.0.0" },
   "keywords": [
     "contextkit",
     "cli",

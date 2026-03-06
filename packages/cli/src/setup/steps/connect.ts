@@ -1,12 +1,13 @@
 import * as p from '@clack/prompts';
 import path from 'node:path';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import * as yaml from 'yaml';
-import { loadConfig, createAdapter } from '@runcontext/core';
+import { loadConfig, createAdapter, MissingDriverError } from '@runcontext/core';
 import type { ColumnInfo, DataSourceConfig } from '@runcontext/core';
 import { parseDbUrl } from '../../commands/introspect.js';
 import { discoverDatabases, toDataSourceConfig } from '../mcp-discovery.js';
-import type { SetupContext, TargetTier } from '../types.js';
+import type { SetupContext, TargetTier, UserIntent } from '../types.js';
 
 interface DetectedDb {
   dsConfig: DataSourceConfig;
@@ -447,24 +448,94 @@ export async function runConnectStep(): Promise<SetupContext | undefined> {
     await adapter.connect();
   } catch (err) {
     spin.stop('Connection failed');
-    p.log.error((err as Error).message);
-    p.cancel('Could not connect to database.');
-    return undefined;
+
+    if (err instanceof MissingDriverError) {
+      p.log.warn(`The ${err.adapter} adapter requires the "${err.driverPackage}" npm package.`);
+      const shouldInstall = await p.confirm({
+        message: `Install "${err.driverPackage}" now?`,
+      });
+
+      if (!p.isCancel(shouldInstall) && shouldInstall) {
+        const installSpin = p.spinner();
+        installSpin.start(`Installing ${err.driverPackage}...`);
+        try {
+          // Use execFileSync to avoid shell injection — package name is from a hardcoded map
+          execFileSync('npm', ['install', err.driverPackage], {
+            stdio: 'pipe',
+            cwd: process.cwd(),
+          });
+          installSpin.stop(`Installed ${err.driverPackage}`);
+
+          // Retry connection
+          spin.start('Retrying connection...');
+          try {
+            adapter = await createAdapter(dsConfig);
+            await adapter.connect();
+            spin.stop('Connected');
+          } catch (retryErr) {
+            spin.stop('Connection failed');
+            p.log.error((retryErr as Error).message);
+            p.cancel('Could not connect to database.');
+            return undefined;
+          }
+        } catch {
+          installSpin.stop('Installation failed');
+          p.log.error(`Could not install ${err.driverPackage}. Try manually:\n  npm install ${err.driverPackage}`);
+          p.cancel('Could not connect to database.');
+          return undefined;
+        }
+      } else {
+        p.log.info(`Install it manually with:\n  npm install ${err.driverPackage}`);
+        p.cancel('Could not connect to database.');
+        return undefined;
+      }
+    } else {
+      p.log.error((err as Error).message);
+      p.cancel('Could not connect to database.');
+      return undefined;
+    }
   }
 
-  const tables = await adapter.listTables();
+  const allTables = await adapter.listTables();
+  spin.stop(`Found ${allTables.length} tables`);
+
+  // Let user select which tables to include
+  let tables = allTables;
+  if (allTables.length > 1) {
+    const tableSelection = await p.multiselect({
+      message: `Select tables to include (${allTables.length} found)`,
+      options: allTables.map((t) => ({
+        value: t.name,
+        label: t.name,
+        hint: `${t.row_count.toLocaleString()} rows`,
+      })),
+      initialValues: allTables.map((t) => t.name),
+      required: true,
+    });
+    if (p.isCancel(tableSelection)) {
+      p.cancel('Setup cancelled.');
+      await adapter.disconnect();
+      return undefined;
+    }
+    const selected = new Set(tableSelection as string[]);
+    tables = allTables.filter((t) => selected.has(t.name));
+  }
+
+  // Introspect columns for selected tables
+  const colSpin = p.spinner();
+  colSpin.start(`Introspecting ${tables.length} tables...`);
   const columns: Record<string, ColumnInfo[]> = {};
   for (const table of tables) {
     columns[table.name] = await adapter.listColumns(table.name);
   }
   const totalCols = Object.values(columns).reduce((sum, c) => sum + c.length, 0);
-  spin.stop(`Found ${tables.length} tables, ${totalCols} columns`);
+  colSpin.stop(`${tables.length} tables, ${totalCols} columns`);
 
-  // Show discovered tables
+  // Show selected tables
   const tableLines = tables
     .map((t) => `  ${t.name.padEnd(30)} ${t.row_count.toLocaleString()} rows`)
     .join('\n');
-  p.note(tableLines, 'Discovered Tables');
+  p.note(tableLines, 'Selected Tables');
 
   // Model name
   const defaultModel = path.basename(cwd).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
@@ -497,6 +568,41 @@ export async function runConnectStep(): Promise<SetupContext | undefined> {
     return undefined;
   }
 
+  // Gather user intent for AI-guided curation
+  let intent: UserIntent | undefined;
+
+  const wantsIntent = await p.confirm({
+    message: 'Describe what you\'re building? (helps AI agents curate better metadata)',
+  });
+
+  if (!p.isCancel(wantsIntent) && wantsIntent) {
+    const goalsInput = await p.text({
+      message: 'What are you trying to accomplish with this data?',
+      placeholder: 'e.g., Analyze coffee shop site selection using demographic and market signals',
+    });
+    if (p.isCancel(goalsInput)) {
+      p.cancel('Setup cancelled.');
+      await adapter.disconnect();
+      return undefined;
+    }
+
+    const metricsInput = await p.text({
+      message: 'What metrics or outcomes matter most? (optional)',
+      placeholder: 'e.g., opportunity score, supply saturation, demand signals',
+    });
+
+    const audienceInput = await p.text({
+      message: 'Who will consume this data? (optional)',
+      placeholder: 'e.g., AI agents writing SQL, analysts building dashboards',
+    });
+
+    intent = {
+      goals: goalsInput as string,
+      metrics: p.isCancel(metricsInput) ? undefined : (metricsInput as string) || undefined,
+      audience: p.isCancel(audienceInput) ? undefined : (audienceInput as string) || undefined,
+    };
+  }
+
   // Ensure config file
   const configPath = path.join(cwd, 'contextkit.config.yaml');
   let config;
@@ -526,5 +632,6 @@ export async function runConnectStep(): Promise<SetupContext | undefined> {
     columns,
     modelName: modelInput as string,
     targetTier: tierInput as TargetTier,
+    intent,
   };
 }

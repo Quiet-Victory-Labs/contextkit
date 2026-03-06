@@ -26,8 +26,8 @@ pnpm typecheck
 
 ```
 packages/
-  core/     — Parser, compiler, linter (25 rules), tier engine, fixer, schemas
-  cli/      — CLI with 10 commands (lint, build, tier, explain, fix, dev, init, site, serve, validate-osi)
+  core/     — Parser, compiler, linter (37 rules), tier engine, fixer, schemas
+  cli/      — CLI with 16 commands (lint, build, tier, explain, fix, dev, init, site, serve, validate-osi)
   mcp/      — MCP server for AI agent integration
   site/     — Static documentation site generator
 create-contextkit/  — Project scaffolder (pnpm create contextkit)

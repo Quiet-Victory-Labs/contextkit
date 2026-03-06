@@ -84,19 +84,23 @@ The server exposes the following to MCP clients:
 
 | Resource | Description |
 |---|---|
-| `context://models` | List all models with metadata |
-| `context://models/{name}` | Full details for a specific model |
-| `context://sources` | List all configured data sources |
-| `context://tier` | Current OSI tier scorecard |
+| `context://manifest` | Full compiled manifest |
+| `context://model/{name}` | Single model details |
+| `context://glossary` | All business term definitions |
+| `context://tier/{name}` | Tier scorecard for a model |
+| `context://data-product/template` | Blank data product YAML template |
+| `context://data-product/{name}` | Export model as data product |
 
 ## Exposed MCP tools
 
 | Tool | Description |
 |---|---|
-| `search_models` | Search models by name, description, or column |
-| `get_model` | Get full metadata for a specific model |
-| `list_relationships` | List relationships for a model |
-| `get_tier` | Get the current OSI tier status |
+| `context_search` | Full-text search across models, fields, terms |
+| `context_explain` | Look up any entity by name |
+| `context_validate` | Run lint rules and return diagnostics |
+| `context_tier` | Get the current tier scorecard |
+| `context_golden_queries` | Retrieve curated SQL templates |
+| `context_guardrails` | Get required filters and business rules |
 
 ## Next steps
 
