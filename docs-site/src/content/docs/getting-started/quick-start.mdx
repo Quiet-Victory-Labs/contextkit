@@ -1,0 +1,78 @@
+---
+title: Quick Start
+description: Get up and running with ContextKit in under 5 minutes
+---
+
+import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## The fastest path
+
+<Steps>
+
+1. **Install the CLI**
+
+   ```bash
+   npm install -g @runcontext/cli
+   ```
+
+2. **Run the setup wizard**
+
+   ```bash
+   context setup
+   ```
+
+   The wizard auto-detects your database, introspects tables, scaffolds metadata, and enriches to Silver — all in one interactive flow.
+
+3. **Check your tier**
+
+   ```bash
+   context tier
+   ```
+
+   You should see your model at **Silver** tier. Gold requires human curation.
+
+4. **Serve to AI agents**
+
+   ```bash
+   context serve --stdio
+   ```
+
+   Your MCP server is live. AI agents now have full semantic context.
+
+</Steps>
+
+## From a new project
+
+```bash
+npx create-contextkit my-project
+cd my-project
+context lint
+context tier
+```
+
+## From an existing project
+
+```bash
+npm install -D @runcontext/cli
+
+# Scaffold metadata from a database
+context introspect --db duckdb://warehouse.duckdb
+
+# Auto-enrich to Silver
+context enrich --target silver --apply --source default
+
+# Check what Gold requires
+context tier
+```
+
+## What just happened?
+
+The setup wizard performed these steps:
+
+1. **Detected** your database (DuckDB or PostgreSQL)
+2. **Introspected** every table — generated OSI YAML with columns, types, descriptions
+3. **Scaffolded** governance files — ownership, security classification, grain statements
+4. **Enriched** to Silver — added lineage, sample values, glossary links, trust status
+5. **Linted** the result — flagged anything that still needs attention
+
+Your metadata now lives in YAML files under `context/`. Edit them directly or let AI agents help curate them toward Gold.

@@ -1,0 +1,91 @@
+---
+title: Database Support
+description: Configuring DuckDB and PostgreSQL connections for ContextKit data validation.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+ContextKit can validate your semantic layer against live data sources. This enables [Data lint rules](/reference/lint-rules/#data-rules-9) that check whether declared tables, columns, and types actually match your database.
+
+## Supported databases
+
+| Database | Adapter | Status |
+|----------|---------|--------|
+| DuckDB | `duckdb` | Supported |
+| PostgreSQL | `postgres` | Supported |
+
+## DuckDB
+
+DuckDB is the default adapter. It works with local `.duckdb` files or in-memory databases, making it ideal for development and CI pipelines.
+
+### Connection string format
+
+```
+/path/to/your/database.duckdb
+```
+
+For DuckDB, the connection string is simply the file path to the database.
+
+### Configuration
+
+```yaml title="contextkit.config.yaml"
+context_dir: ./context
+data_sources:
+  - adapter: duckdb
+    path: ./data/warehouse.duckdb
+```
+
+<Aside type="tip">
+DuckDB can also read Parquet, CSV, and JSON files directly. Point `path` at a `.duckdb` file that has views or tables referencing your data files.
+</Aside>
+
+## PostgreSQL
+
+PostgreSQL support connects to any PostgreSQL-compatible database, including cloud-hosted services like Neon, Supabase, and Amazon RDS.
+
+### Connection string format
+
+```
+postgresql://user:password@host:port/database
+```
+
+Common variants:
+
+```
+postgresql://analyst:secret@localhost:5432/warehouse
+postgresql://user:pass@db.example.com:5432/prod?sslmode=require
+```
+
+### Configuration
+
+```yaml title="contextkit.config.yaml"
+context_dir: ./context
+data_sources:
+  - adapter: postgres
+    connection_string: postgresql://analyst:secret@localhost:5432/warehouse
+```
+
+<Aside type="caution">
+Avoid committing connection strings with credentials to version control. Use environment variable substitution or a `.env` file instead:
+
+```yaml title="contextkit.config.yaml"
+data_sources:
+  - adapter: postgres
+    connection_string: ${DATABASE_URL}
+```
+</Aside>
+
+## Multiple data sources
+
+You can configure multiple data sources if your models span different databases:
+
+```yaml title="contextkit.config.yaml"
+context_dir: ./context
+data_sources:
+  - adapter: duckdb
+    path: ./data/analytics.duckdb
+  - adapter: postgres
+    connection_string: ${PROD_DATABASE_URL}
+```
+
+Each model's `source` field determines which data source is used for validation.

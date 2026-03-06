@@ -1,0 +1,65 @@
+---
+title: MCP Server Overview
+description: How the ContextKit MCP server gives AI agents semantic context about your data models.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The ContextKit MCP server exposes your [Open Semantic Interchange (OSI)](/concepts/osi/)-based semantic layer -- models, glossary terms, business rules, golden queries, guardrails, and [data product blueprints](/concepts/data-products/) -- to any AI agent that speaks the [Model Context Protocol](https://modelcontextprotocol.io/).
+
+## Why agents need semantic context
+
+Giving an AI agent a database connection string is not enough. Without semantic context, agents will:
+
+- Guess at column meanings and get them wrong
+- Join tables incorrectly or choose the wrong grain
+- Produce metrics that contradict your business definitions
+- Generate SQL that violates data governance guardrails
+
+ContextKit solves this by publishing a **machine-readable semantic layer** that agents can query before they write a single line of SQL. The MCP server is the bridge between your curated context and any MCP-compatible agent.
+
+## Transport modes
+
+The MCP server supports two transport modes:
+
+### stdio (default)
+
+The server runs as a child process of your AI tool. Communication happens over standard input/output. This is the simplest mode and works out of the box with Claude Code, Cursor, and other MCP clients.
+
+```bash
+npx contextkit serve
+```
+
+### HTTP (SSE)
+
+The server runs as a standalone HTTP service, exposing a Server-Sent Events endpoint. This is useful for shared environments, remote access, or when multiple clients need to connect simultaneously.
+
+```bash
+npx contextkit serve --transport http --port 4040
+```
+
+<Aside type="tip">
+Use stdio for local development with a single AI tool. Use HTTP when you need to share the MCP server across a team or connect from remote clients.
+</Aside>
+
+## What the server exposes
+
+The MCP server provides two complementary interfaces:
+
+- **Resources** -- read-only URIs that return structured context (the manifest, individual models, glossary terms, tier scorecards, and data product YAML exports). See [Resources](/mcp/resources/).
+- **Tools** -- callable functions that let agents search, explain, validate, and query your semantic layer. See [Tools](/mcp/tools/).
+
+Agents can also request a blank data product template (`context://data-product/template`) or export any model as a portable OSI YAML blueprint (`context://data-product/{name}`).
+
+Together, these give an agent everything it needs to understand your data before generating SQL or answering business questions.
+
+## Quick start
+
+1. Make sure you have a built context directory (run `npx contextkit build` first).
+2. Start the server:
+
+```bash
+npx contextkit serve
+```
+
+3. Configure your AI tool to connect. See [Configuration](/mcp/configuration/) for tool-specific setup.

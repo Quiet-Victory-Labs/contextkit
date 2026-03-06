@@ -9,6 +9,7 @@ import { registerManifestResource } from './resources/manifest.js';
 import { registerModelResource } from './resources/model.js';
 import { registerGlossaryResource } from './resources/glossary.js';
 import { registerTierResource } from './resources/tier.js';
+import { registerDataProductResource } from './resources/data-product.js';
 
 import { registerSearchTool } from './tools/search.js';
 import { registerExplainTool } from './tools/explain.js';
@@ -28,11 +29,12 @@ export function createServer(manifest: Manifest, graph: ContextGraph): McpServer
     version: '0.2.0',
   });
 
-  // Register resources (4)
+  // Register resources (5)
   registerManifestResource(server, manifest);
   registerModelResource(server, manifest);
   registerGlossaryResource(server, manifest);
   registerTierResource(server, manifest);
+  registerDataProductResource(server, manifest);
 
   // Register tools (6)
   registerSearchTool(server, manifest);

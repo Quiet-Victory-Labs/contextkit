@@ -1,0 +1,55 @@
+---
+title: Introduction
+description: What ContextKit is and why it exists
+---
+
+Your data already has a schema. ContextKit gives it meaning.
+
+## What is ContextKit?
+
+ContextKit is a metadata governance toolkit built on the **[Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI)** specification. It transforms raw database schemas into AI-ready **data products** — portable YAML blueprints containing descriptions, ownership, lineage, business rules, golden queries, and semantic roles. ContextKit then lints, scores, and serves those data products to AI agents via the Model Context Protocol (MCP).
+
+OSI is an open standard for describing semantic models in a vendor-neutral format, backed by Snowflake, dbt Labs, Salesforce, and other industry participants. By building on OSI, your metadata is portable across any compliant tool — not locked into ContextKit.
+
+## The Problem
+
+AI agents querying databases face a fundamental problem: they can see table and column names, but they don't understand what the data *means*.
+
+They don't know:
+- Which filters are required for correct results
+- How metrics should be aggregated
+- Which joins are safe
+- What business terms actually mean in SQL
+
+Without this context, agents guess — and guessing produces wrong SQL.
+
+## The Solution
+
+ContextKit creates a governance layer between your database and your AI tools:
+
+```
+Database  →  ContextKit  →  AI Agent
+(schema)     (meaning)      (correct SQL)
+```
+
+With ContextKit, an agent knows:
+- That `revenue` should be `SUM`'d, never `AVG`'d
+- That queries on `transactions` must filter `WHERE status = 'completed'`
+- That `customer_id` joins `orders` to `customers` as many-to-one
+- That "demand signal" means review keywords like *wait*, *crowded*, *busy*
+
+## What's Included
+
+One install, everything you need:
+
+```bash
+npm install @runcontext/cli
+```
+
+- **15 CLI commands** — introspect, enrich, lint, fix, build, tier, verify, serve, and more
+- **37 lint rules** — schema validation, governance, security, data accuracy
+- **Bronze/Silver/Gold tier system** — automated metadata maturity scoring
+- **MCP server** — expose your context graph to AI agents, including data product YAML export
+- **Data products** — portable OSI-compliant YAML blueprints for your data models
+- **Static site generator** — browsable docs from your metadata
+- **Database introspection** — DuckDB and PostgreSQL support

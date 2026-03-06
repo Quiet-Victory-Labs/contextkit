@@ -1,0 +1,92 @@
+---
+title: context site
+description: Generate static HTML documentation from your compiled context files.
+---
+
+The `site` command generates a browsable static documentation site from your context metadata. It provides a human-friendly way to explore your data models, relationships, and business logic.
+
+## Usage
+
+```bash
+context build    # compile context files first
+context site     # generate site/ directory
+```
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--context-dir <path>` | Path to context files | `./context` |
+| `--out <path>` | Output directory for generated site | `./site` |
+| `--title <text>` | Site title | Project name |
+| `--base-url <url>` | Base URL for deployment | `/` |
+
+## Examples
+
+### Generate with defaults
+
+```bash
+context site
+```
+
+Output is written to `./site/`. Open `index.html` in a browser.
+
+### Custom output and title
+
+```bash
+context site --out docs/data-catalog --title "Acme Data Catalog"
+```
+
+### Configure for subdirectory deployment
+
+```bash
+context site --base-url /data-docs/
+```
+
+## What it generates
+
+The `site/` directory contains:
+
+- **Model pages** -- datasets, fields, schema browser, rules, relationships
+- **Glossary** -- all business terms with definitions, synonyms, linked fields
+- **Owner pages** -- team ownership with governed models
+- **Search** -- full-text search across all entities
+- **Tier badges** -- visual Bronze/Silver/Gold status
+
+## Serving
+
+Open directly in a browser:
+
+```bash
+open site/index.html
+```
+
+Or serve with any static file server:
+
+```bash
+npx serve site -l 8080
+```
+
+## Example workflow
+
+```bash
+# Full pipeline from database to documentation
+context introspect --db postgres://localhost/myapp
+context enrich --target silver --apply
+context build
+context site --out public/data-docs
+
+# Deploy the static site anywhere
+cp -r public/data-docs /var/www/html/
+```
+
+## Notes
+
+- Always run `context build` before `context site` -- the site reads from the compiled manifest
+- The site is fully static HTML with no JavaScript dependencies
+- Deploy anywhere: Vercel, Netlify, GitHub Pages, S3, or just open locally
+
+## Next steps
+
+- Serve context to AI tools with [`context serve`](/cli/serve/)
+- Check your tier status with [`context tier`](/cli/build/)

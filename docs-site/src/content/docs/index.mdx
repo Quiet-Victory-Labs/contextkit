@@ -1,0 +1,99 @@
+---
+title: ContextKit
+description: AI-ready metadata governance over OSI
+template: splash
+hero:
+  tagline: Your data already has a schema. ContextKit gives it meaning. Transform raw database schemas into AI-ready semantic layers built on Open Semantic Interchange (OSI) — then lint, score, and serve them to AI agents via MCP.
+  image:
+    dark: ../../assets/logo-dark.svg
+    light: ../../assets/logo-light.svg
+  actions:
+    - text: Get Started
+      link: /getting-started/quick-start/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/erickittelson/ContextKit
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<div style="text-align:center;margin:1rem 0 2.5rem;">
+  <div class="hero-install" onclick="navigator.clipboard.writeText('npm install @runcontext/cli').then(()=>{this.querySelector('.copy-badge').textContent='copied!'})">
+    <span class="prompt">$ </span><span class="cmd">npm install @runcontext/cli</span>
+    <span class="copy-badge">copy</span>
+  </div>
+</div>
+
+## The Problem
+
+AI agents can see your table and column names. They can't see what the data **means**. They don't know which filters are required, how metrics aggregate, or which joins are safe.
+
+<div class="comparison">
+  <div class="without">
+    <h4>Without ContextKit</h4>
+    <pre><code>-- "What's total revenue?"
+SELECT AVG(revenue)     ← wrong aggregation
+FROM transactions       ← no status filter
+                        ← includes cancelled</code></pre>
+  </div>
+  <div class="with">
+    <h4>With ContextKit</h4>
+    <pre><code>-- "What's total revenue?"
+SELECT SUM(revenue)     ← correct (semantic role)
+FROM transactions
+WHERE status='completed' ← required (guardrail)</code></pre>
+  </div>
+</div>
+
+## Three Tiers to AI-Ready
+
+<CardGrid>
+  <Card title="Bronze — Discoverable" icon="document">
+    Descriptions, ownership, security, grain statements. Achieved automatically via `context introspect`.
+  </Card>
+  <Card title="Silver — Trusted" icon="approve-check">
+    Trust status, glossary links, lineage, sample values. Achieved via `context enrich --target silver`.
+  </Card>
+  <Card title="Gold — AI-Ready" icon="star">
+    Semantic roles, aggregation rules, guardrails, golden queries, business rules. Requires human curation.
+  </Card>
+  <Card title="37 Lint Rules" icon="list-format">
+    Schema validation, governance, security, data accuracy — all tier-aware with auto-fix support.
+  </Card>
+</CardGrid>
+
+## Everything in One Install
+
+<CardGrid stagger>
+  <Card title="15 CLI Commands" icon="setting">
+    `setup`, `introspect`, `enrich`, `lint`, `fix`, `build`, `tier`, `explain`, `verify`, `serve`, `site`, `dev`, `init`, `rules`, `validate-osi`
+  </Card>
+  <Card title="MCP Server" icon="rocket">
+    Expose your semantic layer to Claude, Cursor, and other AI tools via stdio or HTTP transport.
+  </Card>
+  <Card title="Database Support" icon="laptop">
+    DuckDB and PostgreSQL. Introspect tables, verify metadata, validate golden queries against live data.
+  </Card>
+  <Card title="Static Docs Site" icon="open-book">
+    Generate browsable HTML docs with model pages, glossary, search, and tier badges.
+  </Card>
+</CardGrid>
+
+## Quick Start
+
+```bash
+npm install @runcontext/cli
+context setup           # interactive wizard — database to metadata
+context tier            # check your Bronze/Silver/Gold score
+context serve --stdio   # expose to AI agents via MCP
+```
+
+<CardGrid>
+  <LinkCard title="Introduction" description="What ContextKit is and why" href="/getting-started/introduction/" />
+  <LinkCard title="Quick Start" description="Up and running in 5 minutes" href="/getting-started/quick-start/" />
+  <LinkCard title="Data Products" description="Portable YAML blueprints over OSI" href="/concepts/data-products/" />
+  <LinkCard title="MCP Server" description="Feed context to AI agents" href="/mcp/overview/" />
+</CardGrid>

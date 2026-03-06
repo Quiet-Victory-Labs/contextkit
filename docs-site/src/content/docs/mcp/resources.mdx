@@ -1,0 +1,86 @@
+---
+title: MCP Resources
+description: Read-only resource URIs exposed by the ContextKit MCP server.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+MCP Resources are read-only URIs that return structured context about your semantic layer. Agents can read these to load model definitions, glossary terms, and tier scorecards without calling any tools.
+
+## Available resources
+
+### `context://manifest`
+
+Returns the full built manifest -- every model, glossary term, business rule, golden query, and guardrail in your context directory. This is the complete picture of your semantic layer in a single read.
+
+**When to use:** When an agent needs a comprehensive understanding of the entire data domain before starting work.
+
+```
+Resource URI: context://manifest
+```
+
+### `context://model/{name}`
+
+Returns the full definition of a single model, including its fields, grain, relationships, business rules, golden queries, and guardrails.
+
+**When to use:** When an agent is working with a specific model and needs its complete definition without loading the entire manifest.
+
+```
+Resource URI: context://model/orders
+Resource URI: context://model/customers
+```
+
+The `{name}` parameter corresponds to the `id` field in your model YAML files.
+
+### `context://glossary`
+
+Returns all glossary terms and their definitions, including synonyms, related terms, and canonical usage notes.
+
+**When to use:** When an agent needs to understand business terminology -- for example, to disambiguate "revenue" vs. "net revenue" or to know that "ARR" is a synonym for "annual recurring revenue."
+
+```
+Resource URI: context://glossary
+```
+
+### `context://tier/{name}`
+
+Returns the tier scorecard for a specific tier level, showing which rules are required, which pass, and the overall compliance status.
+
+**When to use:** When an agent needs to understand the quality and completeness of the semantic layer at a given tier.
+
+```
+Resource URI: context://tier/bronze
+Resource URI: context://tier/silver
+Resource URI: context://tier/gold
+```
+
+<Aside type="note">
+Tier scorecards reflect the results of `contextkit build`. If you have made changes to your context files since the last build, re-run `npx contextkit build` to get up-to-date results.
+</Aside>
+
+### `context://data-product/template`
+
+Returns a blank OSI-compliant [data product](/concepts/data-products/) YAML template that agents or users can fill in to describe a new data model.
+
+**When to use:** When starting a new data product from scratch. The template includes all OSI sections with comments explaining each field.
+
+```
+Resource URI: context://data-product/template
+```
+
+### `context://data-product/{name}`
+
+Exports an existing model as a portable OSI data product YAML blueprint. The export includes the model's schema, governance metadata, glossary terms, metrics, relationships, business rules, and golden queries — everything needed to recreate the model in another environment.
+
+**When to use:** When you need to share a model definition with another team, migrate to a different warehouse, or create a portable backup of your semantic layer.
+
+```
+Resource URI: context://data-product/orders
+Resource URI: context://data-product/customers
+```
+
+## Usage patterns
+
+Agents typically start by reading `context://manifest` or a specific `context://model/{name}` resource, then use [Tools](/mcp/tools/) like `context_search` or `context_explain` for interactive exploration. The resources provide the foundation; the tools provide the interaction.
+
+For portability, agents can export any model as an OSI-compliant data product YAML via `context://data-product/{name}`, or scaffold a new model from the blank template at `context://data-product/template`.

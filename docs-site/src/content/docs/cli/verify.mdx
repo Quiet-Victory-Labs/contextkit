@@ -1,0 +1,95 @@
+---
+title: context verify
+description: Validate that your context metadata accurately reflects the current state of a live database.
+---
+
+The `verify` command compares your context files against a live database to detect drift -- columns that were added, removed, or changed since the last introspection.
+
+## Usage
+
+```bash
+context verify --db <connection-url>
+```
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--source <name>` | Verify only files for this source | All sources |
+| `--db <url>` | Database connection string | `$DATABASE_URL` |
+| `--context-dir <path>` | Path to context files | `./context` |
+| `--format <type>` | Output format: `text`, `json`, `github` | `text` |
+
+## Examples
+
+### Verify all sources
+
+```bash
+context verify --db postgres://localhost:5432/myapp
+```
+
+### Verify a specific source
+
+```bash
+context verify --db postgres://localhost:5432/myapp --source analytics
+```
+
+### JSON output for scripting
+
+```bash
+context verify --db postgres://localhost:5432/myapp --format json
+```
+
+## Example output
+
+```
+Verifying against postgres://localhost:5432/myapp...
+
+context/public/users.context.yaml
+  ✓ All columns match
+
+context/public/orders.context.yaml
+  ✗ Column "discount_code" exists in DB but missing from context
+  ✗ Column "legacy_status" in context but not found in DB
+  ✗ Column "total" type mismatch: context says "integer", DB says "numeric(10,2)"
+
+context/public/sessions.context.yaml
+  ✗ Table "sessions" not found in database
+
+Summary: 1 passed, 2 drifted, 1 missing
+```
+
+## Drift categories
+
+| Category | Meaning |
+|---|---|
+| **Missing column** | Column exists in DB but not in context files |
+| **Extra column** | Column in context but not in DB (removed or renamed) |
+| **Type mismatch** | Column type differs between context and DB |
+| **Missing table** | Table in context but not in DB |
+| **New table** | Table in DB but no context file exists |
+
+## CI integration
+
+```bash
+# Fail the build if context has drifted
+context verify --db "$DATABASE_URL" --format json | jq -e '.drifted == 0'
+```
+
+## Fixing drift
+
+When drift is detected, you have two options:
+
+```bash
+# Re-introspect to pick up DB changes (overwrites manual edits)
+context introspect --db postgres://localhost/myapp --tables "orders"
+
+# Or manually update the context file to match
+# Then verify again
+context verify --db postgres://localhost/myapp
+```
+
+## Next steps
+
+- Re-introspect drifted tables with [`context introspect`](/cli/introspect/)
+- Re-enrich after updating with [`context enrich`](/cli/enrich/)

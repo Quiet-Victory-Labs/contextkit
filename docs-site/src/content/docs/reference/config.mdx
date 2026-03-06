@@ -1,0 +1,60 @@
+---
+title: Config File
+description: The contextkit.config.yaml reference
+---
+
+## Overview
+
+The `contextkit.config.yaml` file configures your ContextKit project. It lives at the root of your project directory.
+
+## Full schema
+
+```yaml
+# Directory containing your context files
+context_dir: context
+
+# Database connections for introspection, enrichment, and verification
+data_sources:
+  default:
+    adapter: duckdb
+    path: ./warehouse.duckdb
+  production:
+    adapter: postgres
+    connection_string: postgres://user:pass@host:5432/analytics
+```
+
+## Fields
+
+### `context_dir`
+
+Path to the directory containing your metadata files. Defaults to `context`.
+
+### `data_sources`
+
+Named database connections. Each source has:
+
+| Field | Required | Description |
+|---|---|---|
+| `adapter` | Yes | Database type: `duckdb` or `postgres` |
+| `path` | DuckDB only | Path to the `.duckdb` file |
+| `connection_string` | Postgres only | Full PostgreSQL connection URI |
+
+### Using named sources
+
+Many CLI commands accept `--source <name>` to specify which data source to use:
+
+```bash
+context introspect --source default
+context enrich --target silver --apply --source production
+context verify --source default
+```
+
+If you only have one source named `default`, commands use it automatically.
+
+## Auto-detection
+
+The `context setup` wizard auto-detects databases from:
+
+1. Existing `contextkit.config.yaml`
+2. `.claude/mcp.json` (DuckDB MCP server configs)
+3. `.duckdb` files in the current directory

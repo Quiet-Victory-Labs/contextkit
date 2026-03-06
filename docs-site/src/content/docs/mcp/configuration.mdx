@@ -1,0 +1,100 @@
+---
+title: MCP Configuration
+description: How to configure the ContextKit MCP server for Claude Code, Cursor, and other MCP clients.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+The ContextKit MCP server can be configured for any MCP-compatible client. Below are setup instructions for the most common tools.
+
+## Claude Code (stdio)
+
+Claude Code uses a `.claude/mcp.json` file in your project root for MCP server configuration. The stdio transport runs the server as a child process.
+
+```json title=".claude/mcp.json"
+{
+  "mcpServers": {
+    "contextkit": {
+      "command": "npx",
+      "args": ["contextkit", "serve"],
+      "cwd": "/path/to/your/project"
+    }
+  }
+}
+```
+
+<Aside type="tip">
+Set `cwd` to the directory containing your `contextkit.config.yaml` file. If the config is in the project root, you can omit `cwd`.
+</Aside>
+
+## HTTP mode
+
+For shared or remote setups, start the server in HTTP mode and point clients at the SSE endpoint.
+
+**Start the server:**
+
+```bash
+npx contextkit serve --transport http --port 4040
+```
+
+**Client configuration (generic):**
+
+```json
+{
+  "mcpServers": {
+    "contextkit": {
+      "url": "http://localhost:4040/sse"
+    }
+  }
+}
+```
+
+## Cursor
+
+Cursor reads MCP configuration from its settings. Add the ContextKit server under the MCP section.
+
+<Tabs>
+<TabItem label="stdio">
+```json title=".cursor/mcp.json"
+{
+  "mcpServers": {
+    "contextkit": {
+      "command": "npx",
+      "args": ["contextkit", "serve"],
+      "cwd": "/path/to/your/project"
+    }
+  }
+}
+```
+</TabItem>
+<TabItem label="HTTP">
+```json title=".cursor/mcp.json"
+{
+  "mcpServers": {
+    "contextkit": {
+      "url": "http://localhost:4040/sse"
+    }
+  }
+}
+```
+</TabItem>
+</Tabs>
+
+## Verifying the connection
+
+Once configured, your AI tool should discover the ContextKit resources and tools automatically. You can verify by asking the agent:
+
+> "What MCP resources are available?"
+
+It should list the `context://` resources. You can also test a tool call:
+
+> "Search my semantic layer for revenue metrics."
+
+The agent should call `context_search` and return results from your context directory.
+
+## Environment variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CONTEXTKIT_CONFIG` | Path to `contextkit.config.yaml` | `./contextkit.config.yaml` |
+| `CONTEXTKIT_PORT` | Port for HTTP transport | `4040` |

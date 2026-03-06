@@ -1,0 +1,126 @@
+---
+title: context lint & context fix
+description: Validate context files against 37 rules and auto-fix violations where possible.
+---
+
+The `lint` command checks your context files for errors, inconsistencies, and missing metadata. The `fix` command auto-repairs violations that have deterministic fixes.
+
+## Lint
+
+### Usage
+
+```bash
+context lint
+```
+
+### Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--context-dir <path>` | Path to context files | `./context` |
+| `--format <type>` | Output format: `text`, `json`, `github` | `text` |
+| `--rule <name>` | Run only specific rule(s) | All rules |
+| `--severity <level>` | Minimum severity: `error`, `warn`, `info` | `warn` |
+
+### Examples
+
+```bash
+# Lint all context files
+context lint
+
+# JSON output for CI
+context lint --format json
+
+# Check only naming rules
+context lint --rule naming-*
+
+# Errors only
+context lint --severity error
+```
+
+### Example output
+
+```
+context/public/users.context.yaml
+  3:5  warn   missing-description     Column "id" has no description
+  7:5  warn   missing-description     Column "email" has no description
+  12:3 error  invalid-relationship    Relationship "orders" references non-existent model
+
+context/public/sessions.context.yaml
+  1:1  error  missing-primary-key     No primary key defined
+
+4 problems (2 errors, 2 warnings)
+```
+
+## Fix
+
+### Usage
+
+```bash
+context fix
+```
+
+### Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--write` | Apply fixes to files (required to make changes) | Off (dry run) |
+| `--context-dir <path>` | Path to context files | `./context` |
+| `--rule <name>` | Fix only specific rule(s) | All fixable rules |
+
+### Examples
+
+```bash
+# Preview what would be fixed
+context fix
+
+# Apply fixes
+context fix --write
+
+# Fix only formatting issues
+context fix --write --rule formatting-*
+```
+
+### Example output
+
+```
+Fixable issues:
+  context/public/users.context.yaml
+    3:5  fix  trailing-whitespace  Remove trailing whitespace
+    8:1  fix  sort-columns         Sort columns alphabetically
+
+  context/public/orders.context.yaml
+    1:1  fix  missing-source       Add source field from directory name
+
+Run with --write to apply 3 fixes.
+```
+
+## Rule categories
+
+The 37 built-in rules cover:
+
+| Category | Rules | Examples |
+|---|---|---|
+| **Structure** | 8 | `missing-primary-key`, `missing-source`, `duplicate-column` |
+| **Naming** | 6 | `naming-convention`, `reserved-word`, `model-name-match` |
+| **Descriptions** | 5 | `missing-description`, `description-too-short` |
+| **Relationships** | 7 | `invalid-relationship`, `orphan-foreign-key`, `circular-ref` |
+| **Types** | 5 | `type-mismatch`, `missing-semantic-type`, `invalid-type` |
+| **Formatting** | 6 | `trailing-whitespace`, `sort-columns`, `indent-style` |
+
+Run `context rules` to see the full list with descriptions.
+
+## CI integration
+
+```bash
+# GitHub Actions example
+- name: Lint context files
+  run: context lint --format github --severity error
+```
+
+The `github` format produces annotations that appear inline on pull requests.
+
+## Next steps
+
+- Auto-fix issues with `context fix --write`
+- Build the manifest with [`context build`](/cli/build/)

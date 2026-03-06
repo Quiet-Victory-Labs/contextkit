@@ -1,0 +1,126 @@
+---
+title: context build & context tier
+description: Compile context files into a manifest JSON and view your OSI tier scorecard.
+---
+
+## Build
+
+The `build` command compiles all `.context.yaml` files into a single `manifest.json` that MCP servers and other tools consume.
+
+### Usage
+
+```bash
+context build
+```
+
+### Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--context-dir <path>` | Path to context files | `./context` |
+| `--out <path>` | Output file path | `./context/manifest.json` |
+| `--format <type>` | Output format: `json`, `yaml` | `json` |
+| `--minify` | Minify the output | Off |
+
+### Examples
+
+```bash
+# Build with defaults
+context build
+
+# Custom output location
+context build --out dist/context-manifest.json
+
+# Minified for production
+context build --minify --out dist/manifest.json
+```
+
+### Output
+
+The manifest contains all models, columns, relationships, and metadata in a single structured file:
+
+```json
+{
+  "version": "1.0",
+  "generated_at": "2025-01-15T10:30:00Z",
+  "sources": {
+    "myapp": {
+      "models": [
+        {
+          "name": "users",
+          "schema": "public",
+          "description": "Registered user accounts.",
+          "columns": [ ... ],
+          "relationships": [ ... ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## Tier
+
+The `tier` command evaluates your context files and displays an OSI tier scorecard.
+
+### Usage
+
+```bash
+context tier
+```
+
+### Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--context-dir <path>` | Path to context files | `./context` |
+| `--format <type>` | Output format: `text`, `json` | `text` |
+
+### Example output
+
+```
+OSI Tier Scorecard
+==================
+
+Source: myapp (23 models)
+
+Overall Tier: Silver
+
+Bronze (required)        23/23  ✓
+  Schema introspected    23/23
+  Primary keys defined   23/23
+  Column types present   23/23
+
+Silver (required)        21/23  ✗
+  Descriptions           21/23  ← 2 models missing
+  Semantic types         19/23
+  Relationships          23/23
+
+Gold (optional)          8/23
+  Business logic         8/23
+  PII classification     12/23
+  Usage examples         5/23
+
+To reach Silver: add descriptions to orders_archive, tmp_imports
+Run 'context enrich --target silver' for suggestions.
+```
+
+### Tier definitions
+
+| Tier | Requirements |
+|---|---|
+| **Bronze** | Schema structure: table names, column names and types, primary keys |
+| **Silver** | Bronze + descriptions, semantic types, relationship documentation |
+| **Gold** | Silver + business logic, data classification, usage examples, quality rules |
+
+## CI usage
+
+```bash
+# Fail CI if not at Silver tier
+context tier --format json | jq -e '.overall_tier == "silver" or .overall_tier == "gold"'
+```
+
+## Next steps
+
+- Serve the manifest with [`context serve`](/cli/serve/)
+- Generate documentation with [`context site`](/cli/site/)

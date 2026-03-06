@@ -1,0 +1,60 @@
+---
+title: context setup
+description: Interactive wizard that detects your database, introspects schema, scaffolds context files, and enriches metadata in one step.
+---
+
+The `setup` command is the fastest way to get started with ContextKit. It runs an interactive wizard that chains together the core workflow commands automatically.
+
+## Usage
+
+```bash
+context setup
+```
+
+No options required. The wizard will prompt you for everything it needs.
+
+## What it does
+
+The setup wizard walks through four stages:
+
+1. **Detect** -- Scans your environment for database connection strings (environment variables, `.env` files, common config files).
+2. **Introspect** -- Connects to the detected database and scaffolds Bronze-level context files for every table.
+3. **Scaffold** -- Writes `.context.yaml` files into your project's `context/` directory.
+4. **Enrich** -- Offers to apply Silver-level enrichments using AI-generated descriptions and relationships.
+
+## Example session
+
+```bash
+$ context setup
+Detecting databases...
+  Found: DATABASE_URL=postgres://localhost:5432/myapp
+
+Connect to postgres://localhost:5432/myapp? (Y/n) Y
+
+Introspecting schema...
+  Found 23 tables, 4 views
+  Scaffolded 27 context files to ./context/
+
+Enrich to Silver tier? (Y/n) Y
+  Enriching users...
+  Enriching orders...
+  ...
+  Done. 27 files enriched.
+
+Run 'context lint' to check for issues.
+Run 'context serve' to start the MCP server.
+```
+
+## When to use setup vs. individual commands
+
+| Scenario | Recommendation |
+|---|---|
+| First time with ContextKit | `context setup` |
+| Adding a new database source | `context introspect --db <url>` |
+| Upgrading existing context to Gold | `context enrich --target gold` |
+| CI/CD pipeline | `context lint && context build` |
+
+## Next steps
+
+- Review the generated files with [`context lint`](/cli/lint/)
+- Start serving context with [`context serve`](/cli/serve/)

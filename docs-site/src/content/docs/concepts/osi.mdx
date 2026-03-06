@@ -1,0 +1,202 @@
+---
+title: OSI Specification
+description: The Open Semantic Interchange standard
+---
+
+The **Open Semantic Interchange (OSI)** specification is an open standard for describing semantic models in a vendor-neutral format. OSI v1.0 is backed by Snowflake, dbt Labs, Salesforce, and other industry participants. ContextKit reads and validates OSI files natively.
+
+For the full specification, see the [OSI GitHub repository](https://github.com/open-semantic-interchange/OSI).
+
+## Why OSI matters
+
+Before OSI, every semantic layer tool used its own proprietary format. Moving metadata between tools meant writing custom adapters. OSI provides a shared language: if your metadata is in OSI format, any compliant tool can read it.
+
+ContextKit uses OSI as the foundation layer. All schema information -- datasets, fields, relationships, and metrics -- lives in `*.osi.yaml` files. Governance, business rules, and enrichment live in separate companion files, so the OSI files remain portable and standard-compliant.
+
+## Core schema
+
+An OSI file contains a `semantic_model` with four main sections:
+
+```yaml
+semantic_model:
+  name: orders
+  description: Order transactions from the e-commerce platform
+
+  datasets:
+    - name: orders
+      description: One row per order
+      schema: analytics
+      table: fct_orders
+      fields:
+        - name: order_id
+          expression: order_id
+          description: Unique order identifier
+        - name: revenue
+          expression: order_total
+          description: Total order amount in USD
+        - name: order_date
+          expression: created_at
+          description: Date the order was placed
+
+  relationships:
+    - name: orders_to_customers
+      from:
+        dataset: orders
+        columns:
+          - customer_id
+      to:
+        dataset: customers
+        columns:
+          - customer_id
+
+  metrics:
+    - name: total_revenue
+      expression: SUM(revenue)
+      description: Sum of all order revenue
+      ai_context: Revenue is recognized at shipment, not at order placement.
+```
+
+## Datasets and fields
+
+A **dataset** maps to a table or view in your warehouse. Each dataset declares its schema, table name, and a list of fields.
+
+A **field** represents a column or derived expression. Fields are defined with:
+
+| Property | Description |
+|---|---|
+| `name` | The semantic name used in queries and references. |
+| `expression` | The SQL expression that produces this field. Can include dialect-specific syntax. |
+| `description` | Human-readable description of what the field represents. |
+
+### Dialect support in expressions
+
+Field expressions can reference raw column names for simple mappings, or use SQL expressions for derived fields:
+
+```yaml
+fields:
+  - name: full_name
+    expression: "CONCAT(first_name, ' ', last_name)"
+    description: Customer full name
+
+  - name: order_year
+    expression: "EXTRACT(YEAR FROM order_date)"
+    description: Year the order was placed
+```
+
+When expressions use dialect-specific SQL, the consuming tool is responsible for translating them to the target warehouse's syntax.
+
+### Dimension and label
+
+Fields can be annotated with type hints that indicate whether they are dimensions (used for grouping and filtering) or labels (human-readable display values):
+
+```yaml
+fields:
+  - name: status_code
+    expression: status
+    description: Order status code
+    dimension: true
+
+  - name: status_label
+    expression: status_name
+    description: Human-readable order status
+    label: true
+```
+
+## Relationships
+
+Relationships define how datasets join together. OSI uses a directional model:
+
+- **`from`** -- the many-side of the relationship (the table with the foreign key)
+- **`to`** -- the one-side of the relationship (the table being referenced)
+- **`from_columns`** / **`to_columns`** -- the columns that form the join condition
+
+```yaml
+relationships:
+  - name: order_items_to_orders
+    from:
+      dataset: order_items
+      columns:
+        - order_id
+    to:
+      dataset: orders
+      columns:
+        - order_id
+
+  - name: order_items_to_products
+    from:
+      dataset: order_items
+      columns:
+        - product_id
+    to:
+      dataset: products
+      columns:
+        - product_id
+```
+
+Relationships are critical for AI agents. Without them, an agent has to guess how tables join -- a common source of hallucinated queries. With explicit relationships, the agent knows exactly which columns to use and which side has many rows.
+
+## Metrics
+
+Metrics are named, reusable calculations defined at the semantic model level. They reference fields from datasets and declare the aggregation logic centrally.
+
+| Property | Description |
+|---|---|
+| `name` | The metric's identifier. |
+| `expression` | The SQL aggregation expression (e.g., `SUM(revenue)`, `COUNT(DISTINCT customer_id)`). |
+| `description` | Human-readable explanation of what the metric measures. |
+| `ai_context` | Instructions for AI agents on how to interpret and use this metric. |
+
+```yaml
+metrics:
+  - name: average_order_value
+    expression: AVG(revenue)
+    description: Average revenue per order
+    ai_context:
+      instructions: >
+        Use this metric for order-level analysis only.
+        For customer-level averages, use customer_lifetime_aov instead.
+      synonyms:
+        - AOV
+        - avg order size
+      examples:
+        - "What is the AOV this quarter?"
+        - "Show me average order value by region"
+```
+
+## The `ai_context` property
+
+The `ai_context` property can appear on metrics, fields, and datasets. It accepts two formats:
+
+### String format
+
+A simple string with instructions for the AI:
+
+```yaml
+ai_context: Revenue is recognized at shipment. Do not confuse with gross_merchandise_value which includes cancelled orders.
+```
+
+### Object format
+
+A structured object with specific guidance:
+
+```yaml
+ai_context:
+  instructions: >
+    This field represents net revenue after returns and discounts.
+    Always pair with order_date for time-series analysis.
+  synonyms:
+    - net sales
+    - revenue
+    - sales amount
+  examples:
+    - "What was total revenue last month?"
+    - "Show revenue by product category"
+```
+
+The object format is preferred for Gold-tier metadata because it gives AI agents structured, unambiguous guidance. The `synonyms` list helps agents match user questions to the correct field even when the user uses informal language. The `examples` list provides concrete query patterns the agent can follow.
+
+## ContextKit and OSI
+
+ContextKit treats OSI files as read-only schema definitions. When you run `context introspect`, ContextKit generates OSI files from your warehouse. When you run `context enrich`, ContextKit writes governance and rules to companion files -- never to the OSI file itself.
+
+This means your OSI files remain compliant with the specification and portable across tools. Any enrichment ContextKit adds is stored separately and can be stripped away without affecting the core schema definition.

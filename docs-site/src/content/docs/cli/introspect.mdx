@@ -1,0 +1,104 @@
+---
+title: context introspect
+description: Scan a database and scaffold Bronze-level OSI metadata files for tables, columns, and relationships.
+---
+
+The `introspect` command connects to a database, reads its schema, and generates `.context.yaml` files with Bronze-level metadata.
+
+## Usage
+
+```bash
+context introspect --db <connection-url>
+```
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--db <url>` | Database connection string | `$DATABASE_URL` |
+| `--source <name>` | Logical name for this data source | Inferred from DB name |
+| `--tables <glob>` | Filter tables by glob pattern | `*` (all tables) |
+| `--model-name <name>` | Override the model name in output files | Table name |
+
+## Examples
+
+### Introspect all tables
+
+```bash
+context introspect --db postgres://localhost:5432/myapp
+```
+
+### Introspect specific tables
+
+```bash
+context introspect \
+  --db postgres://localhost:5432/myapp \
+  --tables "users,orders,order_*"
+```
+
+### Name the source
+
+```bash
+context introspect \
+  --db postgres://localhost:5432/myapp \
+  --source production
+```
+
+This produces files namespaced under `context/production/`.
+
+### Override model name
+
+```bash
+context introspect \
+  --db postgres://localhost:5432/myapp \
+  --tables "user_accounts" \
+  --model-name users
+```
+
+## Output
+
+For each table, `introspect` creates a `.context.yaml` file containing:
+
+- Table name and schema
+- Column names, types, and nullability
+- Primary keys and unique constraints
+- Foreign key relationships
+- Indexes
+
+```yaml
+# context/public/users.context.yaml (generated)
+model:
+  name: users
+  source: myapp
+  schema: public
+  columns:
+    - name: id
+      type: integer
+      primary_key: true
+      nullable: false
+    - name: email
+      type: varchar(255)
+      nullable: false
+      unique: true
+    - name: created_at
+      type: timestamp
+      nullable: false
+  relationships:
+    - name: orders
+      type: has_many
+      foreign_key: user_id
+      references: orders
+```
+
+## Supported databases
+
+- PostgreSQL
+- MySQL / MariaDB
+- SQLite
+- SQL Server
+- Oracle (beta)
+
+## Next steps
+
+- Enrich the generated files with [`context enrich`](/cli/enrich/)
+- Validate them with [`context lint`](/cli/lint/)

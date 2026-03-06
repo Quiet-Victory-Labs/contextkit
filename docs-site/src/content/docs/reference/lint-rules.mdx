@@ -1,0 +1,82 @@
+---
+title: Lint Rules
+description: Complete reference of all 37 ContextKit lint rules across Bronze, Silver, Gold, and Data tiers.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+ContextKit includes 37 lint rules organized by tier. Rules are checked with `npx contextkit lint` and auto-fixable rules can be applied with `npx contextkit fix`.
+
+**Severity levels:** `error` rules block tier promotion. `warning` rules are advisory.
+
+**Fixable:** Rules marked as fixable can be automatically corrected by `npx contextkit fix`.
+
+## Bronze rules (12)
+
+Bronze rules enforce basic structural correctness and naming conventions.
+
+| Rule ID | Severity | Fixable | Description |
+|---------|----------|---------|-------------|
+| `naming/id-kebab-case` | error | No | Model and field IDs must use kebab-case |
+| `osi/descriptions-required` | error | Yes | All models and fields must have descriptions |
+| `governance/ownership-required` | error | No | Every model must declare an owner |
+| `references/resolvable` | error | No | All `$ref` pointers must resolve to existing targets |
+| `glossary/no-duplicate-synonyms` | error | No | Glossary synonyms must be unique across all terms |
+| `security/no-secrets` | error | No | Context files must not contain secrets or credentials |
+| `osi/valid-schema` | error | No | All files must conform to the OSI schema |
+| `governance/model-exists` | error | No | Referenced models must exist in the context directory |
+| `governance/datasets-exist` | error | No | Referenced datasets must exist |
+| `governance/fields-exist` | error | No | Referenced fields must exist in their parent model |
+| `governance/grain-required` | error | Yes | Every model must declare its grain |
+| `governance/security-required` | error | Yes | Every model must have a security classification |
+
+## Silver rules (3)
+
+Silver rules require governance metadata that supports operational use.
+
+| Rule ID | Severity | Fixable | Description |
+|---------|----------|---------|-------------|
+| `governance/trust-required` | error | Yes | Every model must declare a trust level |
+| `governance/refresh-required` | error | Yes | Every model must specify its refresh cadence |
+| `lineage/upstream-required` | error | No | Every model must declare at least one upstream dependency |
+
+## Gold rules (14)
+
+Gold rules enforce rich semantic metadata, quality definitions, and comprehensive coverage.
+
+| Rule ID | Severity | Fixable | Description |
+|---------|----------|---------|-------------|
+| `governance/semantic-role-required` | error | No | Every field must have a semantic role (dimension, measure, etc.) |
+| `governance/aggregation-required` | error | No | Measure fields must specify their aggregation method |
+| `governance/additive-required` | error | No | Measure fields must declare whether they are additive, semi-additive, or non-additive |
+| `rules/golden-queries-minimum` | error | No | Every model must have at least one golden query |
+| `rules/business-rules-exist` | error | No | Every model must have at least one business rule |
+| `rules/guardrails-exist` | error | No | Every model must have at least one guardrail |
+| `rules/hierarchies-exist` | error | No | Models with dimensional fields must define hierarchies |
+| `governance/field-description-quality` | warning | No | Field descriptions must be substantive, not just the field name restated |
+| `glossary/definition-quality` | warning | No | Glossary definitions must be substantive and non-trivial |
+| `lineage/no-self-reference` | error | No | A model cannot list itself as an upstream dependency |
+| `governance/grain-no-placeholder` | error | No | Grain declarations must not be placeholder values |
+| `osi/relationships-coverage` | warning | No | Models should define relationships to other models |
+| `osi/metrics-defined` | error | No | Models with measure fields must define at least one metric |
+| `glossary/coverage` | warning | No | Key business terms should have glossary entries |
+
+## Data rules (9)
+
+Data rules validate context files against live data sources. These require a configured database connection in `contextkit.config.yaml`.
+
+| Rule ID | Severity | Fixable | Description |
+|---------|----------|---------|-------------|
+| `data/source-exists` | error | No | The declared data source table or view must exist in the database |
+| `data/fields-exist` | error | No | Declared fields must exist as columns in the source table |
+| `data/field-types-compatible` | error | No | Declared field types must be compatible with actual column types |
+| `data/sample-values-accurate` | warning | Yes | Sample values in field definitions must actually appear in the data |
+| `data/golden-queries-execute` | error | No | Golden queries must execute without errors |
+| `data/golden-queries-nonempty` | warning | No | Golden queries must return at least one row |
+| `data/guardrails-valid-sql` | error | No | Guardrail SQL expressions must be valid |
+| `data/row-counts-nonzero` | warning | No | Source tables must contain data |
+| `tier/bronze-requirements` | error | No | All Bronze-tier rules must pass before Data rules are evaluated |
+
+<Aside type="note">
+Data rules run only when a data source is configured. See [Database Support](/reference/databases/) for connection setup.
+</Aside>
