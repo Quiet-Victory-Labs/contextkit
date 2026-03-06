@@ -46,15 +46,18 @@ export interface GenerateSiteOptions {
 export function generateSite(
   manifest: Manifest,
   config?: SiteConfig,
+  options?: { studioMode?: boolean },
 ): Map<string, string> {
   const files = new Map<string, string>();
   const siteTitle = config?.title ?? 'ContextKit';
   const basePath = (config?.base_path ?? '').replace(/\/+$/, '') || '.';
+  const studioMode = options?.studioMode ?? false;
 
   // Common data shared across all pages (includes sidebar data)
   const commonData = {
     siteTitle,
     basePath,
+    studioMode,
     models: manifest.models,
     tiers: manifest.tiers,
   };

@@ -57,7 +57,7 @@ export async function startStudioServer(opts: StudioServerOptions): Promise<{
     if (cachedPages) return cachedPages;
     if (!cachedManifest) await recompile();
     const { generateSite } = await import('@runcontext/site');
-    cachedPages = generateSite(cachedManifest!, { ...config.site, studioMode: true });
+    cachedPages = generateSite(cachedManifest!, config.site, { studioMode: true });
     return cachedPages;
   }
 

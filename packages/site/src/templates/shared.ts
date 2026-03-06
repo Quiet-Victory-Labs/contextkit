@@ -689,6 +689,33 @@ export const HEAD = `<!DOCTYPE html>
       .overlay.open { display: block; }
     }
   </style>
+<% if (typeof studioMode !== 'undefined' && studioMode) { %>
+  <style>
+    .edit-btn { background: none; border: 1px solid #c9a55a; color: #c9a55a; border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; margin-left: 8px; opacity: 0.6; transition: opacity 0.2s; }
+    .edit-btn:hover { opacity: 1; }
+    .editable { cursor: text; border-bottom: 1px dashed #c9a55a40; transition: border-color 0.2s; }
+    .editable:hover { border-bottom-color: #c9a55a; }
+    .editable:focus { outline: none; border-bottom: 2px solid #c9a55a; background: #c9a55a10; }
+    .staged-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a2e; border-top: 2px solid #c9a55a; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.3); }
+    .staged-btn { border: none; border-radius: 6px; padding: 8px 20px; font-size: 14px; cursor: pointer; font-weight: 500; }
+    .staged-btn.primary { background: #c9a55a; color: #0a0a0f; }
+    .staged-btn.primary:hover { background: #d4b06a; }
+    .staged-btn.secondary { background: transparent; border: 1px solid #666; color: #999; }
+    .staged-btn.secondary:hover { border-color: #999; color: #fff; }
+    .diff-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+    .diff-modal-content { background: #1a1a2e; border: 1px solid #333; border-radius: 12px; padding: 24px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .diff-modal-content h2 { margin: 0 0 16px; color: #c9a55a; }
+    .diff-file { margin: 12px 0; padding: 12px; background: #0a0a0f; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+    .diff-file-name { color: #888; font-size: 12px; margin-bottom: 8px; }
+    .diff-add { color: #4ade80; }
+    .diff-del { color: #f87171; }
+    .diff-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
+    .toast { position: fixed; top: 20px; right: 20px; background: #1a1a2e; border: 1px solid #c9a55a; color: #e0e0e0; padding: 12px 20px; border-radius: 8px; z-index: 3000; animation: toast-in 0.3s ease-out; }
+    @keyframes toast-in { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .studio-add-btn { background: none; border: 1px dashed #c9a55a60; color: #c9a55a; border-radius: 8px; padding: 12px; width: 100%; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .studio-add-btn:hover { border-color: #c9a55a; background: #c9a55a10; }
+  </style>
+<% } %>
 </head>`;
 
 // ---------------------------------------------------------------------------
@@ -824,4 +851,267 @@ export const SCRIPTS = `<script>
     window.highlightSQL();
   }
 })();
-</script>`;
+</script>
+<% if (typeof studioMode !== 'undefined' && studioMode) { %>
+<div class="staged-bar" id="staged-bar" style="display:none;">
+  <span id="staged-count" style="color:#c9a55a;font-weight:500;">0 changes staged</span>
+  <div>
+    <button onclick="previewAndSave()" class="staged-btn primary">Preview &amp; Save</button>
+    <button onclick="discardEdits()" class="staged-btn secondary" style="margin-left:8px;">Discard</button>
+  </div>
+</div>
+<div class="diff-modal" id="diff-modal" style="display:none;">
+  <div class="diff-modal-content">
+    <h2>Review Changes</h2>
+    <div id="diff-container"></div>
+    <div class="diff-actions">
+      <button onclick="confirmSave()" class="staged-btn primary">Save All</button>
+      <button onclick="closeDiffModal()" class="staged-btn secondary">Cancel</button>
+    </div>
+  </div>
+</div>
+<script>
+window.studioState = { edits: [] };
+
+function stageEdit(file, path, value, label) {
+  window.studioState.edits = window.studioState.edits.filter(
+    e => !(e.file === file && e.path === path)
+  );
+  window.studioState.edits.push({ file, path, value, label });
+  updateStagedBar();
+}
+
+function updateStagedBar() {
+  const bar = document.getElementById('staged-bar');
+  const count = document.getElementById('staged-count');
+  if (!bar || !count) return;
+  const n = window.studioState.edits.length;
+  bar.style.display = n > 0 ? 'flex' : 'none';
+  count.textContent = n + ' change' + (n !== 1 ? 's' : '') + ' staged';
+}
+
+function discardEdits() {
+  window.studioState.edits = [];
+  updateStagedBar();
+  document.querySelectorAll('.editable[contenteditable="true"]').forEach(el => {
+    el.contentEditable = 'false';
+    if (el.dataset.original) el.textContent = el.dataset.original;
+  });
+}
+
+async function previewAndSave() {
+  const edits = window.studioState.edits;
+  if (edits.length === 0) return;
+
+  const fileGroups = {};
+  for (const edit of edits) {
+    if (!fileGroups[edit.file]) fileGroups[edit.file] = [];
+    fileGroups[edit.file].push(edit);
+  }
+
+  const previews = [];
+  for (const [file, fileEdits] of Object.entries(fileGroups)) {
+    try {
+      const res = await fetch('/api/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file: fileEdits[0].file, path: fileEdits[0].path, value: fileEdits[0].value }),
+      });
+      const data = await res.json();
+      previews.push({ file, edits: fileEdits, ...data });
+    } catch (err) {
+      previews.push({ file, edits: fileEdits, error: err.message });
+    }
+  }
+
+  showDiffModal(previews);
+}
+
+function showDiffModal(previews) {
+  const modal = document.getElementById('diff-modal');
+  const container = document.getElementById('diff-container');
+  if (!modal || !container) return;
+
+  container.innerHTML = previews.map(p => {
+    if (p.error) {
+      return '<div class="diff-file"><div class="diff-file-name">' + p.file + '</div><span class="diff-del">Error: ' + p.error + '</span></div>';
+    }
+    const editList = p.edits.map(e => '<div class="diff-add">  ' + e.label + ': ' + JSON.stringify(e.value) + '</div>').join('');
+    return '<div class="diff-file"><div class="diff-file-name">' + p.file + '</div>' + editList + '</div>';
+  }).join('');
+
+  modal.style.display = 'flex';
+}
+
+function closeDiffModal() {
+  const modal = document.getElementById('diff-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function confirmSave() {
+  const edits = window.studioState.edits;
+  if (edits.length === 0) return;
+
+  try {
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edits }),
+    });
+    const data = await res.json();
+    const ok = data.results.filter(r => r.ok).length;
+    showToast(ok + ' file(s) saved');
+    window.studioState.edits = [];
+    updateStagedBar();
+    closeDiffModal();
+  } catch (err) {
+    showToast('Save failed: ' + err.message);
+  }
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function initSSE() {
+  const es = new EventSource('/api/events');
+  es.addEventListener('update', function(e) {
+    try {
+      const data = JSON.parse(e.data);
+      showToast('Recompiled — ' + data.diagnosticCount + ' diagnostics');
+      setTimeout(() => location.reload(), 500);
+    } catch {}
+  });
+}
+
+function makeEditable(el) {
+  el.addEventListener('click', function() {
+    if (el.contentEditable === 'true') return;
+    el.dataset.original = el.textContent;
+    el.contentEditable = 'true';
+    el.focus();
+  });
+  el.addEventListener('blur', function() {
+    el.contentEditable = 'false';
+    const newVal = el.textContent.trim();
+    if (newVal !== el.dataset.original) {
+      stageEdit(el.dataset.file, el.dataset.path, newVal, el.dataset.label || el.dataset.path);
+      el.style.borderBottomColor = '#4ade80';
+      setTimeout(() => { el.style.borderBottomColor = ''; }, 1000);
+    }
+  });
+  el.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      el.blur();
+    }
+    if (e.key === 'Escape') {
+      el.textContent = el.dataset.original;
+      el.contentEditable = 'false';
+    }
+  });
+}
+
+function makeDropdown(el) {
+  el.addEventListener('click', function(e) {
+    document.querySelectorAll('.studio-dropdown').forEach(d => d.remove());
+
+    const options = (el.dataset.options || '').split(',');
+    const dropdown = document.createElement('div');
+    dropdown.className = 'studio-dropdown';
+    dropdown.style.cssText = 'position:absolute;background:#1a1a2e;border:1px solid #c9a55a;border-radius:6px;padding:4px 0;z-index:500;min-width:120px;box-shadow:0 4px 12px rgba(0,0,0,0.4);';
+
+    options.forEach(opt => {
+      const item = document.createElement('div');
+      item.textContent = opt.trim();
+      item.style.cssText = 'padding:6px 16px;cursor:pointer;color:#e0e0e0;font-size:13px;';
+      item.addEventListener('mouseenter', () => { item.style.background = '#c9a55a20'; });
+      item.addEventListener('mouseleave', () => { item.style.background = 'none'; });
+      item.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const val = opt.trim();
+        el.textContent = val;
+        stageEdit(el.dataset.file, el.dataset.path, val, el.dataset.label || el.dataset.path);
+        dropdown.remove();
+        el.style.borderBottomColor = '#4ade80';
+        setTimeout(() => { el.style.borderBottomColor = ''; }, 1000);
+      });
+      dropdown.appendChild(item);
+    });
+
+    const rect = el.getBoundingClientRect();
+    dropdown.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+    dropdown.style.left = (rect.left + window.scrollX) + 'px';
+    document.body.appendChild(dropdown);
+
+    setTimeout(() => {
+      document.addEventListener('click', function closer() {
+        dropdown.remove();
+        document.removeEventListener('click', closer);
+      }, { once: true });
+    }, 0);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.editable').forEach(makeEditable);
+  document.querySelectorAll('.dropdown-editable').forEach(makeDropdown);
+  initSSE();
+});
+</script>
+<% } %>`;
+
+// ---------------------------------------------------------------------------
+// Studio mode constants — exported for use in page-specific templates
+// ---------------------------------------------------------------------------
+
+export const STUDIO_CSS = `
+.edit-btn { background: none; border: 1px solid #c9a55a; color: #c9a55a; border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; margin-left: 8px; opacity: 0.6; transition: opacity 0.2s; }
+.edit-btn:hover { opacity: 1; }
+.editable { cursor: text; border-bottom: 1px dashed #c9a55a40; transition: border-color 0.2s; }
+.editable:hover { border-bottom-color: #c9a55a; }
+.editable:focus { outline: none; border-bottom: 2px solid #c9a55a; background: #c9a55a10; }
+.staged-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a2e; border-top: 2px solid #c9a55a; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.3); }
+.staged-btn { border: none; border-radius: 6px; padding: 8px 20px; font-size: 14px; cursor: pointer; font-weight: 500; }
+.staged-btn.primary { background: #c9a55a; color: #0a0a0f; }
+.staged-btn.primary:hover { background: #d4b06a; }
+.staged-btn.secondary { background: transparent; border: 1px solid #666; color: #999; }
+.staged-btn.secondary:hover { border-color: #999; color: #fff; }
+.diff-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+.diff-modal-content { background: #1a1a2e; border: 1px solid #333; border-radius: 12px; padding: 24px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.diff-modal-content h2 { margin: 0 0 16px; color: #c9a55a; }
+.diff-file { margin: 12px 0; padding: 12px; background: #0a0a0f; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+.diff-file-name { color: #888; font-size: 12px; margin-bottom: 8px; }
+.diff-add { color: #4ade80; }
+.diff-del { color: #f87171; }
+.diff-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
+.toast { position: fixed; top: 20px; right: 20px; background: #1a1a2e; border: 1px solid #c9a55a; color: #e0e0e0; padding: 12px 20px; border-radius: 8px; z-index: 3000; animation: toast-in 0.3s ease-out; }
+@keyframes toast-in { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.studio-add-btn { background: none; border: 1px dashed #c9a55a60; color: #c9a55a; border-radius: 8px; padding: 12px; width: 100%; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+.studio-add-btn:hover { border-color: #c9a55a; background: #c9a55a10; }
+`;
+
+export const STAGED_BAR = `<div class="staged-bar" id="staged-bar" style="display:none;">
+  <span id="staged-count" style="color:#c9a55a;font-weight:500;">0 changes staged</span>
+  <div>
+    <button onclick="previewAndSave()" class="staged-btn primary">Preview &amp; Save</button>
+    <button onclick="discardEdits()" class="staged-btn secondary" style="margin-left:8px;">Discard</button>
+  </div>
+</div>`;
+
+export const DIFF_MODAL = `<div class="diff-modal" id="diff-modal" style="display:none;">
+  <div class="diff-modal-content">
+    <h2>Review Changes</h2>
+    <div id="diff-container"></div>
+    <div class="diff-actions">
+      <button onclick="confirmSave()" class="staged-btn primary">Save All</button>
+      <button onclick="closeDiffModal()" class="staged-btn secondary">Cancel</button>
+    </div>
+  </div>
+</div>`;
