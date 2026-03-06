@@ -47,11 +47,12 @@ context site --base-url /data-docs/
 
 The `site/` directory contains:
 
-- **Model pages** -- datasets, fields, schema browser, rules, relationships
-- **Glossary** -- all business terms with definitions, synonyms, linked fields
+- **Sidebar navigation** -- browse all models with tier badges at a glance
+- **Model pages** -- datasets, fields, schema browser, rules, lineage, tier scorecard
+- **Glossary** -- all business terms with filterable definitions, synonyms, linked fields
 - **Owner pages** -- team ownership with governed models
 - **Search** -- full-text search across all entities
-- **Tier badges** -- visual Bronze/Silver/Gold status
+- **Top bar** -- links back to the ContextKit documentation site
 
 ## Serving
 
@@ -83,7 +84,7 @@ cp -r public/data-docs /var/www/html/
 ## Notes
 
 - Always run `context build` before `context site` -- the site reads from the compiled manifest
-- The site is fully static HTML with no JavaScript dependencies
+- The site is fully static HTML with minimal JavaScript (search, sidebar toggle, expandable sections)
 - Deploy anywhere: Vercel, Netlify, GitHub Pages, S3, or just open locally
 
 ## Next steps

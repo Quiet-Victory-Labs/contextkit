@@ -51,9 +51,12 @@ export function generateSite(
   const siteTitle = config?.title ?? 'ContextKit';
   const basePath = (config?.base_path ?? '').replace(/\/+$/, '') || '.';
 
+  // Common data shared across all pages (includes sidebar data)
   const commonData = {
     siteTitle,
     basePath,
+    models: manifest.models,
+    tiers: manifest.tiers,
   };
 
   // --- Index page ---
@@ -62,9 +65,7 @@ export function generateSite(
     ejs.render(indexTemplate, {
       ...commonData,
       pageTitle: 'Home',
-      models: manifest.models,
       governance: manifest.governance,
-      tiers: manifest.tiers,
       owners: manifest.owners,
       terms: manifest.terms,
     }),

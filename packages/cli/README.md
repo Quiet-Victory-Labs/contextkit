@@ -71,8 +71,17 @@ context init                     # Scaffold a new project structure
 
 | Adapter | Connection |
 |---|---|
-| DuckDB | `--db duckdb://path/to/file.duckdb` |
+| DuckDB | `--db duckdb://path.duckdb` |
 | PostgreSQL | `--db postgres://user:pass@host:5432/db` |
+| MySQL | `--db mysql://user:pass@host:3306/db` |
+| SQL Server | `--db mssql://user:pass@host:1433/db` |
+| SQLite | `--db path/to/file.sqlite` |
+| Snowflake | `--db snowflake://account/database/schema` |
+| BigQuery | `--db bigquery://project/dataset` |
+| ClickHouse | `--db clickhouse://host:8123` |
+| Databricks | Config file only |
+
+Each adapter requires its own driver as an optional peer dependency. See [Database Support docs](https://contextkit.dev/reference/databases/) for installation details.
 
 ## MCP Server
 

@@ -1,19 +1,23 @@
-import { HEAD, NAV, FOOTER, SCRIPTS } from './shared.js';
+import { HEAD, TOPBAR, SIDEBAR, SIDEBAR_DATA, FOOTER, SCRIPTS } from './shared.js';
 
 export const searchTemplate = `${HEAD}
 <body>
-${NAV}
+${TOPBAR}
+${SIDEBAR_DATA}
+${SIDEBAR}
 
-<main class="page">
-  <h1 style="font-family:var(--serif);font-weight:300;font-size:clamp(2rem,5vw,3.5rem);color:var(--text);margin-bottom:2rem;">Search</h1>
+<div class="main">
+  <div class="page-header">
+    <h1>Search</h1>
+  </div>
 
   <input type="text" id="search-input"
-         placeholder="Search models, datasets, terms..."
+         placeholder="Search models, datasets, fields, terms..."
          class="search-input"
-         style="margin-bottom:2rem;" />
+         style="margin-bottom:1.5rem;" />
 
-  <div id="search-results" style="display:flex;flex-direction:column;gap:0.75rem;"></div>
-</main>
+  <div id="search-results" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+</div>
 
 ${FOOTER}
 ${SCRIPTS}
@@ -44,18 +48,18 @@ ${SCRIPTS}
   function createResultElement(doc) {
     var wrapper = document.createElement('div');
     wrapper.className = 'card';
-    wrapper.style.padding = '1rem 1.25rem';
+    wrapper.style.padding = '0.75rem 1rem';
 
     var top = document.createElement('div');
     top.style.display = 'flex';
     top.style.alignItems = 'center';
-    top.style.gap = '0.5rem';
+    top.style.gap = '0.4rem';
 
     var link = document.createElement('a');
     link.href = doc.url;
     link.style.fontFamily = 'var(--mono)';
-    link.style.fontSize = '0.88rem';
-    link.style.color = 'var(--gold-light)';
+    link.style.fontSize = '0.82rem';
+    link.style.color = 'var(--accent-light)';
     link.textContent = doc.title;
     top.appendChild(link);
 
@@ -68,9 +72,9 @@ ${SCRIPTS}
 
     if (doc.description) {
       var desc = document.createElement('p');
-      desc.style.fontSize = '0.82rem';
-      desc.style.color = 'var(--text-muted)';
-      desc.style.marginTop = '0.3rem';
+      desc.style.fontSize = '0.78rem';
+      desc.style.color = 'var(--text-secondary)';
+      desc.style.marginTop = '0.2rem';
       desc.style.fontWeight = '300';
       desc.textContent = doc.description;
       wrapper.appendChild(desc);
@@ -86,7 +90,7 @@ ${SCRIPTS}
     var hits = miniSearch.search(query, { prefix: true, fuzzy: 0.2 });
     if (hits.length === 0) {
       var noResults = document.createElement('p');
-      noResults.style.color = 'var(--text-muted)';
+      noResults.style.color = 'var(--text-secondary)';
       noResults.textContent = 'No results found.';
       resultsContainer.appendChild(noResults);
       return;

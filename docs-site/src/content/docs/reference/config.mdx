@@ -20,7 +20,7 @@ data_sources:
     path: ./warehouse.duckdb
   production:
     adapter: postgres
-    connection_string: postgres://user:pass@host:5432/analytics
+    connection: postgres://user:pass@host:5432/analytics
 ```
 
 ## Fields
@@ -31,13 +31,64 @@ Path to the directory containing your metadata files. Defaults to `context`.
 
 ### `data_sources`
 
-Named database connections. Each source has:
+Named database connections. Each source requires an `adapter` field plus adapter-specific configuration:
 
-| Field | Required | Description |
+| Adapter | Required Fields |
+|---|---|
+| `duckdb` | `path` — path to `.duckdb` file |
+| `postgres` | `connection` — PostgreSQL connection URI |
+| `mysql` | `connection` — MySQL connection URI |
+| `mssql` | `connection` — SQL Server connection URI |
+| `sqlite` | `path` — path to `.sqlite` or `.sqlite3` file |
+| `snowflake` | `account`, `username`, `password`, `database`, `schema` (optional: `warehouse`, `role`) |
+| `bigquery` | `project`, `dataset` (optional: `keyFilename`) |
+| `clickhouse` | `host` (optional: `port`) |
+| `databricks` | `serverHostname`, `httpPath`, `token` |
+
+#### Examples
+
+```yaml
+data_sources:
+  # DuckDB
+  warehouse:
+    adapter: duckdb
+    path: ./warehouse.duckdb
+
+  # PostgreSQL / Neon / Supabase
+  production:
+    adapter: postgres
+    connection: postgres://user:pass@host:5432/analytics
+
+  # MySQL
+  mysql_db:
+    adapter: mysql
+    connection: mysql://user:pass@host:3306/mydb
+
+  # Snowflake
+  snowflake_dwh:
+    adapter: snowflake
+    account: xy12345.us-east-1
+    username: analyst
+    password: ${SNOWFLAKE_PASSWORD}
+    database: ANALYTICS
+    schema: PUBLIC
+    warehouse: COMPUTE_WH
+
+  # BigQuery
+  bq:
+    adapter: bigquery
+    project: my-gcp-project
+    dataset: analytics
+```
+
+### `site`
+
+Optional configuration for the static documentation site:
+
+| Field | Default | Description |
 |---|---|---|
-| `adapter` | Yes | Database type: `duckdb` or `postgres` |
-| `path` | DuckDB only | Path to the `.duckdb` file |
-| `connection_string` | Postgres only | Full PostgreSQL connection URI |
+| `title` | `ContextKit` | Site title shown in navigation |
+| `base_path` | `.` | Base path for asset URLs |
 
 ### Using named sources
 
@@ -56,5 +107,11 @@ If you only have one source named `default`, commands use it automatically.
 The `context setup` wizard auto-detects databases from:
 
 1. Existing `contextkit.config.yaml`
-2. `.claude/mcp.json` (DuckDB MCP server configs)
-3. `.duckdb` files in the current directory
+2. Environment variables (`DATABASE_URL`, `POSTGRES_URL`, etc.)
+3. MCP server configs from 5 IDEs:
+   - **Claude Code** — `.claude/mcp.json`
+   - **Cursor** — `~/.cursor/mcp.json`
+   - **VS Code** — `.vscode/mcp.json` and VS Code settings
+   - **Windsurf** — `~/.windsurf/mcp.json`
+   - **Claude Desktop** — `~/Library/Application Support/Claude/claude_desktop_config.json`
+4. Database files in the current directory (`.duckdb`, `.sqlite`, `.db`)

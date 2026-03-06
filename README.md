@@ -118,7 +118,7 @@ Metadata is structured enough for AI agents to autonomously generate correct SQL
 
 ## CLI Reference
 
-ContextKit ships 15 commands:
+ContextKit ships 16 commands:
 
 ### Core Workflow
 
@@ -140,6 +140,12 @@ context explain <name>           # Look up any model, term, or owner
 context rules                    # List all lint rules with tier, severity, fixability
 context validate-osi <file>      # Validate a single OSI file against the schema
 context verify                   # Check metadata accuracy against a live database
+```
+
+### Data Products
+
+```bash
+context blueprint [model]        # Export a portable data product YAML (OSI format)
 ```
 
 ### Serving
@@ -230,6 +236,8 @@ Or for HTTP mode:
 | `context://model/{name}` | Single model with datasets, fields, relationships, metrics |
 | `context://glossary` | All business term definitions and synonyms |
 | `context://tier/{name}` | Tier scorecard for a model |
+| `context://data-product/template` | Blank OSI data product YAML template |
+| `context://data-product/{name}` | Export a model as a portable data product YAML |
 
 **Tools** — actions an agent can invoke:
 
@@ -261,12 +269,21 @@ Run `context rules` to see the full list with severity and auto-fix support.
 
 ## Database Support
 
-ContextKit connects to databases for introspection, enrichment, and verification:
+ContextKit connects to 9 database engines for introspection, enrichment, and verification:
 
 | Adapter | Connection |
 |---|---|
-| **DuckDB** | `--db duckdb://path/to/file.duckdb` or config `path:` |
+| **DuckDB** | `--db duckdb://path.duckdb` |
 | **PostgreSQL** | `--db postgres://user:pass@host:5432/db` |
+| **MySQL** | `--db mysql://user:pass@host:3306/db` |
+| **SQL Server** | `--db mssql://user:pass@host:1433/db` |
+| **SQLite** | `--db path/to/file.sqlite` |
+| **Snowflake** | `--db snowflake://account/database/schema` |
+| **BigQuery** | `--db bigquery://project/dataset` |
+| **ClickHouse** | `--db clickhouse://host:8123` |
+| **Databricks** | Config file only |
+
+Each adapter uses optional peer dependencies — install only the drivers you need. The setup wizard also auto-detects databases from your MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop).
 
 Configure in `contextkit.config.yaml`:
 
@@ -278,7 +295,7 @@ data_sources:
     path: ./warehouse.duckdb
   production:
     adapter: postgres
-    connection_string: postgres://user:pass@host:5432/analytics
+    connection: postgres://user:pass@host:5432/analytics
 ```
 
 ---
@@ -292,11 +309,12 @@ context build && context site
 ```
 
 Produces a `site/` directory with:
-- **Model pages** — datasets, fields, schema browser, rules
-- **Glossary** — all business terms with definitions and linked fields
+- **Sidebar navigation** — browse all models with tier badges at a glance
+- **Model pages** — datasets, fields, schema browser, rules, lineage, tier scorecard
+- **Glossary** — all business terms with filterable definitions and linked fields
 - **Owner pages** — team ownership with governed models
 - **Search** — full-text search across all entities
-- **Tier badges** — visual Bronze/Silver/Gold status per model
+- **Docs link** — links back to the full ContextKit documentation site
 
 Serve locally or deploy anywhere static files are hosted.
 
@@ -308,7 +326,7 @@ Serve locally or deploy anywhere static files are hosted.
 npm install @runcontext/cli
 ```
 
-That's it — one package, everything included: compiler, linter, tier engine, MCP server, site generator, introspector, enricher, and all 15 CLI commands.
+That's it — one package, everything included: compiler, linter, tier engine, MCP server, site generator, introspector, enricher, and all 16 CLI commands.
 
 | Package | Description |
 |---|---|

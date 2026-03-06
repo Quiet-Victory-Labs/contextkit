@@ -17,7 +17,7 @@ No options required. The wizard will prompt you for everything it needs.
 
 The setup wizard walks through four stages:
 
-1. **Detect** -- Scans your environment for database connection strings (environment variables, `.env` files, common config files).
+1. **Detect** -- Scans your environment for databases: environment variables, `.env` files, MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop), and database files in the current directory.
 2. **Introspect** -- Connects to the detected database and scaffolds Bronze-level context files for every table.
 3. **Scaffold** -- Writes `.context.yaml` files into your project's `context/` directory.
 4. **Enrich** -- Offers to apply Silver-level enrichments using AI-generated descriptions and relationships.

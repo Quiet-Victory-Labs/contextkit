@@ -38,18 +38,26 @@ context --version
 # 0.3.5
 
 context --help
-# Shows all 15 commands
+# Shows all 16 commands
 ```
 
 ## Database drivers
 
-ContextKit supports DuckDB and PostgreSQL. For DuckDB introspection, you'll also need:
+ContextKit supports 9 database engines. Each uses an optional peer dependency — install only the drivers you need:
 
-```bash
-npm install duckdb
-```
+| Database | Driver Package |
+|---|---|
+| DuckDB | `npm install duckdb` |
+| PostgreSQL | `npm install pg` |
+| MySQL | `npm install mysql2` |
+| SQL Server | `npm install mssql` |
+| SQLite | `npm install better-sqlite3` |
+| Snowflake | `npm install snowflake-sdk` |
+| BigQuery | `npm install @google-cloud/bigquery` |
+| ClickHouse | `npm install @clickhouse/client` |
+| Databricks | `npm install @databricks/sql` |
 
-PostgreSQL support works via connection strings — no extra driver needed if you have `pg` available.
+The setup wizard also auto-detects databases from your existing MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop).
 
 ## Next steps
 
