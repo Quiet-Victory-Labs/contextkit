@@ -16,6 +16,7 @@ import { verifyCommand } from './commands/verify.js';
 import { enrichCommand } from './commands/enrich.js';
 import { rulesCommand } from './commands/rules.js';
 import { setupCommand } from './commands/setup.js';
+import { blueprintCommand } from './commands/blueprint.js';
 
 const program = new Command();
 
@@ -40,5 +41,6 @@ program.addCommand(verifyCommand);
 program.addCommand(enrichCommand);
 program.addCommand(rulesCommand);
 program.addCommand(setupCommand);
+program.addCommand(blueprintCommand);
 
 program.parse();

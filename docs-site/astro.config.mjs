@@ -46,6 +46,7 @@ export default defineConfig({
             { label: 'build & tier', slug: 'cli/build' },
             { label: 'verify', slug: 'cli/verify' },
             { label: 'serve', slug: 'cli/serve' },
+            { label: 'blueprint', slug: 'cli/blueprint' },
             { label: 'site', slug: 'cli/site' },
           ],
         },
