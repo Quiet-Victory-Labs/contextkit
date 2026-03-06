@@ -45,7 +45,9 @@ ${TIER_BADGE}
           <div style="padding:0.5rem 1.25rem;font-size:0.72rem;color:var(--text-dim);font-family:var(--mono);">
             Source: <%= ds.source %>
           </div>
-          <% if (ds.description) { %>
+          <% if (typeof studioMode !== 'undefined' && studioMode) { %>
+            <div style="padding:0 1.25rem 0.75rem;font-size:0.82rem;color:var(--text-secondary);font-weight:300;"><span class="editable" data-file="context/models/<%= model.name %>.osi.yaml" data-path="semantic_model.0.datasets.<%= i %>.description" data-label="<%= ds.name %> description"><%= ds.description || 'Add description' %></span></div>
+          <% } else if (ds.description) { %>
             <div style="padding:0 1.25rem 0.75rem;font-size:0.82rem;color:var(--text-secondary);font-weight:300;"><%= ds.description %></div>
           <% } %>
 
@@ -55,15 +57,33 @@ ${TIER_BADGE}
                 <tr><th>Field</th><th>Description</th><th>Semantic Role</th><th>Aggregation</th></tr>
               </thead>
               <tbody>
-                <% for (var field of ds.fields) { %>
+                <% for (var j = 0; j < ds.fields.length; j++) { var field = ds.fields[j]; %>
                   <% var fieldKey = ds.name + '.' + field.name; %>
                   <% var fGov = gov && gov.fields && gov.fields[fieldKey]; %>
                   <% var role = fGov && fGov.semantic_role ? fGov.semantic_role : ''; %>
                   <tr>
                     <td class="mono" style="font-size:0.75rem;"><%= field.name %></td>
-                    <td style="color:var(--text-secondary);font-size:0.8rem;"><%= field.description || '' %></td>
-                    <td><% if (role) { %><span class="tag role-<%= role %>"><%= role %></span><% } %></td>
-                    <td class="mono" style="font-size:0.75rem;color:var(--text-dim);"><%= fGov && fGov.default_aggregation ? fGov.default_aggregation : '' %></td>
+                    <td style="color:var(--text-secondary);font-size:0.8rem;">
+                      <% if (typeof studioMode !== 'undefined' && studioMode) { %>
+                        <span class="editable" data-file="context/models/<%= model.name %>.osi.yaml" data-path="semantic_model.0.datasets.<%= i %>.fields.<%= j %>.description" data-label="<%= field.name %> description"><%= field.description || 'Add description' %></span>
+                      <% } else { %>
+                        <%= field.description || '' %>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (typeof studioMode !== 'undefined' && studioMode) { %>
+                        <span class="dropdown-editable" data-file="context/governance/<%= model.name %>.governance.yaml" data-path="datasets.<%= ds.name %>.fields.<%= field.name %>.semantic_role" data-options="identifier,metric,dimension,date,attribute" data-label="<%= field.name %> semantic role"><%= role || 'Select role' %></span>
+                      <% } else { %>
+                        <% if (role) { %><span class="tag role-<%= role %>"><%= role %></span><% } %>
+                      <% } %>
+                    </td>
+                    <td class="mono" style="font-size:0.75rem;color:var(--text-dim);">
+                      <% if (typeof studioMode !== 'undefined' && studioMode) { %>
+                        <span class="dropdown-editable" data-file="context/governance/<%= model.name %>.governance.yaml" data-path="datasets.<%= ds.name %>.fields.<%= field.name %>.default_aggregation" data-options="SUM,AVG,COUNT,MIN,MAX,NONE" data-label="<%= field.name %> aggregation"><%= fGov && fGov.default_aggregation ? fGov.default_aggregation : 'Select' %></span>
+                      <% } else { %>
+                        <%= fGov && fGov.default_aggregation ? fGov.default_aggregation : '' %>
+                      <% } %>
+                    </td>
                   </tr>
                 <% } %>
               </tbody>
