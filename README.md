@@ -302,15 +302,18 @@ Serve locally or deploy anywhere static files are hosted.
 
 ---
 
-## Packages
+## Installation
 
-| Package | Version | Description |
-|---|---|---|
-| [`@runcontext/core`](https://www.npmjs.com/package/@runcontext/core) | 0.3.3 | Compiler, linter (37 rules), tier engine, fixer, introspector, enricher |
-| [`@runcontext/cli`](https://www.npmjs.com/package/@runcontext/cli) | 0.3.3 | CLI with 15 commands |
-| [`@runcontext/mcp`](https://www.npmjs.com/package/@runcontext/mcp) | 0.3.3 | MCP server — resources, tools, and prompts for AI agents |
-| [`@runcontext/site`](https://www.npmjs.com/package/@runcontext/site) | 0.3.3 | Static documentation site generator |
-| [`create-contextkit`](https://www.npmjs.com/package/create-contextkit) | 0.3.3 | Project scaffolder (`npx create-contextkit my-project`) |
+```bash
+npm install @runcontext/cli
+```
+
+That's it — one package, everything included: compiler, linter, tier engine, MCP server, site generator, introspector, enricher, and all 15 CLI commands.
+
+| Package | Description |
+|---|---|
+| [`@runcontext/cli`](https://www.npmjs.com/package/@runcontext/cli) | The full toolkit — install this |
+| [`create-contextkit`](https://www.npmjs.com/package/create-contextkit) | Project scaffolder (`npx create-contextkit my-project`) |
 
 ---
 
