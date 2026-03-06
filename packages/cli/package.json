@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/cli",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "CLI for ContextKit — lint, build, fix, and serve institutional context",
   "license": "MIT",
   "author": "Eric Kittelson",

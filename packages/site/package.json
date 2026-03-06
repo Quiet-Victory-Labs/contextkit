@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/site",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Static documentation site generator for ContextKit",
   "license": "MIT",
   "author": "Eric Kittelson",
