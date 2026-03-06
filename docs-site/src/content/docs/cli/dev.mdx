@@ -17,6 +17,9 @@ context dev
 |---|---|---|
 | `--context-dir <path>` | Path to context directory | `./context` |
 | `--fix` | Auto-fix problems on each re-lint | Off |
+| `--studio` | Launch the visual metadata editor in your browser | Off |
+| `--port <number>` | Port for the Studio dev server | `4400` |
+| `--host <address>` | Host address for the Studio dev server | `localhost` |
 
 ## Examples
 
@@ -35,6 +38,29 @@ context dev --fix
 ```
 
 Fixable lint violations are corrected automatically each time a file changes.
+
+## Studio Mode
+
+Pass `--studio` to open an interactive metadata editor in your browser:
+
+```bash
+context dev --studio
+```
+
+Studio gives you a visual interface for curating metadata without hand-editing YAML. The editing workflow:
+
+1. **Browse** — navigate your models, columns, and governance files in a tree view.
+2. **Click to edit** — select any field to modify it inline. Editable fields include descriptions, semantic roles, aggregation rules, trust status, golden queries, guardrails, lineage, and glossary terms.
+3. **Stage changes** — edits are staged automatically as you work.
+4. **Preview diff** — review a unified diff of every pending change before saving.
+5. **Save** — writes changes back to the underlying YAML files, triggers a recompile, and the tier scorecard updates live.
+
+### Custom port or host
+
+```bash
+context dev --studio --port 5000
+context dev --studio --host 0.0.0.0
+```
 
 ## Typical workflow
 
