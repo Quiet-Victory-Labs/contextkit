@@ -1,6 +1,6 @@
 {
   "name": "create-contextkit",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Scaffold a new ContextKit project",
   "license": "MIT",
   "author": "Eric Kittelson",
