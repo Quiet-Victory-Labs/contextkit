@@ -1,4 +1,5 @@
 import type { DataAdapter, TableInfo, ColumnInfo, QueryResult } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class MySQLAdapter implements DataAdapter {
   private pool: any;
@@ -13,9 +14,7 @@ export class MySQLAdapter implements DataAdapter {
     try {
       mysql = await import('mysql2/promise');
     } catch {
-      throw new Error(
-        'MySQL driver not found. Install it with: npm install mysql2'
-      );
+      throw new MissingDriverError('mysql');
     }
     this.pool = await mysql.createPool(this.connectionString);
   }

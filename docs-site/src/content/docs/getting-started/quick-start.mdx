@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: Get up and running with ContextKit in under 5 minutes
+description: "Set up ContextKit in under 5 minutes — install, introspect a database, scaffold metadata, and serve to AI agents via MCP"
 ---
 
 import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
@@ -21,9 +21,13 @@ import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
    context setup
    ```
 
-   The wizard auto-detects your database, introspects tables, scaffolds metadata, and enriches to Silver — all in one interactive flow.
+   The wizard auto-detects your database, lets you select which tables to include, introspects them, scaffolds metadata, enriches to Silver, and generates AI agent instructions — all in one interactive flow.
 
-3. **Check your tier**
+3. **Capture your intent**
+
+   The wizard also asks about your goals so AI agents can prioritize curation. Your answers are saved to `AGENT_INSTRUCTIONS.md` and `.claude/CLAUDE.md`, giving AI assistants the context they need to help you reach Gold tier.
+
+4. **Check your tier**
 
    ```bash
    context tier
@@ -31,10 +35,10 @@ import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
 
    You should see your model at **Silver** tier. Gold requires human curation.
 
-4. **Serve to AI agents**
+5. **Serve to AI agents**
 
    ```bash
-   context serve --stdio
+   context serve
    ```
 
    Your MCP server is live. AI agents now have full semantic context.

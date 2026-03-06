@@ -5,6 +5,7 @@ import type {
   ColumnInfo,
   QueryResult,
 } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class ClickHouseAdapter implements DataAdapter {
   private client: any;
@@ -19,9 +20,7 @@ export class ClickHouseAdapter implements DataAdapter {
     try {
       ch = await import('@clickhouse/client');
     } catch {
-      throw new Error(
-        'ClickHouse driver not found. Install it with: npm install @clickhouse/client'
-      );
+      throw new MissingDriverError('clickhouse');
     }
 
     const createClient = ch.createClient ?? ch.default?.createClient;

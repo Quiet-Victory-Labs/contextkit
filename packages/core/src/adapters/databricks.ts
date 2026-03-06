@@ -5,6 +5,7 @@ import type {
   ColumnInfo,
   QueryResult,
 } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class DatabricksAdapter implements DataAdapter {
   private session: any;
@@ -20,9 +21,7 @@ export class DatabricksAdapter implements DataAdapter {
     try {
       dbsql = await import('@databricks/sql');
     } catch {
-      throw new Error(
-        'Databricks driver not found. Install it with: npm install @databricks/sql'
-      );
+      throw new MissingDriverError('databricks');
     }
 
     const DBSQLClient = dbsql.DBSQLClient ?? dbsql.default?.DBSQLClient ?? dbsql.default;

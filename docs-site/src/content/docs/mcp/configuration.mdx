@@ -34,7 +34,7 @@ For shared or remote setups, start the server in HTTP mode and point clients at 
 **Start the server:**
 
 ```bash
-npx @runcontext/cli serve --transport http --port 4040
+npx @runcontext/cli serve --http --port 3000
 ```
 
 **Client configuration (generic):**
@@ -43,7 +43,7 @@ npx @runcontext/cli serve --transport http --port 4040
 {
   "mcpServers": {
     "contextkit": {
-      "url": "http://localhost:4040/sse"
+      "url": "http://localhost:3000/mcp"
     }
   }
 }
@@ -72,7 +72,7 @@ Cursor reads MCP configuration from its settings. Add the ContextKit server unde
 {
   "mcpServers": {
     "contextkit": {
-      "url": "http://localhost:4040/sse"
+      "url": "http://localhost:3000/mcp"
     }
   }
 }
@@ -92,9 +92,13 @@ It should list the `context://` resources. You can also test a tool call:
 
 The agent should call `context_search` and return results from your context directory.
 
-## Environment variables
+## CLI flags
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `CONTEXTKIT_CONFIG` | Path to `contextkit.config.yaml` | `./contextkit.config.yaml` |
-| `CONTEXTKIT_PORT` | Port for HTTP transport | `4040` |
+The `serve` command accepts the following flags:
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--http` | Use HTTP transport (default is stdio) | Off |
+| `--port <number>` | Port for HTTP server | `3000` |
+| `--host <address>` | Host address to bind | `0.0.0.0` |
+| `--context-dir <path>` | Path to context files | `./context` |

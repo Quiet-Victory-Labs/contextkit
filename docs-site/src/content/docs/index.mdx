@@ -1,6 +1,6 @@
 ---
 title: ContextKit
-description: AI-ready metadata governance over OSI
+description: "Open-source semantic layer and metadata governance toolkit for AI agents. Introspect databases, lint YAML metadata, and serve context via MCP."
 template: splash
 hero:
   tagline: Your data already has a schema. ContextKit gives it meaning. Transform raw database schemas into AI-ready semantic layers built on Open Semantic Interchange (OSI) — then lint, score, and serve them to AI agents via MCP.
@@ -21,8 +21,8 @@ hero:
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <div style="text-align:center;margin:1rem 0 2.5rem;">
-  <div class="hero-install" onclick="navigator.clipboard.writeText('npm install @runcontext/cli').then(()=>{this.querySelector('.copy-badge').textContent='copied!'})">
-    <span class="prompt">$ </span><span class="cmd">npm install @runcontext/cli</span>
+  <div class="hero-install" onclick="navigator.clipboard.writeText('npm install -g @runcontext/cli').then(()=>{this.querySelector('.copy-badge').textContent='copied!'})">
+    <span class="prompt">$ </span><span class="cmd">npm install -g @runcontext/cli</span>
     <span class="copy-badge">copy</span>
   </div>
 </div>
@@ -60,7 +60,7 @@ WHERE status='completed' ← required (guardrail)</code></pre>
   <Card title="Gold — AI-Ready" icon="star">
     Semantic roles, aggregation rules, guardrails, golden queries, business rules. Requires human curation.
   </Card>
-  <Card title="37 Lint Rules" icon="list-format">
+  <Card title="40 Lint Rules" icon="list-format">
     Schema validation, governance, security, data accuracy — all tier-aware with auto-fix support.
   </Card>
 </CardGrid>
@@ -68,8 +68,8 @@ WHERE status='completed' ← required (guardrail)</code></pre>
 ## Everything in One Install
 
 <CardGrid stagger>
-  <Card title="16 CLI Commands" icon="setting">
-    `setup`, `introspect`, `enrich`, `lint`, `fix`, `build`, `tier`, `explain`, `verify`, `serve`, `site`, `dev`, `init`, `rules`, `validate-osi`, `blueprint`
+  <Card title="15 CLI Commands" icon="setting">
+    `setup`, `introspect`, `enrich`, `lint`, `fix`, `build`, `tier`, `explain`, `verify`, `serve`, `site`, `dev`, `init`, `rules`, `validate-osi`
   </Card>
   <Card title="MCP Server" icon="rocket">
     Expose your semantic layer to Claude, Cursor, and other AI tools via stdio or HTTP transport.
@@ -85,10 +85,10 @@ WHERE status='completed' ← required (guardrail)</code></pre>
 ## Quick Start
 
 ```bash
-npm install @runcontext/cli
+npm install -g @runcontext/cli
 context setup           # interactive wizard — database to metadata
 context tier            # check your Bronze/Silver/Gold score
-context serve --stdio   # expose to AI agents via MCP
+context serve           # expose to AI agents via MCP
 ```
 
 <CardGrid>

@@ -15,12 +15,14 @@ No options required. The wizard will prompt you for everything it needs.
 
 ## What it does
 
-The setup wizard walks through four stages:
+The setup wizard walks through six stages:
 
-1. **Detect** -- Scans your environment for databases: environment variables, `.env` files, MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop), and database files in the current directory.
-2. **Introspect** -- Connects to the detected database and scaffolds Bronze-level context files for every table.
-3. **Scaffold** -- Writes `.context.yaml` files into your project's `context/` directory.
-4. **Enrich** -- Offers to apply Silver-level enrichments using AI-generated descriptions and relationships.
+1. **Detect** -- Scans your environment for databases: environment variables, `.env` files, MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop), and database files in the current directory. If the required database driver is not installed, the wizard offers to install it automatically (**smart driver detection**).
+2. **Select tables** -- For large databases, lets you interactively pick which tables to include rather than introspecting everything.
+3. **Introspect** -- Connects to the detected database and scaffolds Bronze-level context files for the selected tables.
+4. **Scaffold** -- Writes `.context.yaml` files into your project's `context/` directory.
+5. **Enrich** -- Offers to apply Silver-level enrichments using AI-generated descriptions and relationships.
+6. **Capture intent** -- Asks about your goals and priorities so AI agents can focus curation efforts. Generates `AGENT_INSTRUCTIONS.md` and `.claude/CLAUDE.md` to guide AI assistants toward Gold tier.
 
 ## Example session
 
@@ -31,6 +33,14 @@ Detecting databases...
 
 Connect to postgres://localhost:5432/myapp? (Y/n) Y
 
+Select tables to include:
+  [x] users
+  [x] orders
+  [x] products
+  [ ] _migrations
+  ...
+  Selected 23 of 27 tables
+
 Introspecting schema...
   Found 23 tables, 4 views
   Scaffolded 27 context files to ./context/
@@ -40,6 +50,12 @@ Enrich to Silver tier? (Y/n) Y
   Enriching orders...
   ...
   Done. 27 files enriched.
+
+What are your goals for this data? (optional)
+> We need agents to generate correct revenue reports
+
+Generated AGENT_INSTRUCTIONS.md
+Generated .claude/CLAUDE.md
 
 Run 'context lint' to check for issues.
 Run 'context serve' to start the MCP server.

@@ -1,4 +1,5 @@
 import type { DataAdapter, TableInfo, ColumnInfo, QueryResult } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class SQLiteAdapter implements DataAdapter {
   private db: any;
@@ -14,9 +15,7 @@ export class SQLiteAdapter implements DataAdapter {
       const mod = await import('better-sqlite3');
       Database = mod.default ?? mod;
     } catch {
-      throw new Error(
-        'SQLite driver not found. Install it with: npm install better-sqlite3'
-      );
+      throw new MissingDriverError('sqlite');
     }
     this.db = new Database(this.dbPath, { readonly: true });
   }

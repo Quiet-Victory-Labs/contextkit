@@ -5,6 +5,7 @@ import type {
   ColumnInfo,
   QueryResult,
 } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class BigQueryAdapter implements DataAdapter {
   private client: any;
@@ -19,9 +20,7 @@ export class BigQueryAdapter implements DataAdapter {
     try {
       bq = await import('@google-cloud/bigquery');
     } catch {
-      throw new Error(
-        'BigQuery driver not found. Install it with: npm install @google-cloud/bigquery'
-      );
+      throw new MissingDriverError('bigquery');
     }
 
     const BigQuery = bq.BigQuery ?? bq.default?.BigQuery;

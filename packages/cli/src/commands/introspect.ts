@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import path from 'node:path';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync, unlinkSync } from 'node:fs';
 import * as p from '@clack/prompts';
 import {
   loadConfig,
@@ -209,6 +209,31 @@ export const introspectCommand = new Command('introspect')
       console.log(`  ${path.relative(process.cwd(), osiPath)}`);
       console.log(`  ${path.relative(process.cwd(), govPath)}`);
       console.log(`  ${path.relative(process.cwd(), ownerPath)}`);
+      // Clean up example template files from `context init`
+      const exampleFiles = [
+        path.join(contextDir, 'models', 'example-model.osi.yaml'),
+        path.join(contextDir, 'governance', 'example-model.governance.yaml'),
+        path.join(contextDir, 'glossary', 'glossary.term.yaml'),
+        path.join(contextDir, 'owners', 'data-team.owner.yaml'),
+      ];
+      let removedCount = 0;
+      for (const exFile of exampleFiles) {
+        if (existsSync(exFile)) {
+          try {
+            const content = readFileSync(exFile, 'utf-8');
+            if (content.includes('example-model') || content.includes('Replace this') || content.includes('Example Term') || content.includes('team: data-team')) {
+              unlinkSync(exFile);
+              removedCount++;
+            }
+          } catch {
+            // Ignore errors reading/removing example files
+          }
+        }
+      }
+      if (removedCount > 0) {
+        p.log.info(`Removed ${removedCount} example template file(s) from init`);
+      }
+
       console.log('');
       console.log(chalk.cyan('Run `context tier` to check your tier score.'));
       console.log(

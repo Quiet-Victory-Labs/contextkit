@@ -8,8 +8,7 @@ The `site` command generates a browsable static documentation site from your con
 ## Usage
 
 ```bash
-context build    # compile context files first
-context site     # generate site/ directory
+context site     # compiles context internally and generates site/ directory
 ```
 
 ## Options
@@ -17,9 +16,7 @@ context site     # generate site/ directory
 | Option | Description | Default |
 |---|---|---|
 | `--context-dir <path>` | Path to context files | `./context` |
-| `--out <path>` | Output directory for generated site | `./site` |
-| `--title <text>` | Site title | Project name |
-| `--base-url <url>` | Base URL for deployment | `/` |
+| `--output-dir <path>` | Path to site output directory | `./site` |
 
 ## Examples
 
@@ -31,16 +28,10 @@ context site
 
 Output is written to `./site/`. Open `index.html` in a browser.
 
-### Custom output and title
+### Custom output directory
 
 ```bash
-context site --out docs/data-catalog --title "Acme Data Catalog"
-```
-
-### Configure for subdirectory deployment
-
-```bash
-context site --base-url /data-docs/
+context site --output-dir docs/data-catalog
 ```
 
 ## What it generates
@@ -74,8 +65,7 @@ npx serve site -l 8080
 # Full pipeline from database to documentation
 context introspect --db postgres://localhost/myapp
 context enrich --target silver --apply
-context build
-context site --out public/data-docs
+context site --output-dir public/data-docs
 
 # Deploy the static site anywhere
 cp -r public/data-docs /var/www/html/
@@ -83,7 +73,7 @@ cp -r public/data-docs /var/www/html/
 
 ## Notes
 
-- Always run `context build` before `context site` -- the site reads from the compiled manifest
+- The `site` command compiles context internally -- you do not need to run `context build` first
 - The site is fully static HTML with minimal JavaScript (search, sidebar toggle, expandable sections)
 - Deploy anywhere: Vercel, Netlify, GitHub Pages, S3, or just open locally
 

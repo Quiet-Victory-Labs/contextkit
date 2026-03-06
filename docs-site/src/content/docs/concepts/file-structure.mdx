@@ -8,29 +8,26 @@ ContextKit stores all metadata in a `context/` directory at the root of your pro
 ## Directory layout
 
 ```
+contextkit.config.yaml            # Project config and data sources (project root)
 context/
-  contextkit.config.yaml        # Project config and data sources
   models/
-    orders.osi.yaml             # OSI semantic model for "orders"
-    orders.governance.yaml      # Ownership, trust, security, semantic roles
-    orders.rules.yaml           # Golden queries, business rules, guardrails
+    orders.osi.yaml               # OSI semantic model for "orders"
     customers.osi.yaml
+  governance/
+    orders.governance.yaml        # Ownership, trust, security, semantic roles
     customers.governance.yaml
+    orders.rules.yaml             # Golden queries, business rules, guardrails
     customers.rules.yaml
   lineage/
-    orders.lineage.yaml         # Upstream sources for "orders"
+    orders.lineage.yaml           # Upstream sources for "orders"
     customers.lineage.yaml
   glossary/
-    revenue.term.yaml           # Business glossary term
+    revenue.term.yaml             # Business glossary term
     churn.term.yaml
     arr.term.yaml
   owners/
-    data-engineering.owner.yaml # Team ownership definition
+    data-engineering.owner.yaml   # Team ownership definition
     analytics.owner.yaml
-  governance/
-    global.governance.yaml      # Cross-model governance defaults
-  rules/
-    global.rules.yaml           # Cross-model business rules
 ```
 
 ## File types
@@ -43,7 +40,7 @@ These files follow the [OSI specification](/concepts/osi/) and define the schema
 
 ### `*.governance.yaml` -- Governance metadata
 
-Governance files sit alongside their corresponding OSI file and add the metadata needed to trust and correctly use the data:
+Governance files live in the `context/governance/` directory and add the metadata needed to trust and correctly use the data:
 
 - **Ownership** -- which team or individual is responsible
 - **Trust status** -- `trusted`, `verified`, `unverified`, `deprecated`

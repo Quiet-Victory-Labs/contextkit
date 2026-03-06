@@ -27,15 +27,15 @@ The MCP server supports two transport modes:
 The server runs as a child process of your AI tool. Communication happens over standard input/output. This is the simplest mode and works out of the box with Claude Code, Cursor, and other MCP clients.
 
 ```bash
-npx contextkit serve
+npx @runcontext/cli serve
 ```
 
-### HTTP (SSE)
+### HTTP (Streamable HTTP)
 
-The server runs as a standalone HTTP service, exposing a Server-Sent Events endpoint. This is useful for shared environments, remote access, or when multiple clients need to connect simultaneously.
+The server runs as a standalone HTTP service, exposing a Streamable HTTP endpoint at `/mcp`. This is useful for shared environments, remote access, or when multiple clients need to connect simultaneously.
 
 ```bash
-npx contextkit serve --transport http --port 4040
+npx @runcontext/cli serve --http --port 3000
 ```
 
 <Aside type="tip">
@@ -55,11 +55,11 @@ Together, these give an agent everything it needs to understand your data before
 
 ## Quick start
 
-1. Make sure you have a built context directory (run `npx contextkit build` first).
+1. Make sure you have a context directory with your metadata files.
 2. Start the server:
 
 ```bash
-npx contextkit serve
+npx @runcontext/cli serve
 ```
 
 3. Configure your AI tool to connect. See [Configuration](/mcp/configuration/) for tool-specific setup.

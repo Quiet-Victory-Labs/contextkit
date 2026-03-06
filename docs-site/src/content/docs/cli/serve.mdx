@@ -15,10 +15,9 @@ context serve
 
 | Option | Description | Default |
 |---|---|---|
-| `--stdio` | Use stdio transport (for CLI-based MCP clients) | On (default) |
-| `--http` | Use HTTP transport | Off |
+| `--http` | Use HTTP transport (default is stdio) | Off |
 | `--port <number>` | Port for HTTP server | `3000` |
-| `--host <address>` | Host address to bind | `127.0.0.1` |
+| `--host <address>` | Host address to bind | `0.0.0.0` |
 | `--context-dir <path>` | Path to context files | `./context` |
 
 ## Examples
@@ -26,7 +25,7 @@ context serve
 ### Stdio mode (default)
 
 ```bash
-context serve --stdio
+context serve
 ```
 
 This is the standard mode for use with Claude Desktop, Cursor, and other MCP-compatible tools.
@@ -37,7 +36,7 @@ This is the standard mode for use with Claude Desktop, Cursor, and other MCP-com
 context serve --http --port 8080
 ```
 
-Starts an HTTP server at `http://127.0.0.1:8080` for browser-based or networked clients.
+Starts an HTTP server at `http://0.0.0.0:8080/mcp` for browser-based or networked clients.
 
 ### Bind to all interfaces
 
@@ -56,7 +55,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "context": {
       "command": "context",
-      "args": ["serve", "--stdio"],
+      "args": ["serve"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -72,7 +71,7 @@ Add to `.cursor/mcp.json` in your project:
   "mcpServers": {
     "context": {
       "command": "context",
-      "args": ["serve", "--stdio"]
+      "args": ["serve"]
     }
   }
 }

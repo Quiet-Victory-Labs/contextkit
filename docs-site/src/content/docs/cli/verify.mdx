@@ -15,10 +15,10 @@ context verify --db <connection-url>
 
 | Option | Description | Default |
 |---|---|---|
-| `--source <name>` | Verify only files for this source | All sources |
-| `--db <url>` | Database connection string | `$DATABASE_URL` |
+| `--source <name>` | Use a specific data_source from config | First configured source |
+| `--db <url>` | Database URL override (postgres:// or path.duckdb) | — |
 | `--context-dir <path>` | Path to context files | `./context` |
-| `--format <type>` | Output format: `text`, `json`, `github` | `text` |
+| `--format <type>` | Output format: `pretty`, `json` | `pretty` |
 
 ## Examples
 
@@ -59,15 +59,9 @@ context/public/sessions.context.yaml
 Summary: 1 passed, 2 drifted, 1 missing
 ```
 
-## Drift categories
+## What it checks
 
-| Category | Meaning |
-|---|---|
-| **Missing column** | Column exists in DB but not in context files |
-| **Extra column** | Column in context but not in DB (removed or renamed) |
-| **Type mismatch** | Column type differs between context and DB |
-| **Missing table** | Table in context but not in DB |
-| **New table** | Table in DB but no context file exists |
+The `verify` command connects to your database, introspects tables, columns, sample values, golden queries, and guardrail filters, then runs all `data/*` lint rules against the results. This catches issues like missing tables, missing columns, type mismatches, stale sample values, and failing golden queries.
 
 ## CI integration
 

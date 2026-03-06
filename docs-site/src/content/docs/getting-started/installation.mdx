@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: How to install and configure ContextKit
+description: "Install ContextKit CLI for metadata governance and AI-ready semantic layers. Supports DuckDB, PostgreSQL, MySQL, Snowflake, BigQuery, and 4 more databases."
 ---
 
 ## Install
@@ -38,7 +38,7 @@ context --version
 # 0.3.5
 
 context --help
-# Shows all 16 commands
+# Shows all 15 commands
 ```
 
 ## Database drivers
@@ -58,6 +58,8 @@ ContextKit supports 9 database engines. Each uses an optional peer dependency â€
 | Databricks | `npm install @databricks/sql` |
 
 The setup wizard also auto-detects databases from your existing MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop).
+
+**Smart driver detection:** If you try to connect to a database without the driver installed, the `context setup` wizard will detect this and offer to install it automatically.
 
 ## Next steps
 

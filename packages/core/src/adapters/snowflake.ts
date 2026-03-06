@@ -5,6 +5,7 @@ import type {
   ColumnInfo,
   QueryResult,
 } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class SnowflakeAdapter implements DataAdapter {
   private connection: any;
@@ -19,9 +20,7 @@ export class SnowflakeAdapter implements DataAdapter {
     try {
       snowflake = await import('snowflake-sdk');
     } catch {
-      throw new Error(
-        'Snowflake driver not found. Install it with: npm install snowflake-sdk'
-      );
+      throw new MissingDriverError('snowflake');
     }
 
     const sdk = snowflake.default ?? snowflake;

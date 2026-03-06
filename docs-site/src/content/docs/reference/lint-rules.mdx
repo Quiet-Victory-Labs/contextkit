@@ -1,15 +1,15 @@
 ---
 title: Lint Rules
-description: Complete reference of all 38 ContextKit lint rules across Bronze, Silver, Gold, and Data tiers.
+description: Complete reference of all 40 ContextKit lint rules across Bronze, Silver, Gold, Data, and Composite tiers.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-ContextKit includes 38 lint rules organized by tier. Rules are checked with `npx contextkit lint` and auto-fixable rules can be applied with `npx contextkit fix`.
+ContextKit includes 40 lint rules organized by tier. Rules are checked with `context lint` (or `npx @runcontext/cli lint`) and auto-fixable rules can be applied with `context fix` (or `npx @runcontext/cli fix`).
 
 **Severity levels:** `error` rules block tier promotion. `warning` rules are advisory.
 
-**Fixable:** Rules marked as fixable can be automatically corrected by `npx contextkit fix`.
+**Fixable:** Rules marked as fixable can be automatically corrected by `context fix`.
 
 ## Bronze rules (12)
 
@@ -61,7 +61,7 @@ Gold rules enforce rich semantic metadata, quality definitions, and comprehensiv
 | `osi/metrics-defined` | error | No | Models with measure fields must define at least one metric |
 | `glossary/coverage` | warning | No | Key business terms should have glossary entries |
 
-## Data rules (9)
+## Data rules (8)
 
 Data rules validate context files against live data sources. These require a configured database connection in `contextkit.config.yaml`.
 
@@ -75,7 +75,6 @@ Data rules validate context files against live data sources. These require a con
 | `data/golden-queries-nonempty` | warning | No | Golden queries must return at least one row |
 | `data/guardrails-valid-sql` | error | No | Guardrail SQL expressions must be valid |
 | `data/row-counts-nonzero` | warning | No | Source tables must contain data |
-| `tier/bronze-requirements` | error | No | All Bronze-tier rules must pass before Data rules are evaluated |
 
 <Aside type="note">
 Data rules run only when a data source is configured. See [Database Support](/reference/databases/) for connection setup.

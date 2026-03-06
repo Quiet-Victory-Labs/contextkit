@@ -5,7 +5,7 @@ description: Compile context files into a manifest JSON and view your OSI tier s
 
 ## Build
 
-The `build` command compiles all `.context.yaml` files into a single `manifest.json` that MCP servers and other tools consume.
+The `build` command compiles all context files (`.osi.yaml`, `.governance.yaml`, etc.) into a single `contextkit-manifest.json` that MCP servers and other tools consume.
 
 ### Usage
 
@@ -18,9 +18,8 @@ context build
 | Option | Description | Default |
 |---|---|---|
 | `--context-dir <path>` | Path to context files | `./context` |
-| `--out <path>` | Output file path | `./context/manifest.json` |
-| `--format <type>` | Output format: `json`, `yaml` | `json` |
-| `--minify` | Minify the output | Off |
+| `--output-dir <path>` | Path to output directory | `./dist` |
+| `--format <type>` | Output format: `pretty`, `json` | `pretty` |
 
 ### Examples
 
@@ -28,11 +27,11 @@ context build
 # Build with defaults
 context build
 
-# Custom output location
-context build --out dist/context-manifest.json
+# Custom output directory
+context build --output-dir dist
 
-# Minified for production
-context build --minify --out dist/manifest.json
+# JSON format for CI
+context build --format json
 ```
 
 ### Output
@@ -74,7 +73,7 @@ context tier
 | Option | Description | Default |
 |---|---|---|
 | `--context-dir <path>` | Path to context files | `./context` |
-| `--format <type>` | Output format: `text`, `json` | `text` |
+| `--format <type>` | Output format: `pretty`, `json` | `pretty` |
 
 ### Example output
 

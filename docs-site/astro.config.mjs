@@ -6,7 +6,13 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'ContextKit',
-      description: 'AI-ready metadata governance over OSI',
+      logo: {
+        dark: './src/assets/logo-dark.svg',
+        light: './src/assets/logo-light.svg',
+        replacesTitle: false,
+      },
+      favicon: '/favicon.svg',
+      description: 'ContextKit — open-source semantic layer governance and AI-ready metadata toolkit built on the Open Semantic Interchange (OSI) specification. Introspect databases, lint metadata, enforce Bronze/Silver/Gold tiers, and serve enriched context to AI agents via Model Context Protocol (MCP).',
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/erickittelson/ContextKit' },
       ],
@@ -49,7 +55,7 @@ export default defineConfig({
             { label: 'validate-osi', slug: 'cli/validate-osi' },
             { label: 'verify', slug: 'cli/verify' },
             { label: 'serve', slug: 'cli/serve' },
-            { label: 'blueprint', slug: 'cli/blueprint' },
+
             { label: 'site', slug: 'cli/site' },
             { label: 'dev', slug: 'cli/dev' },
             { label: 'init', slug: 'cli/init' },

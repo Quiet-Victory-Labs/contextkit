@@ -19,6 +19,7 @@ context introspect --db <connection-url>
 | `--source <name>` | Logical name for this data source | Inferred from DB name |
 | `--tables <glob>` | Filter tables by glob pattern | `*` (all tables) |
 | `--model-name <name>` | Override the model name in output files | Table name |
+| `--select` | Interactively pick which tables to include | Off (all tables) |
 
 ## Examples
 
@@ -35,6 +36,16 @@ context introspect \
   --db postgres://localhost:5432/myapp \
   --tables "users,orders,order_*"
 ```
+
+### Interactive table selection
+
+```bash
+context introspect \
+  --db postgres://localhost:5432/myapp \
+  --select
+```
+
+This presents a checklist of all tables in the database, letting you pick which ones to include. Useful for large databases where you only need a subset of tables.
 
 ### Name the source
 
@@ -103,6 +114,8 @@ model:
 - Databricks (config file only)
 
 Each adapter requires its own driver as an optional peer dependency. See [Database Support](/reference/databases/) for installation details.
+
+**Smart driver detection:** If the required driver is not installed, `context introspect` (and `context setup`) will detect this and offer to install it automatically.
 
 ## Next steps
 

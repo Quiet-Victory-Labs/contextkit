@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: What ContextKit is and why it exists
+description: "Learn how ContextKit transforms database schemas into AI-ready semantic layers with metadata governance, linting, and MCP serving"
 ---
 
 Your data already has a schema. ContextKit gives it meaning.
@@ -46,11 +46,14 @@ One install, everything you need:
 npm install @runcontext/cli
 ```
 
-- **16 CLI commands** — introspect, enrich, lint, fix, build, tier, verify, serve, blueprint, and more
-- **37 lint rules** — schema validation, governance, security, data accuracy
+- **15 CLI commands** — introspect, enrich, lint, fix, build, tier, verify, serve, and more
+- **40 lint rules** — schema validation, governance, security, data accuracy
 - **Bronze/Silver/Gold tier system** — automated metadata maturity scoring
 - **MCP server** — expose your context graph to AI agents, including data product YAML export
 - **Data products** — portable OSI-compliant YAML blueprints for your data models
 - **Static site generator** — browsable docs from your metadata
 - **Database introspection** — DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks
 - **MCP config discovery** — auto-detects databases from Claude Code, Cursor, VS Code, Windsurf, and Claude Desktop configs
+- **Smart driver detection** — automatically offers to install missing database drivers during setup
+- **Interactive table selection** — pick which tables to include when introspecting large databases
+- **AI-guided curation** — generates agent instructions (AGENT_INSTRUCTIONS.md) that guide AI assistants to reach Gold tier

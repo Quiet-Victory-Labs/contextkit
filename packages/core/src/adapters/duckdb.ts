@@ -1,4 +1,5 @@
 import type { DataAdapter, TableInfo, ColumnInfo, QueryResult } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class DuckDBAdapter implements DataAdapter {
   private db: any;
@@ -10,7 +11,12 @@ export class DuckDBAdapter implements DataAdapter {
   }
 
   async connect(): Promise<void> {
-    const duckdb = await import('duckdb');
+    let duckdb: any;
+    try {
+      duckdb = await import('duckdb');
+    } catch {
+      throw new MissingDriverError('duckdb');
+    }
     const opts = this.dbPath === ':memory:' ? undefined : { access_mode: 'READ_ONLY' } as Record<string, string>;
     return new Promise((resolve, reject) => {
       this.db = new duckdb.default.Database(this.dbPath, opts, (err: Error | null) => {

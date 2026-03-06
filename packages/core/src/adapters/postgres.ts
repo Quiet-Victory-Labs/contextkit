@@ -1,4 +1,5 @@
 import type { DataAdapter, TableInfo, ColumnInfo, QueryResult } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class PostgresAdapter implements DataAdapter {
   private client: any;
@@ -9,7 +10,12 @@ export class PostgresAdapter implements DataAdapter {
   }
 
   async connect(): Promise<void> {
-    const pg = await import('pg');
+    let pg: any;
+    try {
+      pg = await import('pg');
+    } catch {
+      throw new MissingDriverError('postgres');
+    }
     this.client = new pg.default.Client({ connectionString: this.connectionString });
     await this.client.connect();
   }

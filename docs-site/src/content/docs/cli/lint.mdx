@@ -1,6 +1,6 @@
 ---
 title: context lint & context fix
-description: Validate context files against 37 rules and auto-fix violations where possible.
+description: Validate context files against built-in rules and auto-fix violations where possible.
 ---
 
 The `lint` command checks your context files for errors, inconsistencies, and missing metadata. The `fix` command auto-repairs violations that have deterministic fixes.
@@ -18,9 +18,14 @@ context lint
 | Option | Description | Default |
 |---|---|---|
 | `--context-dir <path>` | Path to context files | `./context` |
-| `--format <type>` | Output format: `text`, `json`, `github` | `text` |
-| `--rule <name>` | Run only specific rule(s) | All rules |
-| `--severity <level>` | Minimum severity: `error`, `warn`, `info` | `warn` |
+| `--format <type>` | Output format: `pretty`, `json`, `sarif`, `github`, `junit` | Auto-detected |
+| `--rule <ruleId:severity>` | Override rule severity (repeatable), e.g. `governance/grain-required:error` | — |
+| `--max-warnings <count>` | Exit with error if warning count exceeds threshold | — |
+| `--output-file <path>` | Write formatted output to a file | — |
+| `--fix` | Automatically fix problems | Off |
+| `--fix-dry-run` | Show what `--fix` would change without writing | Off |
+| `--cache` | Only lint changed files (uses `.contextkit-cache`) | Off |
+| `--no-cache` | Bypass the lint cache | — |
 
 ### Examples
 
@@ -31,22 +36,28 @@ context lint
 # JSON output for CI
 context lint --format json
 
-# Check only naming rules
-context lint --rule naming-*
+# Override a rule severity
+context lint --rule governance/grain-required:error
 
-# Errors only
-context lint --severity error
+# Auto-fix issues
+context lint --fix
+
+# Fail if more than 5 warnings
+context lint --max-warnings 5
+
+# Write results to a file
+context lint --format sarif --output-file results.sarif
 ```
 
 ### Example output
 
 ```
-context/public/users.context.yaml
+context/models/users.osi.yaml
   3:5  warn   missing-description     Column "id" has no description
   7:5  warn   missing-description     Column "email" has no description
   12:3 error  invalid-relationship    Relationship "orders" references non-existent model
 
-context/public/sessions.context.yaml
+context/governance/sessions.governance.yaml
   1:1  error  missing-primary-key     No primary key defined
 
 4 problems (2 errors, 2 warnings)
@@ -64,35 +75,31 @@ context fix
 
 | Option | Description | Default |
 |---|---|---|
-| `--write` | Apply fixes to files (required to make changes) | Off (dry run) |
 | `--context-dir <path>` | Path to context files | `./context` |
-| `--rule <name>` | Fix only specific rule(s) | All fixable rules |
+| `--format <type>` | Output format: `pretty`, `json` | `pretty` |
+| `--dry-run` | Show what would be fixed without writing files | Off |
+| `--db <url>` | Database URL for data-aware fixes (postgres:// or path.duckdb) | — |
+| `--source <name>` | Use a specific data_source from config | — |
 
 ### Examples
 
 ```bash
 # Preview what would be fixed
-context fix
+context fix --dry-run
 
 # Apply fixes
-context fix --write
+context fix
 
-# Fix only formatting issues
-context fix --write --rule formatting-*
+# Apply fixes with database awareness
+context fix --db postgres://localhost/myapp
 ```
 
 ### Example output
 
 ```
-Fixable issues:
-  context/public/users.context.yaml
-    3:5  fix  trailing-whitespace  Remove trailing whitespace
-    8:1  fix  sort-columns         Sort columns alphabetically
-
-  context/public/orders.context.yaml
-    1:1  fix  missing-source       Add source field from directory name
-
-Run with --write to apply 3 fixes.
+Dry run: 3 issue(s) would be fixed in 2 file(s):
+  context/models/users.osi.yaml
+  context/governance/orders.governance.yaml
 ```
 
 ## Rule categories
@@ -115,12 +122,12 @@ Run `context rules` to see the full list with descriptions.
 ```bash
 # GitHub Actions example
 - name: Lint context files
-  run: context lint --format github --severity error
+  run: context lint --format github
 ```
 
 The `github` format produces annotations that appear inline on pull requests.
 
 ## Next steps
 
-- Auto-fix issues with `context fix --write`
+- Auto-fix issues with `context fix`
 - Build the manifest with [`context build`](/cli/build/)

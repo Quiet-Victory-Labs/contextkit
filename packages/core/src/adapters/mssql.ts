@@ -1,4 +1,5 @@
 import type { DataAdapter, TableInfo, ColumnInfo, QueryResult } from './types.js';
+import { MissingDriverError } from './errors.js';
 
 export class MSSQLAdapter implements DataAdapter {
   private pool: any;
@@ -13,9 +14,7 @@ export class MSSQLAdapter implements DataAdapter {
     try {
       mssql = await import('mssql');
     } catch {
-      throw new Error(
-        'MSSQL driver not found. Install it with: npm install mssql'
-      );
+      throw new MissingDriverError('mssql');
     }
     this.pool = await (mssql.default ?? mssql).connect(this.connectionString);
   }
