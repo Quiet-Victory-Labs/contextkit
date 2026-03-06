@@ -17,7 +17,7 @@ export const explainCommand = new Command('explain')
         ? path.resolve(opts.contextDir)
         : path.resolve(config.context_dir);
 
-      const { graph } = await compile({ contextDir, config });
+      const { graph } = await compile({ contextDir, config, rootDir: process.cwd() });
 
       const results: Array<{ type: string; name: string; data: unknown }> = [];
 

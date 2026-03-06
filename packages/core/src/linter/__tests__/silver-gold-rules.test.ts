@@ -69,8 +69,8 @@ async function validGraph(): Promise<ContextGraph> {
 // ALL_RULES count
 // ---------------------------------------------------------------------------
 describe('ALL_RULES with Silver/Gold', () => {
-  it('ALL_RULES array contains 25 rules', () => {
-    expect(ALL_RULES).toHaveLength(33);
+  it('ALL_RULES array contains 40 rules', () => {
+    expect(ALL_RULES).toHaveLength(40);
   });
 
   it('all 33 rules produce 0 diagnostics on valid fixtures', async () => {

@@ -3,10 +3,10 @@ import type { LintRule } from '../rule.js';
 
 /** Mapping of semantic roles to compatible SQL column type patterns. */
 const ROLE_TYPE_PATTERNS: Record<string, RegExp> = {
-  metric: /^(int|integer|bigint|smallint|tinyint|float|double|decimal|numeric|number|real|money)/i,
+  metric: /^(int|integer|bigint|smallint|tinyint|hugeint|float|double|decimal|numeric|number|real|money)/i,
   date: /^(date|time|timestamp|datetime)/i,
-  identifier: /^(int|integer|bigint|smallint|tinyint|varchar|char|text|string|uuid|number)/i,
-  dimension: /^(varchar|char|text|string|bool|boolean|int|integer|bigint|smallint|tinyint|number)/i,
+  identifier: /^(int|integer|bigint|smallint|tinyint|hugeint|varchar|char|text|string|uuid|number)/i,
+  dimension: /^(varchar|char|text|string|bool|boolean|int|integer|bigint|smallint|tinyint|hugeint|float|double|decimal|numeric|real|number)/i,
 };
 
 export const dataFieldTypesCompatible: LintRule = {
@@ -40,6 +40,7 @@ export const dataFieldTypesCompatible: LintRule = {
         if (!columnType) continue;
 
         const role = fieldGov.semantic_role;
+        if (!role) continue;
         const pattern = ROLE_TYPE_PATTERNS[role];
         if (pattern && !pattern.test(columnType)) {
           diagnostics.push({

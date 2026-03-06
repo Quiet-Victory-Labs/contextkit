@@ -1,8 +1,12 @@
 model: retail-sales
 owner: analytics-team
+version: "1.0.0"
 trust: endorsed
 security: internal
 tags: [finance, revenue, kpi]
+business_context:
+  - name: Revenue Analysis
+    description: Track and analyze sales revenue by region and time period for executive reporting.
 
 datasets:
   transactions:

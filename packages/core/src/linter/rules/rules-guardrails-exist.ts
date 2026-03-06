@@ -6,6 +6,7 @@ export const rulesGuardrailsExist: LintRule = {
   defaultSeverity: 'warning',
   description: 'Models with a rules file must have at least 1 guardrail filter',
   fixable: false,
+  tier: 'gold',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

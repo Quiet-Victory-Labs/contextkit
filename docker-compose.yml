@@ -1,0 +1,8 @@
+services:
+  contextkit:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./context:/context/context
+      - ./contextkit.config.yaml:/context/contextkit.config.yaml

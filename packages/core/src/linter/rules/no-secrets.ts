@@ -50,6 +50,7 @@ export const noSecrets: LintRule = {
   defaultSeverity: 'error',
   description: 'Scan string values for patterns that look like secrets',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

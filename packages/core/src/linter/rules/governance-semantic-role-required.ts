@@ -6,6 +6,7 @@ export const governanceSemanticRoleRequired: LintRule = {
   defaultSeverity: 'warning',
   description: 'Every field in every dataset of a governed model must have a governance entry with semantic_role',
   fixable: false,
+  tier: 'gold',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

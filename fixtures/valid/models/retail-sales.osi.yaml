@@ -2,7 +2,7 @@ version: "1.0"
 
 semantic_model:
   - name: retail-sales
-    description: Retail sales analytics model
+    description: Retail sales analytics model covering transactions, customers, and revenue KPIs
     ai_context:
       instructions: "Use for sales revenue and customer analysis"
       synonyms: ["sales model", "revenue model"]

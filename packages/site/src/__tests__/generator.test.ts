@@ -174,10 +174,9 @@ describe('generateSite', () => {
     const files = generateSite(manifest);
     const modelPage = files.get('models/sales.html')!;
 
-    // Should contain the tier badge with 'silver'
+    // Should contain the tier badge with 'silver' using tag-silver class
     expect(modelPage).toContain('silver');
-    expect(modelPage).toContain('uppercase');
-    // The tier badge function renders a span with the tier name
+    expect(modelPage).toContain('tag-silver');
     expect(modelPage).toMatch(/silver/i);
   });
 

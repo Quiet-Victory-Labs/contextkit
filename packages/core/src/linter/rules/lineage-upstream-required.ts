@@ -6,6 +6,7 @@ export const lineageUpstreamRequired: LintRule = {
   defaultSeverity: 'warning',
   description: 'Every governed model should have a lineage file with at least one upstream entry',
   fixable: false,
+  tier: 'silver',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

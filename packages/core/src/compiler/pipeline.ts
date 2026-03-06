@@ -5,20 +5,27 @@ import { validate } from './validate.js';
 import { buildGraph } from './graph.js';
 import { resolveReferences } from './resolve.js';
 import { computeAllTiers } from '../tier/compute.js';
+import { loadIgnorePatterns } from '../config/ignore.js';
+import { extractDirectives, type Directive } from '../linter/directives.js';
 
 export interface CompileResult {
   graph: ContextGraph;
   diagnostics: Diagnostic[];
+  directives: Directive[];
 }
 
 export async function compile(options: {
   contextDir: string;
   config?: Partial<ContextKitConfig>;
+  rootDir?: string;
 }): Promise<CompileResult> {
   const allDiagnostics: Diagnostic[] = [];
 
-  // 1. Discover all files
-  const discovered = await discoverFiles(options.contextDir);
+  // 1. Discover all files (with ignore patterns)
+  const ignorePatterns = options.rootDir
+    ? loadIgnorePatterns(options.rootDir, options.config?.lint?.ignore)
+    : (options.config?.lint?.ignore ?? []);
+  const discovered = await discoverFiles(options.contextDir, ignorePatterns);
 
   // 2. Parse each file
   const parsed = await Promise.all(
@@ -43,6 +50,12 @@ export async function compile(options: {
   // 6. Compute tier scores
   computeAllTiers(graph);
 
-  // 7. Return graph + all diagnostics
-  return { graph, diagnostics: allDiagnostics };
+  // 7. Extract inline directives from all discovered files
+  const directives: Directive[] = [];
+  for (const file of discovered) {
+    directives.push(...extractDirectives(file.path));
+  }
+
+  // 8. Return graph + diagnostics + directives
+  return { graph, diagnostics: allDiagnostics, directives };
 }

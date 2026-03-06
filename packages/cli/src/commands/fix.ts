@@ -8,16 +8,22 @@ import {
   LintEngine,
   ALL_RULES,
   applyFixes,
+  createAdapter,
   type Severity,
+  type DataSourceConfig,
 } from '@runcontext/core';
 import { formatSuccess, formatError } from '../formatters/pretty.js';
 import { formatJson } from '../formatters/json.js';
+import { parseDbUrl } from './introspect.js';
+import { collectDataValidation } from './verify.js';
 
 export const fixCommand = new Command('fix')
   .description('Auto-fix lint issues')
   .option('--context-dir <path>', 'Path to context directory')
   .option('--format <type>', 'Output format: pretty or json', 'pretty')
   .option('--dry-run', 'Show what would be fixed without writing files')
+  .option('--db <url>', 'Database URL for data-aware fixes (postgres:// or path.duckdb)')
+  .option('--source <name>', 'Use a specific data_source from config')
   .action(async (opts) => {
     try {
       const config = loadConfig(process.cwd());
@@ -26,7 +32,26 @@ export const fixCommand = new Command('fix')
         : path.resolve(config.context_dir);
 
       // Compile and lint
-      const { graph } = await compile({ contextDir, config });
+      const { graph } = await compile({ contextDir, config, rootDir: process.cwd() });
+
+      // If --db or data_sources configured, connect and collect validation data
+      let dsConfig: DataSourceConfig | undefined;
+      if (opts.db) {
+        dsConfig = parseDbUrl(opts.db);
+      } else {
+        const sources = config.data_sources;
+        if (sources && Object.keys(sources).length > 0) {
+          const name = opts.source ?? Object.keys(sources)[0]!;
+          dsConfig = sources[name];
+        }
+      }
+
+      if (dsConfig) {
+        const adapter = await createAdapter(dsConfig);
+        await adapter.connect();
+        graph.dataValidation = await collectDataValidation(adapter, graph);
+        await adapter.disconnect();
+      }
 
       const overrides = config.lint?.severity_overrides as
         | Record<string, Severity | 'off'>

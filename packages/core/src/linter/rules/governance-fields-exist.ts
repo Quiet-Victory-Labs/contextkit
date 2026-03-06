@@ -6,6 +6,7 @@ export const governanceFieldsExist: LintRule = {
   defaultSeverity: 'error',
   description: 'Every field key in governance must exist as a field in the referenced OSI model dataset',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

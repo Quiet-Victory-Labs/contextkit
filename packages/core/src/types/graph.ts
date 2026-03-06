@@ -20,6 +20,11 @@ export interface DataValidationInfo {
   guardrailResults: Map<number, { valid: boolean; error?: string }>;
 }
 
+export interface SourceFileInfo {
+  filePath: string;
+  content: string;
+}
+
 export interface ContextGraph {
   models: Map<string, OsiSemanticModel>;
   governance: Map<string, GovernanceFile>;
@@ -28,6 +33,8 @@ export interface ContextGraph {
   terms: Map<string, TermFile>;
   owners: Map<string, OwnerFile>;
   tiers: Map<string, TierScore>;
+  /** Maps synthetic keys (e.g. "model:retail-sales") to their source file info. */
+  sourceMap: Map<string, SourceFileInfo>;
   indexes: {
     byOwner: Map<string, string[]>;
     byTag: Map<string, string[]>;

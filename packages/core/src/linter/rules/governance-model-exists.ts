@@ -6,6 +6,7 @@ export const governanceModelExists: LintRule = {
   defaultSeverity: 'error',
   description: 'Every governance file must reference a model that exists in the graph',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

@@ -39,7 +39,7 @@ function findTable(
 /**
  * Introspect the database and collect validation data for the graph.
  */
-async function collectDataValidation(
+export async function collectDataValidation(
   adapter: DataAdapter,
   graph: ContextGraph,
 ): Promise<DataValidationInfo> {

@@ -3,6 +3,9 @@ export interface GoldenQuery {
   sql: string;
   dialect?: string;
   tags?: string[];
+  intent?: string;
+  expected_rows?: string;
+  caveats?: string;
 }
 
 export interface BusinessRule {

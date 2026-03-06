@@ -16,7 +16,7 @@ export const siteCommand = new Command('site')
         : path.resolve(config.context_dir);
 
       // Compile the context graph
-      const { graph } = await compile({ contextDir, config });
+      const { graph } = await compile({ contextDir, config, rootDir: process.cwd() });
       const manifest = emitManifest(graph, config);
 
       // Try to import the site generator

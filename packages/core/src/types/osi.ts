@@ -48,12 +48,16 @@ export interface OsiDataset {
   custom_extensions?: CustomExtension[];
 }
 
+export type RelationshipCardinality = 'one_to_one' | 'one_to_many' | 'many_to_one' | 'many_to_many';
+
 export interface OsiRelationship {
   name: string;
   from: string;
   to: string;
   from_columns: string[];
   to_columns: string[];
+  cardinality?: RelationshipCardinality;
+  notes?: string;
   ai_context?: string | AIContext;
   custom_extensions?: CustomExtension[];
 }

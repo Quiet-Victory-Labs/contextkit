@@ -14,7 +14,7 @@ export const datasetGovernanceSchema = z.object({
 });
 
 export const fieldGovernanceSchema = z.object({
-  semantic_role: semanticRoleEnum,
+  semantic_role: semanticRoleEnum.optional(),
   default_aggregation: defaultAggregationEnum.optional(),
   additive: z.boolean().optional(),
   default_filter: z.string().optional(),
@@ -27,12 +27,19 @@ const dottedFieldsRecord = z.record(z.string(), fieldGovernanceSchema).refine(
   { message: 'Field keys must use "dataset.field" dot notation (e.g., "orders.amount")' },
 );
 
+export const businessContextSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+});
+
 export const governanceFileSchema = z.object({
   model: z.string(),
   owner: z.string(),
+  version: z.string().optional(),
   trust: trustStatusEnum.optional(),
   security: securityClassificationEnum.optional(),
   tags: z.array(z.string()).optional(),
+  business_context: z.array(businessContextSchema).optional(),
   datasets: z.record(z.string(), datasetGovernanceSchema).optional(),
   fields: dottedFieldsRecord.optional(),
 });

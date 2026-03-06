@@ -51,12 +51,18 @@ export const osiDatasetSchema = z.object({
   custom_extensions: z.array(customExtensionSchema).optional(),
 });
 
+export const relationshipCardinalityEnum = z.enum([
+  'one_to_one', 'one_to_many', 'many_to_one', 'many_to_many',
+]);
+
 export const osiRelationshipSchema = z.object({
   name: z.string(),
   from: z.string(),
   to: z.string(),
   from_columns: z.array(z.string()),
   to_columns: z.array(z.string()),
+  cardinality: relationshipCardinalityEnum.optional(),
+  notes: z.string().optional(),
   ai_context: aiContextSchema.optional(),
   custom_extensions: z.array(customExtensionSchema).optional(),
 });

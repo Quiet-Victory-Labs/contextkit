@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@runcontext/cli": "^0.3.3"
+  },
+  "_npx": {
+    "packages": [
+      "@runcontext/cli"
+    ]
+  }
+}

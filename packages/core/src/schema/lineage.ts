@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const lineageTypeEnum = z.enum(['pipeline', 'dashboard', 'ml_model', 'api', 'manual']);
+export const lineageTypeEnum = z.enum(['pipeline', 'dashboard', 'ml_model', 'api', 'manual', 'file', 'derived']);
 
 export const upstreamEntrySchema = z.object({
   source: z.string(),

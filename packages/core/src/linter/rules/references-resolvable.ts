@@ -7,6 +7,7 @@ export const referencesResolvable: LintRule = {
   defaultSeverity: 'error',
   description: 'All cross-file references must resolve to existing entities',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     return resolveReferences(graph);
   },

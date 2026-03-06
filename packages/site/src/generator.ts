@@ -49,7 +49,7 @@ export function generateSite(
 ): Map<string, string> {
   const files = new Map<string, string>();
   const siteTitle = config?.title ?? 'ContextKit';
-  const basePath = (config?.base_path ?? '').replace(/\/+$/, '');
+  const basePath = (config?.base_path ?? '').replace(/\/+$/, '') || '.';
 
   const commonData = {
     siteTitle,
@@ -66,6 +66,7 @@ export function generateSite(
       governance: manifest.governance,
       tiers: manifest.tiers,
       owners: manifest.owners,
+      terms: manifest.terms,
     }),
   );
 
@@ -74,6 +75,7 @@ export function generateSite(
     const gov = manifest.governance[name] ?? null;
     const tier = manifest.tiers[name] ?? null;
     const rules = manifest.rules[name] ?? null;
+    const lineage = manifest.lineage[name] ?? null;
 
     // Main model page
     files.set(
@@ -85,6 +87,7 @@ export function generateSite(
         gov,
         tier,
         rules,
+        lineage,
       }),
     );
 

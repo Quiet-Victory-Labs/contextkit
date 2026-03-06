@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContextKit — AI-Ready Metadata Governance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-2: #1a1a26;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #8888a0;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --accent-glow: rgba(99, 102, 241, 0.15);
+    --gold: #f59e0b;
+    --silver: #94a3b8;
+    --bronze: #d97706;
+    --green: #22c55e;
+    --red: #ef4444;
+    --cyan: #06b6d4;
+  }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── Slide System ── */
+  .deck {
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 6rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(40px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  /* ── Typography ── */
+  h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; }
+  h2 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+  h3 { font-size: 1.5rem; font-weight: 600; line-height: 1.3; }
+  p, li { font-size: 1.25rem; line-height: 1.6; color: var(--text-dim); }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gold-text { color: var(--gold); }
+  .silver-text { color: var(--silver); }
+  .bronze-text { color: var(--bronze); }
+
+  /* ── Reusable Components ── */
+  .tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .tag-accent { background: var(--accent-glow); color: var(--accent-light); border: 1px solid rgba(99,102,241,0.3); }
+  .tag-gold { background: rgba(245,158,11,0.15); color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
+  .tag-silver { background: rgba(148,163,184,0.15); color: var(--silver); border: 1px solid rgba(148,163,184,0.3); }
+  .tag-bronze { background: rgba(217,119,6,0.15); color: var(--bronze); border: 1px solid rgba(217,119,6,0.3); }
+  .tag-green { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+
+  .code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    width: 100%;
+    color: var(--text-dim);
+  }
+
+  .code .kw { color: var(--accent-light); }
+  .code .str { color: var(--green); }
+  .code .cm { color: #555570; }
+  .code .num { color: var(--gold); }
+  .code .fn { color: var(--cyan); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: border-color 0.3s;
+  }
+
+  .card:hover { border-color: var(--accent); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; width: 100%; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; width: 100%; }
+
+  .spacer { height: 2rem; }
+  .spacer-sm { height: 1rem; }
+
+  .wide { width: 100%; max-width: 1100px; }
+
+  .left-align { text-align: left; align-items: flex-start; }
+
+  ul { list-style: none; padding: 0; }
+  ul li { position: relative; padding-left: 1.5rem; margin-bottom: 0.6rem; }
+  ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .check-list li::before { content: ''; background: var(--green); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 1.05rem; }
+  th { text-align: left; padding: 0.75rem 1rem; color: var(--text-dim); font-weight: 500; border-bottom: 1px solid var(--border); }
+  td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(42,42,58,0.5); }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { color: var(--text); font-weight: 500; }
+
+  .fade-in { animation: fadeIn 0.6s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .stagger > * { animation: fadeIn 0.5s ease both; }
+  .stagger > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.5s; }
+  .stagger > *:nth-child(6) { animation-delay: 0.6s; }
+  .stagger > *:nth-child(7) { animation-delay: 0.7s; }
+
+  /* ── Progress Bar ── */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  /* ── Slide Counter ── */
+  .counter {
+    position: fixed;
+    bottom: 2rem;
+    right: 3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    z-index: 100;
+  }
+
+  /* ── Navigation Hint ── */
+  .nav-hint {
+    position: fixed;
+    bottom: 2rem;
+    left: 3rem;
+    font-size: 0.8rem;
+    color: rgba(136,136,160,0.4);
+    z-index: 100;
+  }
+
+  /* ── Decorative Elements ── */
+  .glow-orb {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .slide-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+
+  /* ── Pipeline Diagram ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .pipeline-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .pipeline-arrow {
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    padding: 0 0.4rem;
+  }
+
+  /* ── Tier Bars ── */
+  .tier-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+
+  .tier-label {
+    font-weight: 700;
+    font-size: 1.1rem;
+    width: 80px;
+    text-align: right;
+  }
+
+  .tier-track {
+    flex: 1;
+    height: 36px;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .tier-fill {
+    height: 100%;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--bg);
+    transition: width 1.5s ease;
+  }
+
+  .tier-fill.bronze { background: linear-gradient(90deg, var(--bronze), #b45309); }
+  .tier-fill.silver { background: linear-gradient(90deg, var(--silver), #64748b); }
+  .tier-fill.gold { background: linear-gradient(90deg, var(--gold), #d97706); }
+
+  /* ── File Tree ── */
+  .file-tree {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    width: 100%;
+  }
+
+  .file-tree .dir { color: var(--accent-light); font-weight: 500; }
+  .file-tree .file { color: var(--text-dim); }
+  .file-tree .comment { color: #555570; }
+
+  /* ── Before/After Comparison ── */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    width: 100%;
+  }
+
+  .comparison-side { text-align: center; }
+  .comparison-side h3 { margin-bottom: 1rem; }
+
+  .comparison .bad { border-color: rgba(239,68,68,0.3); }
+  .comparison .good { border-color: rgba(34,197,94,0.3); }
+
+  /* ── Logo ── */
+  .logo-mark {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 40px var(--accent-glow);
+  }
+
+  .subtitle { font-size: 1.35rem; color: var(--text-dim); font-weight: 400; max-width: 700px; text-align: center; }
+
+  /* ── Stat Grid ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  .stat {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-label { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+  /* ── MCP diagram ── */
+  .mcp-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    width: 100%;
+    padding: 2rem 0;
+  }
+
+  .mcp-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .mcp-box h4 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .mcp-box p { font-size: 0.85rem; color: var(--text-dim); }
+
+  .mcp-arrow {
+    font-size: 2rem;
+    color: var(--accent);
+  }
+
+  .mcp-box.highlight {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+
+  /* Center slide content */
+  .center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .left-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    width: 100%;
+    max-width: 1100px;
+    align-items: start;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .slide { padding: 2rem 2rem; }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; }
+    .grid-2, .grid-3, .split, .comparison { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .pipeline { flex-direction: column; }
+    .mcp-diagram { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+<div class="nav-hint">Arrow keys / Space to navigate</div>
+
+<div class="deck" id="deck">
+
+  <!-- ═══════════════ SLIDE 1: TITLE ═══════════════ -->
+  <div class="slide active">
+    <div class="glow-orb" style="top: -100px; right: -100px;"></div>
+    <div class="center-content stagger">
+      <div class="logo-mark">C</div>
+      <span class="tag tag-accent" style="margin-bottom: 1.5rem;">Open Source &middot; OSI v1.0</span>
+      <h1>Context<span class="gradient-text">Kit</span></h1>
+      <div class="spacer-sm"></div>
+      <p class="subtitle">
+        AI-ready metadata governance.<br>
+        Transform institutional knowledge into structured contracts that empower AI agents to generate correct SQL — autonomously.
+      </p>
+      <div class="spacer"></div>
+      <div style="display: flex; gap: 1rem;">
+        <span class="tag tag-bronze">Bronze</span>
+        <span class="tag tag-silver">Silver</span>
+        <span class="tag tag-gold">Gold</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 2: THE PROBLEM ═══════════════ -->
+  <div class="slide">
+    <div class="left-content stagger">
+      <span class="tag tag-accent">The Problem</span>
+      <div class="spacer-sm"></div>
+      <h2>AI agents don't understand<br>your data — <span style="color: var(--red)">yet</span></h2>
+      <div class="spacer"></div>
+      <div class="comparison">
+        <div class="comparison-side">
+          <h3 style="color: var(--red);">What catalogs provide</h3>
+          <div class="card bad" style="text-align: left;">
+            <ul>
+              <li>Table names and column types</li>
+              <li>Basic descriptions</li>
+              <li>"What exists" — not "how to use it"</li>
+              <li>No query patterns or rules</li>
+            </ul>
+          </div>
+        </div>
+        <div class="comparison-side">
+          <h3 style="color: var(--green);">What AI agents need</h3>
+          <div class="card good" style="text-align: left;">
+            <ul class="check-list">
+              <li>Semantic roles (metric vs dimension)</li>
+              <li>Default aggregations &amp; additivity</li>
+              <li>Guardrail filters &amp; business rules</li>
+              <li>Golden query examples</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 3: THE RESULT ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">The Consequence</span>
+      <div class="spacer-sm"></div>
+      <h2>Without context, AI generates <span style="color: var(--red);">wrong SQL</span></h2>
+      <div class="spacer"></div>
+      <div class="comparison">
+        <div class="comparison-side">
+          <h3 style="color: var(--red);">AI without context</h3>
+          <div class="code bad" style="text-align: left;">
+            <span class="cm">-- "How many customers?"</span><br>
+            <span class="kw">SELECT</span> <span class="fn">COUNT</span>(*)<br>
+            <span class="kw">FROM</span> transactions<br>
+            <br>
+            <span class="cm">-- Wrong: counts transactions,</span><br>
+            <span class="cm">-- not distinct customers.</span><br>
+            <span class="cm">-- Also includes refunds.</span>
+          </div>
+        </div>
+        <div class="comparison-side">
+          <h3 style="color: var(--green);">AI with ContextKit</h3>
+          <div class="code good" style="text-align: left;">
+            <span class="cm">-- "How many customers?"</span><br>
+            <span class="kw">SELECT</span> <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> customer_id)<br>
+            <span class="kw">FROM</span> transactions<br>
+            <span class="kw">WHERE</span> amount &gt; <span class="num">0</span><br>
+            <br>
+            <span class="cm">-- Correct: business rules,</span><br>
+            <span class="cm">-- guardrails, semantic roles.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 4: THE SOLUTION ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-green">The Solution</span>
+      <div class="spacer-sm"></div>
+      <h2>ContextKit: Structured metadata<br>that AI agents can <span class="gradient-text">actually use</span></h2>
+      <div class="spacer"></div>
+      <div class="grid-3">
+        <div class="card" style="text-align: center;">
+          <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">Define</h3>
+          <p style="font-size: 1rem;">Semantic models, governance policies, business rules, and lineage in versioned YAML</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">Validate</h3>
+          <p style="font-size: 1rem;">25 lint rules enforce quality. Auto-fixer resolves common issues. Tier scoring tracks maturity.</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">Expose</h3>
+          <p style="font-size: 1rem;">MCP server feeds rich context to AI agents. Docs site makes it human-browsable.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 5: BUILT ON OSI ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">Foundation</span>
+      <div class="spacer-sm"></div>
+      <h2>Built on <span class="gradient-text">Open Semantic Interchange</span> v1.0</h2>
+      <div class="spacer-sm"></div>
+      <p style="max-width: 750px; text-align: center;">
+        A vendor-neutral semantic model standard backed by Snowflake, dbt Labs, Salesforce, Alation, Sigma, ThoughtSpot, and others. ContextKit reads and validates OSI files natively — never modifies them.
+      </p>
+      <div class="spacer"></div>
+      <div class="grid-2">
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">OSI Defines</h3>
+          <ul>
+            <li>Datasets, fields, and expressions</li>
+            <li>Relationships and join paths</li>
+            <li>Metrics with SQL expressions</li>
+            <li>AI context (synonyms, instructions)</li>
+          </ul>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">ContextKit Adds</h3>
+          <ul>
+            <li>Governance (ownership, trust, security)</li>
+            <li>Business rules &amp; guardrails</li>
+            <li>Golden query examples</li>
+            <li>Lineage, glossary, tier scoring</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 6: FILE STRUCTURE ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">Architecture</span>
+      <div class="spacer-sm"></div>
+      <h2>Everything is <span class="gradient-text">versioned YAML</span></h2>
+      <div class="spacer"></div>
+      <div class="split">
+        <div class="file-tree">
+          <span class="dir">context/</span><br>
+          &nbsp;&nbsp;<span class="dir">models/</span> <span class="comment"># OSI v1.0 semantic models</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">retail-sales.osi.yaml</span><br>
+          &nbsp;&nbsp;<span class="dir">governance/</span> <span class="comment"># Ownership, trust, security</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">retail-sales.governance.yaml</span><br>
+          &nbsp;&nbsp;<span class="dir">rules/</span> <span class="comment"># Business rules &amp; queries</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">retail-sales.rules.yaml</span><br>
+          &nbsp;&nbsp;<span class="dir">lineage/</span> <span class="comment"># Data flow declarations</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">retail-sales.lineage.yaml</span><br>
+          &nbsp;&nbsp;<span class="dir">glossary/</span> <span class="comment"># Business term definitions</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">revenue.term.yaml</span><br>
+          &nbsp;&nbsp;<span class="dir">owners/</span> <span class="comment"># Team/person registry</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">analytics-team.owner.yaml</span><br>
+          <span class="file">contextkit.config.yaml</span>
+        </div>
+        <div style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">Separation of Concerns</h3>
+          <ul>
+            <li><strong style="color: var(--text);">OSI files</strong> — pure semantic models, interoperable with any OSI tool</li>
+            <li><strong style="color: var(--text);">Governance</strong> — layers ownership, trust, security, field semantics</li>
+            <li><strong style="color: var(--text);">Rules</strong> — golden queries, business rules, guardrails, hierarchies</li>
+            <li><strong style="color: var(--text);">Lineage</strong> — upstream sources and downstream consumers</li>
+            <li><strong style="color: var(--text);">Glossary &amp; Owners</strong> — reusable term definitions and team registry</li>
+          </ul>
+          <div class="spacer"></div>
+          <p style="font-size: 1rem;">All files are version-controlled, reviewable, and CI/CD-friendly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 7: TIER SYSTEM ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-gold">Quality Tiers</span>
+      <div class="spacer-sm"></div>
+      <h2>Automated <span class="bronze-text">Bronze</span> / <span class="silver-text">Silver</span> / <span class="gold-text">Gold</span> scoring</h2>
+      <div class="spacer-sm"></div>
+      <p style="text-align: center; max-width: 700px;">ContextKit computes metadata maturity automatically. No manual classification — just add metadata and your tier rises.</p>
+      <div class="spacer"></div>
+      <div class="wide">
+        <div class="tier-bar">
+          <span class="tier-label bronze-text">Bronze</span>
+          <div class="tier-track">
+            <div class="tier-fill bronze" style="width: 0%;" data-width="35%">Discoverable</div>
+          </div>
+        </div>
+        <div class="tier-bar">
+          <span class="tier-label silver-text">Silver</span>
+          <div class="tier-track">
+            <div class="tier-fill silver" style="width: 0%;" data-width="65%">Trusted</div>
+          </div>
+        </div>
+        <div class="tier-bar">
+          <span class="tier-label gold-text">Gold</span>
+          <div class="tier-track">
+            <div class="tier-fill gold" style="width: 0%;" data-width="100%">AI-Ready</div>
+          </div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="grid-3">
+        <div class="card" style="text-align: left; border-color: rgba(217,119,6,0.3);">
+          <h3 class="bronze-text" style="margin-bottom: 0.75rem;">Bronze — Discoverable</h3>
+          <ul>
+            <li>Descriptions on all fields</li>
+            <li>Ownership assigned</li>
+            <li>Security classification</li>
+            <li>Grain statements</li>
+          </ul>
+        </div>
+        <div class="card" style="text-align: left; border-color: rgba(148,163,184,0.3);">
+          <h3 class="silver-text" style="margin-bottom: 0.75rem;">Silver — Trusted</h3>
+          <ul>
+            <li>Trust status set</li>
+            <li>Glossary links</li>
+            <li>Upstream lineage</li>
+            <li>Refresh cadence</li>
+          </ul>
+        </div>
+        <div class="card" style="text-align: left; border-color: rgba(245,158,11,0.3);">
+          <h3 class="gold-text" style="margin-bottom: 0.75rem;">Gold — AI-Ready</h3>
+          <ul>
+            <li>Semantic roles on all fields</li>
+            <li>Aggregations &amp; additivity</li>
+            <li>Guardrails &amp; business rules</li>
+            <li>3+ golden queries</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 8: PIPELINE ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">How It Works</span>
+      <div class="spacer-sm"></div>
+      <h2>The compilation pipeline</h2>
+      <div class="spacer"></div>
+      <div class="pipeline">
+        <div class="pipeline-step">Discover</div>
+        <div class="pipeline-arrow">&rarr;</div>
+        <div class="pipeline-step">Parse YAML</div>
+        <div class="pipeline-arrow">&rarr;</div>
+        <div class="pipeline-step">Validate Schemas</div>
+        <div class="pipeline-arrow">&rarr;</div>
+        <div class="pipeline-step">Resolve Refs</div>
+        <div class="pipeline-arrow">&rarr;</div>
+        <div class="pipeline-step">Build Graph</div>
+        <div class="pipeline-arrow">&rarr;</div>
+        <div class="pipeline-step">Lint</div>
+        <div class="pipeline-arrow">&rarr;</div>
+        <div class="pipeline-step">Compute Tiers</div>
+        <div class="pipeline-arrow">&rarr;</div>
+        <div class="pipeline-step" style="border-color: var(--accent);">Manifest</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="grid-2">
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">25 Lint Rules</h3>
+          <ul>
+            <li>OSI schema validation</li>
+            <li>Cross-file reference integrity</li>
+            <li>Naming conventions (kebab-case)</li>
+            <li>Governance completeness per tier</li>
+            <li>Secret detection in YAML</li>
+            <li>Glossary duplicate detection</li>
+          </ul>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">Typed Context Graph</h3>
+          <ul>
+            <li>SemanticModelNode (from OSI)</li>
+            <li>GovernanceNode (ownership, trust)</li>
+            <li>RulesNode (queries, guardrails)</li>
+            <li>LineageNode (upstream/downstream)</li>
+            <li>TermNode &amp; OwnerNode</li>
+            <li>Indexed by tag, owner, trust, security</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 9: MCP SERVER ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-green">AI Integration</span>
+      <div class="spacer-sm"></div>
+      <h2>MCP server for <span class="gradient-text">AI agents</span></h2>
+      <div class="spacer-sm"></div>
+      <p style="text-align: center; max-width: 700px;">Expose your full context graph via the Model Context Protocol. Any LLM can query your metadata, rules, and golden queries in real time.</p>
+      <div class="spacer"></div>
+      <div class="mcp-diagram">
+        <div class="mcp-box">
+          <h4>AI Agent</h4>
+          <p>Claude, GPT, etc.</p>
+        </div>
+        <div class="mcp-arrow">&harr;</div>
+        <div class="mcp-box highlight">
+          <h4>ContextKit MCP</h4>
+          <p>9 resources, 6 tools</p>
+        </div>
+        <div class="mcp-arrow">&harr;</div>
+        <div class="mcp-box">
+          <h4>Context Graph</h4>
+          <p>Models, rules, lineage</p>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="grid-2">
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 0.75rem;">Resources</h3>
+          <div class="code" style="font-size: 0.8rem; padding: 1rem;">
+            context://manifest<br>
+            context://model/{name}<br>
+            context://model/{name}/schema<br>
+            context://model/{name}/relationships<br>
+            context://model/{name}/metrics<br>
+            context://model/{name}/rules<br>
+            context://model/{name}/lineage<br>
+            context://glossary<br>
+            context://tier/{name}
+          </div>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 0.75rem;">Tools</h3>
+          <table style="font-size: 0.9rem;">
+            <tr><td style="color: var(--cyan);">context_search</td><td>Keyword search across all nodes</td></tr>
+            <tr><td style="color: var(--cyan);">context_explain</td><td>Deep explain any entity</td></tr>
+            <tr><td style="color: var(--cyan);">context_validate</td><td>Run linter, return diagnostics</td></tr>
+            <tr><td style="color: var(--cyan);">context_tier</td><td>Compute tier for a model</td></tr>
+            <tr><td style="color: var(--cyan);">context_golden_query</td><td>Find matching golden queries</td></tr>
+            <tr><td style="color: var(--cyan);">context_guardrails</td><td>Get guardrail filters for tables</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 10: CLI ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">Developer Experience</span>
+      <div class="spacer-sm"></div>
+      <h2>10 CLI commands. <span class="gradient-text">Zero config to start.</span></h2>
+      <div class="spacer"></div>
+      <div class="split">
+        <div class="code" style="font-size: 0.95rem;">
+          <span class="cm"># Get started in seconds</span><br>
+          <span class="fn">$</span> pnpm create contextkit my-project<br>
+          <span class="fn">$</span> cd my-project<br>
+          <br>
+          <span class="cm"># Core workflow</span><br>
+          <span class="fn">$</span> context <span class="kw">lint</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># validate</span><br>
+          <span class="fn">$</span> context <span class="kw">build</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># compile</span><br>
+          <span class="fn">$</span> context <span class="kw">tier</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># scorecard</span><br>
+          <span class="fn">$</span> context <span class="kw">fix</span> --write &nbsp;<span class="cm"># auto-fix</span><br>
+          <br>
+          <span class="cm"># Explore &amp; serve</span><br>
+          <span class="fn">$</span> context <span class="kw">explain</span> revenue <span class="cm"># look up</span><br>
+          <span class="fn">$</span> context <span class="kw">site</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># docs site</span><br>
+          <span class="fn">$</span> context <span class="kw">dev</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># watch mode</span><br>
+          <span class="fn">$</span> context <span class="kw">serve</span> --stdio &nbsp;<span class="cm"># MCP</span><br>
+        </div>
+        <div style="text-align: left;">
+          <h3 style="margin-bottom: 1.5rem;">Built for workflow</h3>
+          <ul>
+            <li><strong style="color: var(--text);">Scaffold</strong> — instant project setup with example files</li>
+            <li><strong style="color: var(--text);">Lint</strong> — 25 rules catch issues before they reach production</li>
+            <li><strong style="color: var(--text);">Fix</strong> — auto-fix common problems (missing descriptions, kebab-case)</li>
+            <li><strong style="color: var(--text);">Build</strong> — compile to typed manifest JSON with tier scores</li>
+            <li><strong style="color: var(--text);">Dev</strong> — watch mode re-lints on every save</li>
+            <li><strong style="color: var(--text);">Site</strong> — generate browsable docs with tier badges &amp; schema browser</li>
+            <li><strong style="color: var(--text);">Serve</strong> — start MCP server for AI agent integration</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 11: WALKTHROUGH ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">Example</span>
+      <div class="spacer-sm"></div>
+      <h2>From YAML to <span class="gradient-text">AI-ready</span> in minutes</h2>
+      <div class="spacer"></div>
+      <div class="split">
+        <div>
+          <div class="code" style="font-size: 0.82rem; margin-bottom: 1rem;">
+            <span class="cm"># governance/retail-sales.governance.yaml</span><br>
+            <span class="kw">model</span>: <span class="str">retail-sales</span><br>
+            <span class="kw">owner</span>: <span class="str">analytics-team</span><br>
+            <span class="kw">trust</span>: <span class="str">endorsed</span><br>
+            <span class="kw">security</span>: <span class="str">internal</span><br>
+            <br>
+            <span class="kw">fields</span>:<br>
+            &nbsp;&nbsp;<span class="kw">transactions.amount</span>:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">semantic_role</span>: <span class="str">metric</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">default_aggregation</span>: <span class="str">SUM</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">additive</span>: <span class="num">true</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">default_filter</span>: <span class="str">"amount &gt; 0"</span><br>
+            &nbsp;&nbsp;<span class="kw">customers.region</span>:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">semantic_role</span>: <span class="str">dimension</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">sample_values</span>: <span class="str">[NA, EMEA, APAC]</span>
+          </div>
+        </div>
+        <div>
+          <div class="code" style="font-size: 0.82rem; margin-bottom: 1rem;">
+            <span class="cm"># rules/retail-sales.rules.yaml</span><br>
+            <span class="kw">model</span>: <span class="str">retail-sales</span><br>
+            <br>
+            <span class="kw">golden_queries</span>:<br>
+            &nbsp;&nbsp;- <span class="kw">question</span>: <span class="str">"Revenue by region?"</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">sql</span>: |<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">SELECT</span> c.region,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>(t.amount) <span class="kw">AS</span> revenue<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">FROM</span> transactions t<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">JOIN</span> customers c ...<br>
+            <br>
+            <span class="kw">guardrail_filters</span>:<br>
+            &nbsp;&nbsp;- <span class="kw">filter</span>: <span class="str">"amount &gt; 0"</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">reason</span>: <span class="str">"Exclude refunds"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 12: COMPETITIVE ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">Differentiation</span>
+      <div class="spacer-sm"></div>
+      <h2>Beyond traditional <span class="gradient-text">data catalogs</span></h2>
+      <div class="spacer"></div>
+      <div class="card wide" style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Traditional Catalog</th>
+              <th style="color: var(--accent-light);">ContextKit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Format</td>
+              <td style="color: var(--text-dim);">Proprietary schema</td>
+              <td style="color: var(--green);">OSI v1.0 (open standard)</td>
+            </tr>
+            <tr>
+              <td>AI-Readiness</td>
+              <td style="color: var(--text-dim);">Descriptive only</td>
+              <td style="color: var(--green);">Structured for autonomous SQL</td>
+            </tr>
+            <tr>
+              <td>Quality Tracking</td>
+              <td style="color: var(--text-dim);">Manual classification</td>
+              <td style="color: var(--green);">Auto Bronze / Silver / Gold</td>
+            </tr>
+            <tr>
+              <td>Enforcement</td>
+              <td style="color: var(--text-dim);">Documentation</td>
+              <td style="color: var(--green);">25 lint rules + auto-fixer</td>
+            </tr>
+            <tr>
+              <td>AI Integration</td>
+              <td style="color: var(--text-dim);">Custom APIs</td>
+              <td style="color: var(--green);">Standard MCP protocol</td>
+            </tr>
+            <tr>
+              <td>Business Rules</td>
+              <td style="color: var(--text-dim);">Stored elsewhere</td>
+              <td style="color: var(--green);">Declarative, versioned, testable</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 13: ARCHITECTURE ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">Packages</span>
+      <div class="spacer-sm"></div>
+      <h2>Modular <span class="gradient-text">TypeScript</span> monorepo</h2>
+      <div class="spacer"></div>
+      <div class="grid-2" style="max-width: 900px;">
+        <div class="card" style="text-align: left;">
+          <h3 style="color: var(--cyan); margin-bottom: 0.5rem;">@runcontext/core</h3>
+          <p style="font-size: 1rem;">Parser, compiler, linter, tier engine, fixer, schema validation. The foundation.</p>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="color: var(--cyan); margin-bottom: 0.5rem;">@runcontext/cli</h3>
+          <p style="font-size: 1rem;">10 commands for the full developer workflow — lint, build, tier, fix, dev, site, serve.</p>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="color: var(--cyan); margin-bottom: 0.5rem;">@runcontext/mcp</h3>
+          <p style="font-size: 1rem;">MCP server with 9 resources and 6 tools. Stdio + HTTP transports.</p>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="color: var(--cyan); margin-bottom: 0.5rem;">@runcontext/site</h3>
+          <p style="font-size: 1rem;">Static docs site generator with tier badges, schema browser, and relationship diagrams.</p>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="stat-grid" style="max-width: 900px;">
+        <div class="stat">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Packages</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">25</div>
+          <div class="stat-label">Lint Rules</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">161</div>
+          <div class="stat-label">Tests Passing</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">TypeScript</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 14: USE CASES ═══════════════ -->
+  <div class="slide">
+    <div class="center-content stagger">
+      <span class="tag tag-accent">Who It's For</span>
+      <div class="spacer-sm"></div>
+      <h2>Three audiences, <span class="gradient-text">one platform</span></h2>
+      <div class="spacer"></div>
+      <div class="grid-3">
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">Data Teams</h3>
+          <ul>
+            <li>Governance at scale across hundreds of models</li>
+            <li>Automated maturity tracking</li>
+            <li>25 lint rules enforce policy in CI/CD</li>
+            <li>Auto-generated docs with tier badges</li>
+          </ul>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">AI / LLM Builders</h3>
+          <ul>
+            <li>Semantic roles &amp; aggregations for correct SQL</li>
+            <li>Join graph with cardinality</li>
+            <li>Business rules prevent wrong queries</li>
+            <li>Golden queries as few-shot examples</li>
+          </ul>
+        </div>
+        <div class="card" style="text-align: left;">
+          <h3 style="margin-bottom: 1rem;">Business Users</h3>
+          <ul>
+            <li>Browse datasets by owner, tag, trust</li>
+            <li>Business glossary linked to fields</li>
+            <li>Lineage visibility: where data flows</li>
+            <li>Copy-paste golden queries for questions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 15: CLOSING ═══════════════ -->
+  <div class="slide">
+    <div class="glow-orb" style="bottom: -200px; left: -100px;"></div>
+    <div class="center-content stagger">
+      <div class="logo-mark">C</div>
+      <h1>Context<span class="gradient-text">Kit</span></h1>
+      <div class="spacer-sm"></div>
+      <p class="subtitle" style="font-size: 1.5rem; color: var(--text);">
+        Make your data AI-ready.
+      </p>
+      <div class="spacer-sm"></div>
+      <p class="subtitle">
+        Open source. OSI v1.0 native. TypeScript.<br>
+        From discoverable to autonomous in three tiers.
+      </p>
+      <div class="spacer"></div>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+        <span class="tag tag-accent">MIT License</span>
+        <span class="tag tag-green">Published on npm</span>
+        <span class="tag tag-accent">github.com/erickittelson/ContextKit</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="code" style="max-width: 500px; text-align: center; font-size: 1.1rem;">
+        <span class="fn">$</span> pnpm create contextkit my-project
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  let current = 0;
+  let transitioning = false;
+
+  function updateSlide(next) {
+    if (next < 0 || next >= slides.length || transitioning) return;
+    transitioning = true;
+
+    const prev = current;
+    current = next;
+
+    slides[prev].classList.remove('active');
+    slides[prev].classList.add('exit');
+
+    setTimeout(() => {
+      slides[prev].classList.remove('exit');
+      slides[current].classList.add('active');
+
+      // Animate tier bars if on tier slide
+      animateTierBars();
+
+      setTimeout(() => { transitioning = false; }, 300);
+    }, 250);
+
+    progress.style.width = ((current / (slides.length - 1)) * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+  }
+
+  function animateTierBars() {
+    const bars = slides[current].querySelectorAll('.tier-fill');
+    bars.forEach(bar => {
+      const w = bar.getAttribute('data-width');
+      if (w) {
+        bar.style.width = '0%';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            bar.style.width = w;
+          });
+        });
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      updateSlide(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      updateSlide(current - 1);
+    } else if (e.key === 'Home') {
+      updateSlide(0);
+    } else if (e.key === 'End') {
+      updateSlide(slides.length - 1);
+    }
+  });
+
+  // Touch support
+  let touchStart = 0;
+  document.addEventListener('touchstart', (e) => { touchStart = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStart - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? updateSlide(current + 1) : updateSlide(current - 1);
+    }
+  });
+
+  // Click to advance (right half) or go back (left half)
+  document.addEventListener('click', (e) => {
+    if (e.clientX > window.innerWidth * 0.6) updateSlide(current + 1);
+    else if (e.clientX < window.innerWidth * 0.4) updateSlide(current - 1);
+  });
+
+  // Init
+  counter.textContent = '1 / ' + slides.length;
+  progress.style.width = '0%';
+</script>
+</body>
+</html>

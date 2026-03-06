@@ -6,6 +6,7 @@ export const governanceAdditiveRequired: LintRule = {
   defaultSeverity: 'warning',
   description: 'Every field with semantic_role "metric" must have additive flag set',
   fixable: false,
+  tier: 'gold',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

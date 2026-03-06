@@ -17,7 +17,7 @@ export const tierCommand = new Command('tier')
         ? path.resolve(opts.contextDir)
         : path.resolve(config.context_dir);
 
-      const { graph } = await compile({ contextDir, config });
+      const { graph } = await compile({ contextDir, config, rootDir: process.cwd() });
 
       let scores: TierScore[];
 

@@ -6,6 +6,7 @@ export const rulesGoldenQueriesMinimum: LintRule = {
   defaultSeverity: 'warning',
   description: 'Models with a rules file must have at least 3 golden queries',
   fixable: false,
+  tier: 'gold',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

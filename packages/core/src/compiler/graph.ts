@@ -7,6 +7,7 @@ import type {
   TermFile,
   OwnerFile,
   TierScore,
+  SourceFileInfo,
 } from '../types/index.js';
 import type { ValidateResult } from './validate.js';
 
@@ -19,6 +20,7 @@ export function createEmptyGraph(): ContextGraph {
     terms: new Map<string, TermFile>(),
     owners: new Map<string, OwnerFile>(),
     tiers: new Map<string, TierScore>(),
+    sourceMap: new Map<string, SourceFileInfo>(),
     indexes: {
       byOwner: new Map<string, string[]>(),
       byTag: new Map<string, string[]>(),
@@ -52,31 +54,49 @@ export function buildGraph(results: ValidateResult[]): ContextGraph {
       case 'model': {
         const model = result.data as OsiSemanticModel;
         graph.models.set(model.name, model);
+        if (result.sourceFile) {
+          graph.sourceMap.set(`model:${model.name}`, { filePath: result.sourceFile, content: '' });
+        }
         break;
       }
       case 'governance': {
         const gov = result.data as GovernanceFile;
         graph.governance.set(gov.model, gov);
+        if (result.sourceFile) {
+          graph.sourceMap.set(`governance:${gov.model}`, { filePath: result.sourceFile, content: '' });
+        }
         break;
       }
       case 'rules': {
         const rules = result.data as RulesFile;
         graph.rules.set(rules.model, rules);
+        if (result.sourceFile) {
+          graph.sourceMap.set(`rules:${rules.model}`, { filePath: result.sourceFile, content: '' });
+        }
         break;
       }
       case 'lineage': {
         const lineage = result.data as LineageFile;
         graph.lineage.set(lineage.model, lineage);
+        if (result.sourceFile) {
+          graph.sourceMap.set(`lineage:${lineage.model}`, { filePath: result.sourceFile, content: '' });
+        }
         break;
       }
       case 'term': {
         const term = result.data as TermFile;
         graph.terms.set(term.id, term);
+        if (result.sourceFile) {
+          graph.sourceMap.set(`term:${term.id}`, { filePath: result.sourceFile, content: '' });
+        }
         break;
       }
       case 'owner': {
         const owner = result.data as OwnerFile;
         graph.owners.set(owner.id, owner);
+        if (result.sourceFile) {
+          graph.sourceMap.set(`owner:${owner.id}`, { filePath: result.sourceFile, content: '' });
+        }
         break;
       }
     }

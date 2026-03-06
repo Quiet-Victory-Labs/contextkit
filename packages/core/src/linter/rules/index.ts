@@ -27,6 +27,13 @@ import { rulesGoldenQueriesMinimum } from './rules-golden-queries-minimum.js';
 import { rulesBusinessRulesExist } from './rules-business-rules-exist.js';
 import { rulesGuardrailsExist } from './rules-guardrails-exist.js';
 import { rulesHierarchiesExist } from './rules-hierarchies-exist.js';
+import { governanceFieldDescriptionQuality } from './governance-field-description-quality.js';
+import { glossaryDefinitionQuality } from './glossary-definition-quality.js';
+import { lineageNoSelfReference } from './lineage-no-self-reference.js';
+import { governanceGrainNoPlaceholder } from './governance-grain-no-placeholder.js';
+import { osiRelationshipsCoverage } from './osi-relationships-coverage.js';
+import { osiMetricsDefined } from './osi-metrics-defined.js';
+import { glossaryCoverage } from './glossary-coverage.js';
 
 // Data-aware rules (require dataValidation on the graph)
 import { dataSourceExists } from './data-source-exists.js';
@@ -69,6 +76,13 @@ export {
   rulesBusinessRulesExist,
   rulesGuardrailsExist,
   rulesHierarchiesExist,
+  governanceFieldDescriptionQuality,
+  glossaryDefinitionQuality,
+  lineageNoSelfReference,
+  governanceGrainNoPlaceholder,
+  osiRelationshipsCoverage,
+  osiMetricsDefined,
+  glossaryCoverage,
   // Data-aware
   dataSourceExists,
   dataFieldsExist,
@@ -102,7 +116,7 @@ export const ALL_RULES: LintRule[] = [
   governanceTrustRequired,
   governanceRefreshRequired,
   lineageUpstreamRequired,
-  // Gold (7)
+  // Gold (14)
   governanceSemanticRoleRequired,
   governanceAggregationRequired,
   governanceAdditiveRequired,
@@ -110,6 +124,13 @@ export const ALL_RULES: LintRule[] = [
   rulesBusinessRulesExist,
   rulesGuardrailsExist,
   rulesHierarchiesExist,
+  governanceFieldDescriptionQuality,
+  glossaryDefinitionQuality,
+  lineageNoSelfReference,
+  governanceGrainNoPlaceholder,
+  osiRelationshipsCoverage,
+  osiMetricsDefined,
+  glossaryCoverage,
   // Data-aware (8)
   dataSourceExists,
   dataFieldsExist,

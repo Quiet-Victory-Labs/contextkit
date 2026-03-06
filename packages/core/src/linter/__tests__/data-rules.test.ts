@@ -56,8 +56,8 @@ function minimalModel(name: string): OsiSemanticModel {
 // ALL_RULES count includes data-aware rules
 // ---------------------------------------------------------------------------
 describe('ALL_RULES includes data-aware rules', () => {
-  it('ALL_RULES array contains 33 rules (25 original + 8 data-aware)', () => {
-    expect(ALL_RULES).toHaveLength(33);
+  it('ALL_RULES array contains 40 rules (29 original + 8 data-aware + 3 coverage)', () => {
+    expect(ALL_RULES).toHaveLength(40);
   });
 
   it('all data-aware rules are present by id', () => {

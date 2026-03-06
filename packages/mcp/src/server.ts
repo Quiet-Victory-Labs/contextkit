@@ -1,5 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
 import type { Manifest, ContextGraph, ContextKitConfig } from '@runcontext/core';
 import { compile, emitManifest, loadConfig } from '@runcontext/core';
 
@@ -64,4 +66,79 @@ export async function startServer(options?: {
   await server.connect(transport);
 
   return server;
+}
+
+/**
+ * Compile context, create server, and serve over HTTP.
+ *
+ * Each request gets a fresh McpServer + transport (stateless mode).
+ * The graph is compiled once at startup and reused for all requests.
+ */
+export async function startServerHttp(options?: {
+  contextDir?: string;
+  rootDir?: string;
+  port?: number;
+  host?: string;
+}): Promise<void> {
+  const rootDir = options?.rootDir ?? process.cwd();
+  const config = loadConfig(rootDir);
+  const contextDir = options?.contextDir ?? config.context_dir;
+
+  const { graph } = await compile({ contextDir, config });
+  const manifest = emitManifest(graph, config);
+
+  const host = options?.host ?? '0.0.0.0';
+  const app = createMcpExpressApp({ host });
+
+  // Stateless: new server + transport per POST (per MCP SDK pattern)
+  app.post('/mcp', async (req, res) => {
+    try {
+      const server = createServer(manifest, graph);
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined,
+      });
+      await server.connect(transport);
+      await transport.handleRequest(req, res, req.body);
+      res.on('close', () => {
+        transport.close();
+        server.close();
+      });
+    } catch (error) {
+      if (!res.headersSent) {
+        res.status(500).json({
+          jsonrpc: '2.0',
+          error: { code: -32603, message: 'Internal server error' },
+          id: null,
+        });
+      }
+    }
+  });
+
+  // GET /mcp and DELETE /mcp are not supported in stateless mode
+  app.get('/mcp', (_req, res) => {
+    res.writeHead(405).end(JSON.stringify({
+      jsonrpc: '2.0',
+      error: { code: -32000, message: 'Method not allowed.' },
+      id: null,
+    }));
+  });
+
+  app.delete('/mcp', (_req, res) => {
+    res.writeHead(405).end(JSON.stringify({
+      jsonrpc: '2.0',
+      error: { code: -32000, message: 'Method not allowed.' },
+      id: null,
+    }));
+  });
+
+  // Health check
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'ok', models: [...graph.models.keys()] });
+  });
+
+  const port = options?.port ?? 3000;
+  app.listen(port, host, () => {
+    console.error(`ContextKit MCP server listening on http://${host}:${port}/mcp`);
+    console.error(`Health check: http://${host}:${port}/health`);
+  });
 }

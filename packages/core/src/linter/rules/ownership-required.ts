@@ -6,6 +6,7 @@ export const ownershipRequired: LintRule = {
   defaultSeverity: 'error',
   description: 'Every governance file must have an owner field set',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

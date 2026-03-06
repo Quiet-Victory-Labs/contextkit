@@ -22,7 +22,7 @@ export const buildCommand = new Command('build')
         : path.resolve(config.output_dir);
 
       // Compile the context graph
-      const { graph, diagnostics } = await compile({ contextDir, config });
+      const { graph, diagnostics } = await compile({ contextDir, config, rootDir: process.cwd() });
 
       // Check for compile errors
       const errors = diagnostics.filter((d) => d.severity === 'error');

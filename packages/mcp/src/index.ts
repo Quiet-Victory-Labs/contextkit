@@ -1,5 +1,5 @@
 // ContextKit MCP Server v0.2
-export { createServer, startServer } from './server.js';
+export { createServer, startServer, startServerHttp } from './server.js';
 
 // Re-export resource helpers for advanced usage
 export { registerManifestResource } from './resources/manifest.js';

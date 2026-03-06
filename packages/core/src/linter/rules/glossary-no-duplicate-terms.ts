@@ -6,6 +6,7 @@ export const glossaryNoDuplicateTerms: LintRule = {
   defaultSeverity: 'warning',
   description: 'No two terms should share the same synonym string',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
     const seen = new Map<string, string>(); // synonym -> first term id

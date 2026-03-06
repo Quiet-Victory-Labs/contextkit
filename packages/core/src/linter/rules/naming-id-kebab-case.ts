@@ -8,6 +8,7 @@ export const namingIdKebabCase: LintRule = {
   defaultSeverity: 'warning',
   description: 'Owner and term IDs must be kebab-case',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

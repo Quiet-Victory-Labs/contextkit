@@ -1,11 +1,12 @@
 import type { ContextGraph, Diagnostic } from '../../types/index.js';
 import type { LintRule } from '../rule.js';
+import { replaceSampleValues, readFileContent } from '../../fixer/yaml-locate.js';
 
 export const dataSampleValuesAccurate: LintRule = {
   id: 'data/sample-values-accurate',
   defaultSeverity: 'warning',
   description: 'Governance sample_values should match actual values found in the database',
-  fixable: false,
+  fixable: true,
   run(graph: ContextGraph): Diagnostic[] {
     if (!graph.dataValidation) return [];
     const diagnostics: Diagnostic[] = [];
@@ -25,6 +26,32 @@ export const dataSampleValuesAccurate: LintRule = {
         );
 
         if (mismatched.length > 0) {
+          const syntheticFile = `governance:${govKey}`;
+          const source = graph.sourceMap.get(syntheticFile);
+
+          if (source) {
+            // Pick replacement values from actual data (up to original count)
+            const replacementValues = actualValues.slice(0, fieldGov.sample_values.length);
+            const content = readFileContent(source.filePath);
+            const edit = replaceSampleValues(content, fieldKey, replacementValues);
+
+            if (edit) {
+              diagnostics.push({
+                ruleId: this.id,
+                severity: this.defaultSeverity,
+                message: `Field "${fieldKey}" has sample_values [${mismatched.join(', ')}] not found in actual data`,
+                location: { file: source.filePath, line: 1, column: 1 },
+                fixable: true,
+                fix: {
+                  description: `Replace sample_values with actual values from database`,
+                  edits: [edit],
+                },
+              });
+              continue;
+            }
+          }
+
+          // Fallback: not fixable (no sourceMap or couldn't locate in YAML)
           diagnostics.push({
             ruleId: this.id,
             severity: this.defaultSeverity,

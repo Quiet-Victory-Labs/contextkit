@@ -6,6 +6,7 @@ export const governanceDatasetsExist: LintRule = {
   defaultSeverity: 'error',
   description: 'Every dataset key in governance must exist as a dataset in the referenced OSI model',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

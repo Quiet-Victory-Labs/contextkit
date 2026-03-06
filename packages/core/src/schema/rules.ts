@@ -5,6 +5,9 @@ export const goldenQuerySchema = z.object({
   sql: z.string(),
   dialect: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  intent: z.string().optional(),
+  expected_rows: z.string().optional(),
+  caveats: z.string().optional(),
 });
 
 export const businessRuleSchema = z.object({

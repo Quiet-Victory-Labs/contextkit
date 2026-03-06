@@ -61,8 +61,8 @@ describe('Bronze rules on valid fixtures', () => {
     }
   });
 
-  it('ALL_RULES array contains 25 rules', () => {
-    expect(ALL_RULES).toHaveLength(33);
+  it('ALL_RULES array contains 40 rules', () => {
+    expect(ALL_RULES).toHaveLength(40);
   });
 });
 

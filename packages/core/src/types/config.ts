@@ -4,6 +4,7 @@ import type { DataSourceConfig } from '../adapters/types.js';
 
 export interface LintConfig {
   severity_overrides?: Record<string, Severity | 'off'>;
+  ignore?: string[];
 }
 
 export interface SiteConfig {
@@ -20,6 +21,8 @@ export interface ContextKitConfig {
   context_dir: string;
   output_dir: string;
   minimum_tier?: MetadataTier;
+  extends?: string[];
+  plugins?: string[];
   lint?: LintConfig;
   site?: SiteConfig;
   mcp?: McpConfig;

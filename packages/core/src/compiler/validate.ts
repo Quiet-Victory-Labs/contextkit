@@ -15,6 +15,7 @@ export interface ValidateResult {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- validated data varies by FileKind
   data?: any;
   diagnostics: Diagnostic[];
+  sourceFile?: string;
 }
 
 const SCHEMA_MAP: Record<FileKind, ZodSchema> = {
@@ -45,6 +46,7 @@ export function validate(parsed: ParsedFile): ValidateResult {
       kind: parsed.kind,
       data: undefined,
       diagnostics: zodErrorToDiagnostics(parseResult.error, parsed.source),
+      sourceFile: parsed.source.file,
     };
   }
 
@@ -60,5 +62,6 @@ export function validate(parsed: ParsedFile): ValidateResult {
     kind: parsed.kind,
     data,
     diagnostics: [],
+    sourceFile: parsed.source.file,
   };
 }

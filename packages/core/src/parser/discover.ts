@@ -17,10 +17,17 @@ const PATTERNS: Record<FileKind, string> = {
   owner: '**/*.owner.yaml',
 };
 
-export async function discoverFiles(contextDir: string): Promise<DiscoveredFile[]> {
+export async function discoverFiles(
+  contextDir: string,
+  ignore?: string[],
+): Promise<DiscoveredFile[]> {
   const files: DiscoveredFile[] = [];
   for (const [kind, pattern] of Object.entries(PATTERNS)) {
-    const matches = await glob(pattern, { cwd: contextDir, absolute: true });
+    const matches = await glob(pattern, {
+      cwd: contextDir,
+      absolute: true,
+      ignore: ignore ?? [],
+    });
     for (const match of matches) {
       files.push({ path: match, kind: kind as FileKind });
     }

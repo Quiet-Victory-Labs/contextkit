@@ -28,7 +28,8 @@ function buildTestGraph(): ContextGraph {
 
   const model: OsiSemanticModel = {
     name: 'retail-sales',
-    description: 'Retail sales analytics model',
+    description: 'Retail sales analytics model covering transactions, customers, and revenue KPIs for regional analysis',
+    ai_context: 'Use this model for revenue analytics. Always filter amount > 0 for valid transactions.',
     datasets: [
       {
         name: 'transactions',
@@ -50,6 +51,11 @@ function buildTestGraph(): ContextGraph {
             description: 'Transaction date',
             expression: { dialects: [{ dialect: 'ANSI_SQL', expression: 'txn_date' }] },
           },
+          {
+            name: 'customer_id',
+            description: 'Foreign key to customers table',
+            expression: { dialects: [{ dialect: 'ANSI_SQL', expression: 'customer_id' }] },
+          },
         ],
       },
       {
@@ -70,15 +76,35 @@ function buildTestGraph(): ContextGraph {
         ],
       },
     ],
+    relationships: [
+      {
+        name: 'txn-to-customer',
+        from: 'transactions',
+        to: 'customers',
+        from_columns: ['customer_id'],
+        to_columns: ['customer_id'],
+      },
+    ],
+    metrics: [
+      {
+        name: 'total_revenue',
+        expression: { dialects: [{ dialect: 'ANSI_SQL', expression: 'SUM(transactions.amount)' }] },
+        description: 'Total revenue across all transactions',
+      },
+    ],
   };
   graph.models.set('retail-sales', model);
 
   const gov: GovernanceFile = {
     model: 'retail-sales',
     owner: 'analytics-team',
+    version: '1.0.0',
     trust: 'endorsed',
     security: 'internal',
     tags: ['finance', 'revenue', 'kpi'],
+    business_context: [
+      { name: 'Revenue Analysis', description: 'Track and analyze sales revenue by region and time period.' },
+    ],
     datasets: {
       transactions: { grain: 'One row per transaction', refresh: 'daily', table_type: 'fact' },
       customers: { grain: 'One row per customer', refresh: 'hourly', table_type: 'dimension' },
@@ -93,6 +119,7 @@ function buildTestGraph(): ContextGraph {
         sample_values: ['10.00', '25.50'],
       },
       'transactions.txn_date': { semantic_role: 'date', sample_values: ['2024-01-01'] },
+      'transactions.customer_id': { semantic_role: 'identifier' },
       'customers.customer_id': { semantic_role: 'identifier' },
       'customers.region': { semantic_role: 'dimension', sample_values: ['NA', 'EMEA'] },
     },

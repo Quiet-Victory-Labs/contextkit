@@ -1,4 +1,4 @@
-export type LineageType = 'pipeline' | 'dashboard' | 'ml_model' | 'api' | 'manual';
+export type LineageType = 'pipeline' | 'dashboard' | 'ml_model' | 'api' | 'manual' | 'file' | 'derived';
 
 export interface UpstreamEntry {
   source: string;

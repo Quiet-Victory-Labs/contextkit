@@ -6,6 +6,7 @@ export const governanceAggregationRequired: LintRule = {
   defaultSeverity: 'warning',
   description: 'Every field with semantic_role "metric" must have default_aggregation set',
   fixable: false,
+  tier: 'gold',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

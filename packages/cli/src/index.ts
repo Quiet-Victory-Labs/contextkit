@@ -14,13 +14,15 @@ import { validateOsiCommand } from './commands/validate-osi.js';
 import { introspectCommand } from './commands/introspect.js';
 import { verifyCommand } from './commands/verify.js';
 import { enrichCommand } from './commands/enrich.js';
+import { rulesCommand } from './commands/rules.js';
+import { setupCommand } from './commands/setup.js';
 
 const program = new Command();
 
 program
   .name('context')
   .description('ContextKit — AI-ready metadata governance over OSI')
-  .version('0.2.0');
+  .version('0.3.1');
 
 // Register all commands
 program.addCommand(lintCommand);
@@ -36,5 +38,7 @@ program.addCommand(validateOsiCommand);
 program.addCommand(introspectCommand);
 program.addCommand(verifyCommand);
 program.addCommand(enrichCommand);
+program.addCommand(rulesCommand);
+program.addCommand(setupCommand);
 
 program.parse();

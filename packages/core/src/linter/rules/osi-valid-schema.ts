@@ -6,6 +6,7 @@ export const osiValidSchema: LintRule = {
   defaultSeverity: 'error',
   description: 'OSI models must have at least one dataset',
   fixable: false,
+  tier: 'bronze',
   run(graph: ContextGraph): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 
