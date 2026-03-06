@@ -87,5 +87,7 @@ export const osiSemanticModelSchema = z.object({
 
 export const osiDocumentSchema = z.object({
   version: z.literal('1.0'),
+  dialects: z.array(dialectEnum).optional(),
+  vendors: z.array(vendorEnum).optional(),
   semantic_model: z.array(osiSemanticModelSchema),
 });
