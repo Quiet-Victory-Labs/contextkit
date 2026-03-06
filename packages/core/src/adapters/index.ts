@@ -1,4 +1,4 @@
-export type { DataAdapter, DataSourceConfig, TableInfo, ColumnInfo, QueryResult } from './types.js';
+export type { DataAdapter, DataSourceConfig, AdapterType, TableInfo, ColumnInfo, QueryResult } from './types.js';
 
 import type { DataAdapter, DataSourceConfig } from './types.js';
 
@@ -13,6 +13,43 @@ export async function createAdapter(config: DataSourceConfig): Promise<DataAdapt
       if (!config.connection) throw new Error('Postgres adapter requires "connection"');
       const { PostgresAdapter } = await import('./postgres.js');
       return new PostgresAdapter(config.connection);
+    }
+    case 'mysql': {
+      if (!config.connection) throw new Error('MySQL adapter requires "connection"');
+      const { MySQLAdapter } = await import('./mysql.js');
+      return new MySQLAdapter(config.connection);
+    }
+    case 'mssql': {
+      if (!config.connection) throw new Error('MSSQL adapter requires "connection"');
+      const { MSSQLAdapter } = await import('./mssql.js');
+      return new MSSQLAdapter(config.connection);
+    }
+    case 'snowflake': {
+      if (!config.account) throw new Error('Snowflake adapter requires "account"');
+      const { SnowflakeAdapter } = await import('./snowflake.js');
+      return new SnowflakeAdapter(config);
+    }
+    case 'bigquery': {
+      if (!config.project) throw new Error('BigQuery adapter requires "project"');
+      if (!config.dataset) throw new Error('BigQuery adapter requires "dataset"');
+      const { BigQueryAdapter } = await import('./bigquery.js');
+      return new BigQueryAdapter(config);
+    }
+    case 'clickhouse': {
+      const { ClickHouseAdapter } = await import('./clickhouse.js');
+      return new ClickHouseAdapter(config);
+    }
+    case 'databricks': {
+      if (!config.serverHostname) throw new Error('Databricks adapter requires "serverHostname"');
+      if (!config.httpPath) throw new Error('Databricks adapter requires "httpPath"');
+      if (!config.token) throw new Error('Databricks adapter requires "token"');
+      const { DatabricksAdapter } = await import('./databricks.js');
+      return new DatabricksAdapter(config);
+    }
+    case 'sqlite': {
+      if (!config.path) throw new Error('SQLite adapter requires "path"');
+      const { SQLiteAdapter } = await import('./sqlite.js');
+      return new SQLiteAdapter(config.path);
     }
     default:
       throw new Error(`Unknown adapter: ${(config as any).adapter}`);

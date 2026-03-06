@@ -10,17 +10,56 @@ import {
 import type { DataSourceConfig } from '@runcontext/core';
 
 export function parseDbUrl(db: string): DataSourceConfig {
+  // URL-scheme based detection
   if (db.startsWith('duckdb://')) {
     return { adapter: 'duckdb', path: db.slice('duckdb://'.length) };
   }
   if (db.startsWith('postgres://') || db.startsWith('postgresql://')) {
     return { adapter: 'postgres', connection: db };
   }
-  if (db.endsWith('.duckdb') || db.endsWith('.db')) {
+  if (db.startsWith('mysql://')) {
+    return { adapter: 'mysql', connection: db };
+  }
+  if (db.startsWith('mssql://') || db.startsWith('sqlserver://')) {
+    return { adapter: 'mssql', connection: db };
+  }
+  if (db.startsWith('clickhouse://')) {
+    return { adapter: 'clickhouse', host: db } as DataSourceConfig;
+  }
+  if (db.startsWith('snowflake://')) {
+    // snowflake://account/database/schema
+    const parts = db.slice('snowflake://'.length).split('/');
+    return {
+      adapter: 'snowflake',
+      account: parts[0] ?? '',
+      database: parts[1] ?? '',
+      schema: parts[2] ?? '',
+    } as DataSourceConfig;
+  }
+  if (db.startsWith('bigquery://')) {
+    // bigquery://project/dataset
+    const parts = db.slice('bigquery://'.length).split('/');
+    return {
+      adapter: 'bigquery',
+      project: parts[0] ?? '',
+      dataset: parts[1] ?? '',
+    } as DataSourceConfig;
+  }
+
+  // File-extension based detection
+  if (db.endsWith('.duckdb')) {
     return { adapter: 'duckdb', path: db };
   }
+  if (db.endsWith('.sqlite') || db.endsWith('.sqlite3')) {
+    return { adapter: 'sqlite', path: db } as DataSourceConfig;
+  }
+  if (db.endsWith('.db')) {
+    // .db files could be either DuckDB or SQLite; default to duckdb for backward compat
+    return { adapter: 'duckdb', path: db };
+  }
+
   throw new Error(
-    `Cannot determine adapter from "${db}". Use duckdb:// or postgres:// prefix.`,
+    `Cannot determine adapter from "${db}". Use a URL prefix (duckdb://, postgres://, mysql://, mssql://, clickhouse://, snowflake://, bigquery://) or a recognized file extension (.duckdb, .db, .sqlite, .sqlite3).`,
   );
 }
 
@@ -60,7 +99,7 @@ export const introspectCommand = new Command('introspect')
           );
           process.exit(1);
         }
-        dsConfig = config.data_sources[opts.source];
+        dsConfig = config.data_sources[opts.source]!;
         dsName = opts.source;
       } else {
         const sources = config.data_sources;

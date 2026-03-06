@@ -5,6 +5,7 @@ import * as yaml from 'yaml';
 import { loadConfig, createAdapter } from '@runcontext/core';
 import type { ColumnInfo, DataSourceConfig } from '@runcontext/core';
 import { parseDbUrl } from '../../commands/introspect.js';
+import { discoverDatabases, toDataSourceConfig } from '../mcp-discovery.js';
 import type { SetupContext, TargetTier } from '../types.js';
 
 interface DetectedDb {
@@ -12,7 +13,7 @@ interface DetectedDb {
   label: string;
 }
 
-/** Try to auto-detect a database from config, env vars, or MCP config. */
+/** Try to auto-detect a single database from config, env vars, or MCP config. */
 function autoDetectDb(cwd: string): DetectedDb | undefined {
   // 1. contextkit.config.yaml
   try {
@@ -39,7 +40,19 @@ function autoDetectDb(cwd: string): DetectedDb | undefined {
     };
   }
 
-  // 3. .claude/mcp.json duckdb server
+  // 3. MCP config discovery (multiple files)
+  try {
+    const discovered = discoverDatabases(cwd);
+    if (discovered.length > 0) {
+      const first = discovered[0]!;
+      const ds = toDataSourceConfig(first);
+      if (ds) {
+        return { dsConfig: ds, label: first.label };
+      }
+    }
+  } catch { /* discovery failed */ }
+
+  // 4. Legacy fallback: .claude/mcp.json duckdb server
   const mcpPath = path.join(cwd, '.claude', 'mcp.json');
   if (existsSync(mcpPath)) {
     try {
@@ -64,89 +77,336 @@ function autoDetectDb(cwd: string): DetectedDb | undefined {
   return undefined;
 }
 
-/** Prompt user to select a connector and provide connection details. */
-async function promptForConnection(): Promise<DataSourceConfig | undefined> {
-  const connector = await p.select({
-    message: 'Select your database',
+/** Discover all databases from MCP config files for the selection menu. */
+function discoverAllDatabases(cwd: string): DetectedDb[] {
+  try {
+    return discoverDatabases(cwd)
+      .map((d) => {
+        const dsConfig = toDataSourceConfig(d);
+        if (!dsConfig) return null;
+        return { dsConfig, label: d.label };
+      })
+      .filter((d): d is DetectedDb => d !== null);
+  } catch {
+    return [];
+  }
+}
+
+/** Prompt for file path or env var (DuckDB / SQLite). */
+async function promptForFileDb(
+  adapter: 'duckdb' | 'sqlite',
+  ext: string,
+  envDefault: string,
+): Promise<DataSourceConfig | undefined> {
+  const method = await p.select({
+    message: 'How do you connect?',
     options: [
-      { value: 'duckdb', label: 'DuckDB', hint: 'Local .duckdb file' },
-      { value: 'postgres', label: 'PostgreSQL', hint: 'Connection string' },
+      { value: 'env', label: 'Environment variable', hint: `e.g. ${envDefault}` },
+      { value: 'path', label: 'File path', hint: `e.g. ./warehouse${ext}` },
     ],
   });
-  if (p.isCancel(connector)) return undefined;
+  if (p.isCancel(method)) return undefined;
 
-  if (connector === 'duckdb') {
-    const method = await p.select({
-      message: 'How do you connect?',
-      options: [
-        { value: 'env', label: 'Environment variable', hint: 'e.g. DUCKDB_PATH' },
-        { value: 'path', label: 'File path', hint: 'e.g. ./warehouse.duckdb' },
-      ],
+  if (method === 'env') {
+    const envName = await p.text({
+      message: 'Environment variable name',
+      initialValue: envDefault,
+      validate(value) {
+        if (!value) return 'Required';
+        const resolved = process.env[value];
+        if (!resolved) return `$${value} is not set`;
+        if (!existsSync(resolved)) return `$${value} points to "${resolved}" which does not exist`;
+      },
     });
-    if (p.isCancel(method)) return undefined;
-
-    if (method === 'env') {
-      const envName = await p.text({
-        message: 'Environment variable name',
-        initialValue: 'DUCKDB_PATH',
-        validate(value) {
-          if (!value) return 'Required';
-          const resolved = process.env[value];
-          if (!resolved) return `$${value} is not set`;
-          if (!existsSync(resolved)) return `$${value} points to "${resolved}" which does not exist`;
-        },
-      });
-      if (p.isCancel(envName)) return undefined;
-      return { adapter: 'duckdb', path: process.env[envName as string]! };
-    } else {
-      const filePath = await p.text({
-        message: 'Path to .duckdb file',
-        placeholder: './warehouse.duckdb',
-        validate(value) {
-          if (!value) return 'Required';
-          if (!existsSync(value)) return `File not found: ${value}`;
-        },
-      });
-      if (p.isCancel(filePath)) return undefined;
-      return { adapter: 'duckdb', path: path.resolve(filePath as string) };
-    }
+    if (p.isCancel(envName)) return undefined;
+    return { adapter, path: process.env[envName as string]! } as DataSourceConfig;
   } else {
-    // Postgres
-    const method = await p.select({
-      message: 'How do you connect?',
-      options: [
-        { value: 'env', label: 'Environment variable', hint: 'e.g. DATABASE_URL' },
-        { value: 'url', label: 'Connection string', hint: 'postgres://...' },
-      ],
+    const filePath = await p.text({
+      message: `Path to ${ext} file`,
+      placeholder: `./warehouse${ext}`,
+      validate(value) {
+        if (!value) return 'Required';
+        if (!existsSync(value)) return `File not found: ${value}`;
+      },
     });
-    if (p.isCancel(method)) return undefined;
+    if (p.isCancel(filePath)) return undefined;
+    return { adapter, path: path.resolve(filePath as string) } as DataSourceConfig;
+  }
+}
 
-    if (method === 'env') {
-      const envName = await p.text({
-        message: 'Environment variable name',
-        initialValue: 'DATABASE_URL',
-        validate(value) {
-          if (!value) return 'Required';
-          const resolved = process.env[value];
-          if (!resolved) return `$${value} is not set`;
-        },
-      });
-      if (p.isCancel(envName)) return undefined;
-      return { adapter: 'postgres', connection: process.env[envName as string]! };
-    } else {
-      const url = await p.text({
-        message: 'Connection string',
-        placeholder: 'postgres://user:pass@host:5432/dbname',
-        validate(value) {
-          if (!value) return 'Required';
-          if (!value.startsWith('postgres://') && !value.startsWith('postgresql://')) {
-            return 'Must start with postgres:// or postgresql://';
-          }
-        },
-      });
-      if (p.isCancel(url)) return undefined;
-      return { adapter: 'postgres', connection: url as string };
-    }
+/** Prompt for connection-string based databases (Postgres, MySQL, MSSQL). */
+async function promptForConnectionString(
+  adapter: 'postgres' | 'mysql' | 'mssql',
+  scheme: string,
+  envDefault: string,
+): Promise<DataSourceConfig | undefined> {
+  const method = await p.select({
+    message: 'How do you connect?',
+    options: [
+      { value: 'env', label: 'Environment variable', hint: `e.g. ${envDefault}` },
+      { value: 'url', label: 'Connection string', hint: `${scheme}://...` },
+    ],
+  });
+  if (p.isCancel(method)) return undefined;
+
+  if (method === 'env') {
+    const envName = await p.text({
+      message: 'Environment variable name',
+      initialValue: envDefault,
+      validate(value) {
+        if (!value) return 'Required';
+        const resolved = process.env[value];
+        if (!resolved) return `$${value} is not set`;
+      },
+    });
+    if (p.isCancel(envName)) return undefined;
+    return { adapter, connection: process.env[envName as string]! } as DataSourceConfig;
+  } else {
+    const url = await p.text({
+      message: 'Connection string',
+      placeholder: `${scheme}://user:pass@host:5432/dbname`,
+      validate(value) {
+        if (!value) return 'Required';
+        if (!value.startsWith(`${scheme}://`)) {
+          return `Must start with ${scheme}://`;
+        }
+      },
+    });
+    if (p.isCancel(url)) return undefined;
+    return { adapter, connection: url as string } as DataSourceConfig;
+  }
+}
+
+/** Prompt for Snowflake credentials. */
+async function promptForSnowflake(): Promise<DataSourceConfig | undefined> {
+  const account = await p.text({
+    message: 'Snowflake account identifier',
+    placeholder: 'xy12345.us-east-1',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(account)) return undefined;
+
+  const username = await p.text({
+    message: 'Username',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(username)) return undefined;
+
+  const password = await p.password({
+    message: 'Password',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(password)) return undefined;
+
+  const warehouse = await p.text({
+    message: 'Warehouse',
+    placeholder: 'COMPUTE_WH',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(warehouse)) return undefined;
+
+  const database = await p.text({
+    message: 'Database',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(database)) return undefined;
+
+  const schema = await p.text({
+    message: 'Schema',
+    initialValue: 'PUBLIC',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(schema)) return undefined;
+
+  return {
+    adapter: 'snowflake',
+    account: account as string,
+    username: username as string,
+    password: password as string,
+    warehouse: warehouse as string,
+    database: database as string,
+    schema: schema as string,
+  } as DataSourceConfig;
+}
+
+/** Prompt for BigQuery credentials. */
+async function promptForBigQuery(): Promise<DataSourceConfig | undefined> {
+  const project = await p.text({
+    message: 'Google Cloud project ID',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(project)) return undefined;
+
+  const dataset = await p.text({
+    message: 'Dataset',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(dataset)) return undefined;
+
+  const keyFilename = await p.text({
+    message: 'Path to service account key file (JSON)',
+    placeholder: './service-account.json',
+    validate(value) {
+      if (!value) return 'Required';
+      if (!existsSync(value)) return `File not found: ${value}`;
+    },
+  });
+  if (p.isCancel(keyFilename)) return undefined;
+
+  return {
+    adapter: 'bigquery',
+    project: project as string,
+    dataset: dataset as string,
+    keyFilename: path.resolve(keyFilename as string),
+  } as DataSourceConfig;
+}
+
+/** Prompt for ClickHouse credentials. */
+async function promptForClickHouse(): Promise<DataSourceConfig | undefined> {
+  const host = await p.text({
+    message: 'Host',
+    initialValue: 'localhost',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(host)) return undefined;
+
+  const port = await p.text({
+    message: 'HTTP port',
+    initialValue: '8123',
+    validate(value) {
+      if (!value) return 'Required';
+      if (!/^\d+$/.test(value)) return 'Must be a number';
+    },
+  });
+  if (p.isCancel(port)) return undefined;
+
+  const database = await p.text({
+    message: 'Database',
+    initialValue: 'default',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(database)) return undefined;
+
+  const username = await p.text({
+    message: 'Username',
+    initialValue: 'default',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(username)) return undefined;
+
+  const password = await p.password({
+    message: 'Password (leave empty if none)',
+  });
+  if (p.isCancel(password)) return undefined;
+
+  return {
+    adapter: 'clickhouse',
+    host: host as string,
+    port: parseInt(port as string, 10),
+    database: database as string,
+    username: username as string,
+    password: (password as string) || undefined,
+  } as DataSourceConfig;
+}
+
+/** Prompt for Databricks credentials. */
+async function promptForDatabricks(): Promise<DataSourceConfig | undefined> {
+  const serverHostname = await p.text({
+    message: 'Server hostname',
+    placeholder: 'abc-12345678-wxyz.cloud.databricks.com',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(serverHostname)) return undefined;
+
+  const httpPath = await p.text({
+    message: 'HTTP path',
+    placeholder: '/sql/1.0/warehouses/abcdef1234567890',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(httpPath)) return undefined;
+
+  const token = await p.password({
+    message: 'Personal access token',
+    validate(value) { if (!value) return 'Required'; },
+  });
+  if (p.isCancel(token)) return undefined;
+
+  return {
+    adapter: 'databricks',
+    serverHostname: serverHostname as string,
+    httpPath: httpPath as string,
+    token: token as string,
+  } as DataSourceConfig;
+}
+
+/** Prompt user to select a connector and provide connection details. */
+async function promptForConnection(): Promise<DataSourceConfig | undefined> {
+  const cwd = process.cwd();
+  const discovered = discoverAllDatabases(cwd);
+
+  // Use string values for all options; discovered dbs use "discovered:N" keys
+  const discoveredMap = new Map<string, DataSourceConfig>();
+  const options: Array<{ value: string; label: string; hint?: string }> = [];
+
+  for (let i = 0; i < discovered.length; i++) {
+    const key = `discovered:${i}`;
+    discoveredMap.set(key, discovered[i]!.dsConfig);
+    options.push({ value: key, label: discovered[i]!.label });
+  }
+
+  if (discovered.length > 0) {
+    options.push({ value: '__separator__', label: '\u2500\u2500\u2500 Or connect manually \u2500\u2500\u2500' });
+  }
+
+  options.push(
+    { value: 'duckdb', label: 'DuckDB', hint: 'Local .duckdb file' },
+    { value: 'postgres', label: 'PostgreSQL', hint: 'Connection string' },
+    { value: 'mysql', label: 'MySQL / MariaDB', hint: 'Connection string' },
+    { value: 'mssql', label: 'SQL Server', hint: 'Connection string' },
+    { value: 'snowflake', label: 'Snowflake', hint: 'Account credentials' },
+    { value: 'bigquery', label: 'BigQuery', hint: 'Google Cloud project' },
+    { value: 'clickhouse', label: 'ClickHouse', hint: 'HTTP connection' },
+    { value: 'databricks', label: 'Databricks', hint: 'Workspace connection' },
+    { value: 'sqlite', label: 'SQLite', hint: 'Local .db file' },
+  );
+
+  const selection = await p.select({
+    message: 'Select your database',
+    options,
+  });
+  if (p.isCancel(selection)) return undefined;
+
+  const connector = selection as string;
+
+  // If user picked a discovered database, return its config directly
+  if (discoveredMap.has(connector)) {
+    return discoveredMap.get(connector)!;
+  }
+
+  // If user somehow picked the separator, re-prompt
+  if (connector === '__separator__') return promptForConnection();
+
+  switch (connector) {
+    case 'duckdb':
+      return promptForFileDb('duckdb', '.duckdb', 'DUCKDB_PATH');
+    case 'sqlite':
+      return promptForFileDb('sqlite', '.db', 'SQLITE_PATH');
+    case 'postgres':
+      return promptForConnectionString('postgres', 'postgres', 'DATABASE_URL');
+    case 'mysql':
+      return promptForConnectionString('mysql', 'mysql', 'MYSQL_URL');
+    case 'mssql':
+      return promptForConnectionString('mssql', 'mssql', 'MSSQL_URL');
+    case 'snowflake':
+      return promptForSnowflake();
+    case 'bigquery':
+      return promptForBigQuery();
+    case 'clickhouse':
+      return promptForClickHouse();
+    case 'databricks':
+      return promptForDatabricks();
+    default:
+      return undefined;
   }
 }
 

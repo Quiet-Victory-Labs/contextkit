@@ -26,8 +26,38 @@ export interface DataAdapter {
   query(sql: string): Promise<QueryResult>;
 }
 
+export type AdapterType =
+  | 'duckdb'
+  | 'postgres'
+  | 'mysql'
+  | 'mssql'
+  | 'snowflake'
+  | 'bigquery'
+  | 'clickhouse'
+  | 'databricks'
+  | 'sqlite';
+
 export interface DataSourceConfig {
-  adapter: 'duckdb' | 'postgres';
-  path?: string;
-  connection?: string;
+  adapter: AdapterType;
+  path?: string;           // duckdb, sqlite
+  connection?: string;     // postgres, mysql, mssql (connection string)
+  // Snowflake
+  account?: string;
+  username?: string;
+  password?: string;
+  warehouse?: string;
+  database?: string;
+  schema?: string;
+  role?: string;
+  // BigQuery
+  project?: string;
+  dataset?: string;
+  keyFilename?: string;
+  // ClickHouse
+  host?: string;
+  port?: number;
+  // Databricks
+  serverHostname?: string;
+  httpPath?: string;
+  token?: string;
 }

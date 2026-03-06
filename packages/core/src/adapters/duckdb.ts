@@ -11,7 +11,7 @@ export class DuckDBAdapter implements DataAdapter {
 
   async connect(): Promise<void> {
     const duckdb = await import('duckdb');
-    const opts = this.dbPath === ':memory:' ? {} : { access_mode: 'READ_ONLY' };
+    const opts = this.dbPath === ':memory:' ? undefined : { access_mode: 'READ_ONLY' } as Record<string, string>;
     return new Promise((resolve, reject) => {
       this.db = new duckdb.default.Database(this.dbPath, opts, (err: Error | null) => {
         if (err) return reject(err);
@@ -90,7 +90,7 @@ export class DuckDBAdapter implements DataAdapter {
     return new Promise((resolve, reject) => {
       this.conn.all(sql, (err: Error | null, rows: Record<string, unknown>[]) => {
         if (err) return reject(err);
-        const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+        const columns = rows.length > 0 ? Object.keys(rows[0]!) : [];
         resolve({ columns, rows, row_count: rows.length });
       });
     });
