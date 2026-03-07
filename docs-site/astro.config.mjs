@@ -12,11 +12,11 @@ export default defineConfig({
         replacesTitle: false,
       },
       favicon: '/favicon.svg',
-      description: 'ContextKit — open-source semantic layer governance and AI-ready metadata toolkit built on the Open Semantic Interchange (OSI) specification. Introspect databases, lint metadata, enforce Bronze/Silver/Gold tiers, and serve enriched context to AI agents via Model Context Protocol (MCP).',
+      description: 'ContextKit — tell your AI agent to build your semantic layer. Open-source CLI for introspecting databases, curating metadata to Gold tier, and serving AI-ready context via MCP. Built on the Open Semantic Interchange (OSI) specification.',
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/erickittelson/ContextKit' },
       ],
-      editLink: { baseUrl: 'https://github.com/erickittelson/ContextKit/edit/master/docs-site/' },
+      // editLink removed — not needed for public docs
       customCss: ['./src/styles/custom.css'],
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },

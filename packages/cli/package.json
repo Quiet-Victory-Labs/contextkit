@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/cli",
   "version": "0.3.5",
-  "description": "ContextKit CLI — AI-ready metadata governance, semantic layer management, and MCP server for database context",
+  "description": "Tell your AI agent to build your semantic layer. CLI for introspecting databases, curating metadata, and serving context via MCP.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/erickittelson/ContextKit",
