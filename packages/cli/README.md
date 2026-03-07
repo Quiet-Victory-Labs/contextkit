@@ -1,101 +1,65 @@
 # @runcontext/cli
 
-CLI for [ContextKit](https://github.com/erickittelson/ContextKit) — AI-ready metadata governance over OSI.
+**ContextKit — tell your AI agent to build your semantic layer.**
 
-**Your data already has a schema. ContextKit gives it meaning.**
+Tell your AI agent: *"Install @runcontext/cli and build a semantic layer for my database."*
+
+The agent introspects your database, scaffolds metadata, and goes back and forth with you — asking about metrics, ownership, and business rules — while it builds the semantic layer using CLI commands. When it reaches Gold tier, it exports an **AI Blueprint** and serves the metadata to other AI agents via MCP.
 
 ## Installation
 
 ```bash
-# Global install
-npm install -g @runcontext/cli
-
-# Or per-project
-npm install -D @runcontext/cli
+npm install @runcontext/cli
 ```
 
 ## Quick Start
 
-```bash
-# Point at any database — interactive wizard does the rest
-context setup
+In Claude Code, Cursor, Windsurf, or any agentic coding platform:
 
-# Or step by step
-context introspect --db duckdb://warehouse.duckdb
-context enrich --target silver --apply
-context tier
+> *"Install @runcontext/cli and build a semantic layer for my database."*
+
+Or run it yourself:
+
+```bash
+context setup           # Interactive wizard — database to metadata in one flow
+context tier            # Check Bronze/Silver/Gold score
+context blueprint       # Export AI Blueprint (portable Gold-tier spec)
+context serve --stdio   # Serve to AI agents via MCP
 ```
 
 ## Commands
 
-### Core Workflow
-
 ```bash
-context setup                    # Interactive wizard — database to metadata in one flow
-context introspect               # Scan a database → scaffold Bronze-level OSI metadata
-context enrich --target silver   # Auto-enrich metadata toward a target tier
-context lint                     # Run 37 lint rules against context files
-context fix --write              # Auto-fix lint issues where possible
-context build                    # Compile context files → emit manifest JSON
+# Build the semantic layer
+context setup                    # Interactive wizard — full pipeline in one flow
+context new <name>               # Scaffold a new data product
+context introspect               # Scan a database -> scaffold Bronze metadata
+context enrich --target silver   # Auto-enrich toward a target tier
+context lint                     # Run 40 lint rules
+context fix --write              # Auto-fix lint issues
+context build                    # Compile -> emit manifest JSON
 context tier [model]             # Show Bronze/Silver/Gold scorecard
-```
 
-### Exploration
-
-```bash
+# Explore and verify
 context explain <name>           # Look up any model, term, or owner
-context rules                    # List all lint rules with tier, severity, fixability
-context validate-osi <file>      # Validate a single OSI file against the schema
-context verify                   # Check metadata accuracy against a live database
+context rules                    # List all lint rules
+context validate-osi <file>      # Validate against OSI spec
+context verify                   # Check accuracy against a live database
+
+# Export and serve
+context blueprint [model]        # Export AI Blueprints (portable OSI YAML)
+context serve --stdio            # MCP server over stdio
+context serve --http --port 3000 # MCP server over HTTP
+context site                     # Static documentation site
+context dev --studio             # Visual editor in the browser
+context init                     # Scaffold a new project
 ```
-
-### Serving
-
-```bash
-context serve --stdio            # Start MCP server over stdio (for Claude, Cursor, etc.)
-context serve --http --port 3000 # Start MCP server over HTTP
-context site                     # Generate a static documentation site
-context dev                      # Watch mode — re-lint on file changes
-context init                     # Scaffold a new project structure
-```
-
-## The Tier System
-
-| Tier | What it means | How to get there |
-|---|---|---|
-| **Bronze** | Discoverable — described, owned, classified | `context introspect` |
-| **Silver** | Trusted — lineage, glossary, sample values, trust status | `context enrich --target silver` |
-| **Gold** | AI-Ready — semantic roles, golden queries, guardrails, business rules | Human curation + `context enrich --target gold` |
 
 ## Database Support
 
-| Adapter | Connection |
-|---|---|
-| DuckDB | `--db duckdb://path.duckdb` |
-| PostgreSQL | `--db postgres://user:pass@host:5432/db` |
-| MySQL | `--db mysql://user:pass@host:3306/db` |
-| SQL Server | `--db mssql://user:pass@host:1433/db` |
-| SQLite | `--db path/to/file.sqlite` |
-| Snowflake | `--db snowflake://account/database/schema` |
-| BigQuery | `--db bigquery://project/dataset` |
-| ClickHouse | `--db clickhouse://host:8123` |
-| Databricks | Config file only |
-
-Each adapter requires its own driver as an optional peer dependency. See [Database Support docs](https://contextkit.dev/reference/databases/) for installation details.
+DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks.
 
 ## MCP Server
-
-Expose your metadata to AI agents:
-
-```bash
-# For Claude Code / Cursor
-context serve --stdio
-
-# For multi-agent setups
-context serve --http --port 3000
-```
-
-Add to `.claude/mcp.json`:
 
 ```json
 {
@@ -108,9 +72,9 @@ Add to `.claude/mcp.json`:
 }
 ```
 
-## Full Documentation
+## Documentation
 
-See the [ContextKit repository](https://github.com/erickittelson/ContextKit) for complete docs, file structure, tier requirements, and examples.
+[contextkit.dev](https://contextkit.dev) | [GitHub](https://github.com/erickittelson/ContextKit)
 
 ## License
 

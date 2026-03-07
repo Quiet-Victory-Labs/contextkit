@@ -27,10 +27,10 @@ AI agents querying databases today see table and column names — but they don't
 
 ## The Solution
 
-Tell your AI agent to install ContextKit and build your semantic layer. The agent runs the CLI, introspects your database, and goes back and forth with you — asking about your metrics, business rules, and use cases — while it curates the metadata. When it reaches Gold tier, it serves the semantic layer to other AI agents via [MCP](https://modelcontextprotocol.io), so they generate correct SQL instead of guessing.
+Tell your AI agent to install `@runcontext/cli` and build your semantic layer. The agent runs the CLI, introspects your database, and goes back and forth with you — asking about your metrics, business rules, and use cases — while it curates the metadata. When it reaches Gold tier, it serves the semantic layer to other AI agents via [MCP](https://modelcontextprotocol.io), so they generate correct SQL instead of guessing.
 
 ```
-You: "Install ContextKit and build my semantic layer for this DuckDB"
+You: "Install @runcontext/cli and build a semantic layer for my database"
 Agent: npm install @runcontext/cli
 Agent: context setup → connects → introspects → scaffolds metadata
 Agent: context enrich --target silver --apply → auto-fills descriptions, types, lineage
