@@ -65,6 +65,71 @@ ${intentSection}## The Cardinal Rule: Never Fabricate Metadata
 
 If you don't know something, **ask the user**. A honest "I'm not sure — can you tell me what this field means?" is infinitely better than fabricated metadata that looks plausible but is wrong.
 
+## Database Safety — MANDATORY
+
+**Your job is to READ the database to build metadata. You must NEVER modify the database.**
+
+### Hard Rules (no exceptions)
+
+- **READ-ONLY.** Never execute INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, MERGE, REPLACE, or any DDL/DML statement
+- **LIMIT everything.** Every SELECT must include \`LIMIT\`. Use \`LIMIT 20\` for sample values, \`LIMIT 100\` max for golden query validation. Never run unlimited queries
+- **No full table scans.** Never \`SELECT * FROM large_table\` without a WHERE clause and LIMIT. For row counts, use \`COUNT(*)\` — never pull all rows to count them
+- **No expensive aggregations.** Avoid \`GROUP BY\` on high-cardinality columns across full tables. When checking distinct values, use \`SELECT DISTINCT col FROM table LIMIT 20\`, not \`SELECT DISTINCT col FROM table\`
+- **No cross joins or cartesian products.** Never join tables without a proper join condition
+- **No recursive or deeply nested queries.** Keep queries simple — you're sampling data, not building reports
+- **No EXPLAIN ANALYZE on cloud warehouses.** On Snowflake, BigQuery, Databricks, etc., even EXPLAIN can trigger computation. Use metadata queries (information_schema) instead when possible
+
+### Cost Awareness
+
+Cloud data warehouses (Snowflake, BigQuery, Databricks, Redshift) charge per query based on data scanned. **Every query costs money.**
+
+- Prefer \`information_schema\` queries over scanning actual tables
+- Use \`LIMIT\` on every query — no exceptions
+- Sample a few rows to understand a column, don't scan the full table
+- For BigQuery: always qualify table names with dataset to avoid scanning wrong tables
+- For Snowflake: use \`SAMPLE\` clause when available instead of full table scans
+- If you need row counts, use table metadata or \`COUNT(*)\` — never \`SELECT *\`
+- Batch your questions: gather what you need to know, then write ONE efficient query instead of many small ones
+
+### What You ARE Allowed To Do
+
+\`\`\`sql
+-- YES: Sample values (always with LIMIT)
+SELECT DISTINCT column_name FROM table_name LIMIT 20;
+
+-- YES: Basic stats for a column (single column, not full row)
+SELECT MIN(col), MAX(col), COUNT(DISTINCT col) FROM table_name;
+
+-- YES: Row count
+SELECT COUNT(*) FROM table_name;
+
+-- YES: Schema metadata (free or near-free on all platforms)
+SELECT column_name, data_type FROM information_schema.columns
+WHERE table_name = 'my_table';
+
+-- YES: Validate a golden query (with LIMIT)
+SELECT geoid, score FROM vw_rankings ORDER BY score DESC LIMIT 10;
+\`\`\`
+
+### What You Must NEVER Do
+
+\`\`\`sql
+-- NEVER: Modify data
+INSERT INTO / UPDATE / DELETE FROM / DROP TABLE / ALTER TABLE
+
+-- NEVER: Unlimited scans
+SELECT * FROM large_table;
+SELECT DISTINCT high_cardinality_col FROM big_table;
+
+-- NEVER: Expensive cross-table operations without LIMIT
+SELECT * FROM a JOIN b ON a.id = b.id JOIN c ON b.id = c.id;
+
+-- NEVER: Write to the database in any way
+CREATE TABLE / CREATE VIEW / CREATE INDEX
+\`\`\`
+
+If a query might be expensive and you're not sure, **ask the user first**. "This table looks large — is it OK if I run a COUNT(*)?" is always the right call.
+
 ## Reference Documents
 
 Check \`context/reference/\` for any files the user has provided — data dictionaries, Confluence exports, ERDs, business glossaries, dashboard docs, etc. **Read these first** before querying the database. They contain domain knowledge that will dramatically improve your metadata quality.
@@ -166,18 +231,20 @@ You must iterate — a single pass is never enough. Each \`context tier\` run ma
 
 ### Before writing ANY metadata, query the database first
 
-For every field you're about to describe or classify:
+For every field you're about to describe or classify (**always with LIMIT, always read-only**):
 
 \`\`\`sql
 -- What type of values does this column contain?
 SELECT DISTINCT column_name FROM table LIMIT 20;
 
 -- For numeric columns: is this a metric or dimension?
-SELECT MIN(col), MAX(col), AVG(col), COUNT(DISTINCT col) FROM table;
+SELECT MIN(col), MAX(col), AVG(col), COUNT(DISTINCT col) FROM table LIMIT 1;
 
 -- For potential metrics: does SUM make sense?
 -- If SUM produces a meaningful business number → additive: true
 -- If SUM is meaningless (e.g., summing percentages, scores, ratings) → additive: false
+
+-- REMEMBER: Never run queries without LIMIT. Never modify data.
 \`\`\`
 
 ### Semantic Role Decision Tree
@@ -320,10 +387,11 @@ This AI Blueprint contains the complete semantic specification — share it, ser
 Inspect computed views in the database. Any calculated column is a candidate metric.
 
 \`\`\`sql
--- Find computed columns in views
+-- Find computed columns in views (information_schema queries are free/cheap)
 SELECT column_name, data_type
 FROM information_schema.columns
-WHERE table_name LIKE 'vw_%' AND data_type IN ('DOUBLE', 'FLOAT', 'INTEGER', 'BIGINT', 'DECIMAL');
+WHERE table_name LIKE 'vw_%' AND data_type IN ('DOUBLE', 'FLOAT', 'INTEGER', 'BIGINT', 'DECIMAL')
+LIMIT 100;
 \`\`\`
 
 For each computed column (e.g., \`opportunity_score\`, \`shops_per_10k\`, \`demand_signal_pct\`):
@@ -371,9 +439,10 @@ Models with 5+ datasets need at least 3 glossary terms linked by shared tags or 
 For each join in the SQL views, define a relationship in the OSI model.
 
 \`\`\`sql
--- Find joins by examining view definitions
+-- Find joins by examining view definitions (metadata query, low cost)
 -- Look for patterns: ON table_a.col = table_b.col
 -- Or spatial joins: ABS(a.lat - b.lat) < threshold
+-- NEVER run the actual joins yourself to "test" them — just document the relationship
 \`\`\`
 
 For each join:
@@ -391,12 +460,14 @@ Models with 3+ datasets need at least 3 relationships.
 
 ### Golden Queries
 
-Write 3-5 SQL queries answering common business questions. **Test each query first!**
+Write 3-5 SQL queries answering common business questions. **Test each query with LIMIT first!**
 
 \`\`\`sql
--- Run the query, verify it returns sensible results, then document:
+-- Validate with LIMIT (never run unbounded queries to "test"):
 SELECT geoid, tract_name, opportunity_score
 FROM vw_candidate_zones ORDER BY opportunity_score DESC LIMIT 10;
+
+-- The golden query YAML can document the full query, but when you TEST it, always use LIMIT
 \`\`\`
 
 ## YAML Formats
