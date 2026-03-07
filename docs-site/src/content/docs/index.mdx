@@ -3,7 +3,7 @@ title: ContextKit
 description: "Tell your AI agent to build your semantic layer. ContextKit — the open-source CLI for introspecting databases, curating metadata, and serving AI-ready context via MCP."
 template: splash
 hero:
-  tagline: Tell your AI agent to build your semantic layer. It uses ContextKit to introspect your database, scaffold metadata, and serve curated context to every AI tool in your stack via MCP.
+  tagline: "Tell your AI agent: 'Install ContextKit and build my semantic layer.' The agent installs the CLI, connects to your database, and works with you to build Gold-tier metadata — then serves it to every AI tool via MCP."
   image:
     dark: ../../assets/logo-dark.svg
     light: ../../assets/logo-light.svg
@@ -29,7 +29,7 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## How It Works
 
-Your agent runs ContextKit commands to build the semantic layer with you. You provide the business knowledge. The agent does the rest.
+You tell your AI agent to build it. The agent runs CLI commands, asks you about your data, and iterates until Gold. You provide the business knowledge. The agent does the rest.
 
 <div class="comparison">
   <div class="without">
@@ -84,11 +84,15 @@ WHERE status='completed' ← required (guardrail)</code></pre>
 
 ## Quick Start
 
+Tell your AI agent: *"Install @runcontext/cli and build a semantic layer for my database."*
+
+Or do it yourself:
+
 ```bash
 npm install -g @runcontext/cli
-context setup           # interactive wizard — database to metadata
+context setup           # connect → introspect → scaffold → enrich → generate agent instructions
 context tier            # check your Bronze/Silver/Gold score
-context serve           # expose to AI agents via MCP
+context serve --stdio   # serve to AI agents via MCP
 ```
 
 <CardGrid>

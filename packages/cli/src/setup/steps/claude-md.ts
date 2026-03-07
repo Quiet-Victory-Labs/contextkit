@@ -3,9 +3,11 @@ import path from 'node:path';
 import { existsSync, writeFileSync } from 'node:fs';
 import type { SetupContext, StepResult } from '../types.js';
 
-function buildClaudeMd(ctx: SetupContext): string {
+function buildAgentInstructions(ctx: SetupContext): string {
   const modelName = ctx.modelName;
   const tier = ctx.tierScore?.tier?.toUpperCase() ?? 'UNKNOWN';
+  const tableList = ctx.tables.map((t) => t.name).join(', ');
+  const dbInfo = ctx.dsConfig.path ?? ctx.dsConfig.connection ?? 'configured';
 
   // Extract dataset info from graph
   const model = ctx.graph?.models.get(modelName);
@@ -38,16 +40,16 @@ ${ctx.intent.goals}
 ${ctx.intent.metrics ? `\n**Key metrics/outcomes:** ${ctx.intent.metrics}` : ''}
 ${ctx.intent.audience ? `\n**Audience:** ${ctx.intent.audience}` : ''}
 
-Use these goals to prioritize which datasets, fields, and metrics to curate first. Focus metadata curation on the tables and columns most relevant to these outcomes.
+Use these goals to prioritize which datasets, fields, and metrics to curate first.
 
 `
     : '';
 
   return `# ContextKit Agent Instructions
 
-You have two MCP servers: **duckdb** (query data) and **contextkit** (query metadata).
-
 Model: **${modelName}** | Current Tier: **${tier}**
+Database: ${ctx.dsConfig.adapter} (${dbInfo})
+Tables: ${tableList}
 
 ${intentSection}## The Cardinal Rule: Never Fabricate Metadata
 
@@ -61,24 +63,102 @@ ${intentSection}## The Cardinal Rule: Never Fabricate Metadata
 - NEVER write a business_context narrative you can't justify from the data
 - NEVER create a glossary definition that is just "Definition for X"
 
-If you don't know something, say so. Leave it as a TODO with a note about what you'd need to determine the answer. A honest TODO is infinitely better than fabricated metadata that looks plausible but is wrong.
+If you don't know something, **ask the user**. A honest "I'm not sure — can you tell me what this field means?" is infinitely better than fabricated metadata that looks plausible but is wrong.
+
+## Reference Documents
+
+Check \`context/reference/\` for any files the user has provided — data dictionaries, Confluence exports, ERDs, business glossaries, dashboard docs, etc. **Read these first** before querying the database. They contain domain knowledge that will dramatically improve your metadata quality.
+
+If the folder is empty, ask the user: "Do you have any existing documentation about this data? Data dictionaries, wiki pages, spreadsheets? Drop them in context/reference/ and I'll use them."
 
 ## On Session Start
 
-1. Run \`context_tier\` to check the current metadata tier (Bronze/Silver/Gold)
-2. Report the current tier and list failing checks
-3. Ask the user what they'd like to work on — don't start changing files unprompted
+1. Check \`context/reference/\` for any reference documents — read them if present
+2. Run \`context tier\` to check the current metadata tier (Bronze/Silver/Gold)
+3. Report the current tier and summarize failing checks
+4. Ask the user what they'd like to focus on — don't start changing files unprompted
+5. If the user says "get me to Gold" or "build my semantic layer," follow the iterative workflow below
 
-## When Asked to Reach Gold
+## The Iterative Workflow
 
-Work through ALL failing Gold checks iteratively until \`context tier\` reports Gold:
+Building a semantic layer is a **conversation**. You and the user go back and forth — you query the data, propose metadata, ask questions, and iterate. Here's the loop:
 
-1. Run \`context_tier\` and collect every failing check
+\`\`\`
+                    ┌─────────────────────────┐
+                    │   context tier           │
+                    │   (check failing checks) │
+                    └──────────┬──────────────┘
+                               │
+                    ┌──────────▼──────────────┐
+                    │  Pick highest-impact     │
+                    │  failing check           │
+                    └──────────┬──────────────┘
+                               │
+                    ┌──────────▼──────────────┐
+                    │  Query the database      │
+                    │  to gather evidence      │
+                    └──────────┬──────────────┘
+                               │
+                    ┌──────────▼──────────────┐
+                    │  Need user input?        │──── YES ──→ Ask the user
+                    └──────────┬──────────────┘              (then continue)
+                               │ NO
+                    ┌──────────▼──────────────┐
+                    │  Edit YAML metadata      │
+                    └──────────┬──────────────┘
+                               │
+                    ┌──────────▼──────────────┐
+                    │  context lint            │
+                    │  context tier            │
+                    └──────────┬──────────────┘
+                               │
+                    ┌──────────▼──────────────┐
+                    │  All Gold checks pass?   │──── NO ──→ Loop back
+                    └──────────┬──────────────┘
+                               │ YES
+                            ✓ DONE
+\`\`\`
+
+### What to Ask the User About
+
+You know the data. The user knows the business. Ask them about:
+
+- **Ownership** — "Who owns this data? What team maintains it?"
+- **Metric intent** — "Should revenue be summed or averaged? Is this an additive metric?"
+- **Business rules** — "Are there any filters that should always be applied? (e.g., only active records)"
+- **Data lineage** — "Where does this data come from originally? What upstream system?"
+- **Use cases** — "What questions do people ask this data? What dashboards use it?"
+- **Glossary terms** — "What does 'churn rate' mean in your organization?"
+- **Data quality** — "I see 15% null values in this column — is that expected?"
+
+Don't batch all questions at once. Ask as you encounter each field or concept that needs clarification.
+
+### CLI Commands to Use
+
+\`\`\`bash
+# Check where you are
+context tier                    # Show Bronze/Silver/Gold scorecard with failing checks
+context lint                    # Run all 40 lint rules
+context explain ${modelName}     # Full model details — governance, rules, lineage, tier
+
+# Build and fix
+context enrich --target silver --apply --source default  # Auto-enrich to Silver
+context fix --write             # Auto-fix lint issues where possible
+context verify                  # Validate metadata against the live database
+
+# Serve to other agents
+context serve --stdio           # Start MCP server (for Claude, Cursor, etc.)
+context dev --studio            # Open visual editor in browser
+\`\`\`
+
+### Do NOT Stop Until Gold
+
+1. Run \`context tier\` and collect every failing check
 2. For each failing check, query the database to gather evidence, then fix the metadata
-3. Run \`context_tier\` again
+3. Run \`context tier\` again
 4. If checks still fail, go back to step 2
-5. **Do NOT stop until every Gold check passes** or you hit something that genuinely requires human input (like real owner contact info)
-6. For checks you cannot fix (e.g., owner email), leave a clear TODO explaining what a human needs to provide
+5. **Do NOT stop until every Gold check passes** or you hit something that genuinely requires human input
+6. For checks you cannot fix, ask the user or leave a clear TODO explaining what's needed
 
 You must iterate — a single pass is never enough. Each \`context tier\` run may reveal new failures after earlier ones are fixed.
 
@@ -180,7 +260,7 @@ ${datasetList || '(none detected)'}
 
 ${failingSection}
 
-## MCP Tools
+## MCP Tools (if using ContextKit as an MCP server)
 
 | Tool | Parameters | What it does |
 |------|-----------|-------------|
@@ -332,19 +412,23 @@ hierarchies:
     dataset: my_table
 \`\`\`
 
-## CLI Commands
+## File Structure
 
-\`\`\`bash
-context tier                  # Check scorecard
-context verify --db <path>    # Validate against live data
-context fix --db <path>       # Auto-fix data warnings
-context setup                 # Interactive setup wizard
-context dev                   # Watch mode for live editing
+\`\`\`
+context/
+  models/*.osi.yaml              # OSI semantic model (schema, relationships, metrics)
+  governance/*.governance.yaml   # Ownership, trust, security, semantic roles
+  rules/*.rules.yaml             # Golden queries, business rules, guardrails
+  lineage/*.lineage.yaml         # Upstream sources
+  glossary/*.term.yaml           # Business term definitions
+  owners/*.owner.yaml            # Team ownership records
+  reference/                     # User-provided docs (data dictionaries, wiki exports, etc.)
+  AGENT_INSTRUCTIONS.md          # This file
 \`\`\`
 `;
 }
 
-export async function runClaudeMdStep(ctx: SetupContext): Promise<StepResult> {
+export async function runAgentInstructionsStep(ctx: SetupContext): Promise<StepResult> {
   const instructionsPath = path.join(ctx.contextDir, 'AGENT_INSTRUCTIONS.md');
 
   if (existsSync(instructionsPath)) {
@@ -356,10 +440,10 @@ export async function runClaudeMdStep(ctx: SetupContext): Promise<StepResult> {
     }
   }
 
-  const content = buildClaudeMd(ctx);
+  const content = buildAgentInstructions(ctx);
   writeFileSync(instructionsPath, content, 'utf-8');
 
-  p.log.success('Generated context/AGENT_INSTRUCTIONS.md with agent curation instructions');
+  p.log.success('Generated context/AGENT_INSTRUCTIONS.md — the agent curation guide');
 
   return { skipped: false, summary: 'Generated context/AGENT_INSTRUCTIONS.md' };
 }

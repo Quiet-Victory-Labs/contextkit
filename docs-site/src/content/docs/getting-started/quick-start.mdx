@@ -5,7 +5,15 @@ description: "Set up ContextKit in under 5 minutes — install, introspect a dat
 
 import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
 
-## The fastest path
+## The fastest path: tell your AI agent
+
+In Claude Code, Cursor, or any agentic coding platform:
+
+> *"Install @runcontext/cli and build a semantic layer for my database."*
+
+The agent will run `context setup`, introspect your database, and start asking you questions about your data — metrics, ownership, business rules. It reads the generated `context/AGENT_INSTRUCTIONS.md` and knows exactly what to do.
+
+## Or do it yourself
 
 <Steps>
 
@@ -21,32 +29,30 @@ import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
    context setup
    ```
 
-   The wizard auto-detects your database, lets you select which tables to include, introspects them, scaffolds metadata, enriches to Silver, and generates AI agent instructions — all in one interactive flow.
+   The wizard auto-detects your database, introspects tables, scaffolds metadata, enriches to Silver, and generates agent instruction files — all in one interactive flow.
 
-3. **Capture your intent**
-
-   The wizard also asks about your goals so AI agents can prioritize curation. Your answers are saved to `AGENT_INSTRUCTIONS.md` and `.claude/CLAUDE.md`, giving AI assistants the context they need to help you reach Gold tier.
-
-4. **Check your tier**
+3. **Check your tier**
 
    ```bash
    context tier
    ```
 
-   You should see your model at **Silver** tier. Gold requires human curation.
+   You should see your model at **Silver** tier. Gold requires human or agent curation.
 
-5. **Open the visual editor** *(optional)*
+4. **Curate to Gold**
+
+   Tell your AI agent: *"Read context/AGENT_INSTRUCTIONS.md and get this project to Gold."*
+
+   The agent will go back and forth with you, asking about your data as it builds. Or use the visual editor:
 
    ```bash
    context dev --studio
    ```
 
-   Open the visual editor in your browser to curate metadata — edit descriptions, semantic roles, and business rules interactively, then save changes back to YAML.
-
-6. **Serve to AI agents**
+5. **Serve to AI agents**
 
    ```bash
-   context serve
+   context serve --stdio
    ```
 
    Your MCP server is live. AI agents now have full semantic context.

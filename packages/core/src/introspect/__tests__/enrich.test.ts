@@ -131,7 +131,7 @@ describe('suggestEnrichments', () => {
     const suggestions = suggestEnrichments('silver', tierScore, ['users']);
     expect(suggestions.glossaryTerms).toBeDefined();
     expect(suggestions.glossaryTerms!.length).toBeGreaterThanOrEqual(1);
-    expect(suggestions.glossaryTerms![0].id).toBe('users');
-    expect(suggestions.glossaryTerms![0].owner).toBe('default-team');
+    expect(suggestions.glossaryTerms![0]!.id).toBe('users');
+    expect(suggestions.glossaryTerms![0]!.owner).toBe('default-team');
   });
 });

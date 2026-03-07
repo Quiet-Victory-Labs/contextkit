@@ -8,8 +8,8 @@ describe('data_sources config', () => {
         warehouse: { adapter: 'duckdb', path: './data.duckdb' },
       },
     });
-    expect(config.data_sources!.warehouse.adapter).toBe('duckdb');
-    expect(config.data_sources!.warehouse.path).toBe('./data.duckdb');
+    expect(config.data_sources!['warehouse']!.adapter).toBe('duckdb');
+    expect(config.data_sources!['warehouse']!.path).toBe('./data.duckdb');
   });
 
   it('accepts valid postgres data source', () => {
@@ -18,7 +18,7 @@ describe('data_sources config', () => {
         analytics: { adapter: 'postgres', connection: 'postgresql://localhost/db' },
       },
     });
-    expect(config.data_sources!.analytics.adapter).toBe('postgres');
+    expect(config.data_sources!['analytics']!.adapter).toBe('postgres');
   });
 
   it('accepts multiple data sources', () => {

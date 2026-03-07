@@ -22,7 +22,7 @@ The setup wizard walks through six stages:
 3. **Introspect** -- Connects to the detected database and scaffolds Bronze-level context files for the selected tables.
 4. **Scaffold** -- Writes `.context.yaml` files into your project's `context/` directory.
 5. **Enrich** -- Offers to apply Silver-level enrichments using AI-generated descriptions and relationships.
-6. **Capture intent** -- Asks about your goals and priorities so AI agents can focus curation efforts. Generates `AGENT_INSTRUCTIONS.md` and `.claude/CLAUDE.md` to guide AI assistants toward Gold tier.
+6. **Capture intent** -- Asks about your goals and priorities so AI agents can focus curation efforts. Generates `context/AGENT_INSTRUCTIONS.md` — a comprehensive guide that tells any AI agent (Claude Code, Cursor, Windsurf, etc.) exactly how to curate metadata toward Gold tier.
 
 ## Example session
 
@@ -54,8 +54,7 @@ Enrich to Silver tier? (Y/n) Y
 What are your goals for this data? (optional)
 > We need agents to generate correct revenue reports
 
-Generated AGENT_INSTRUCTIONS.md
-Generated .claude/CLAUDE.md
+Generated context/AGENT_INSTRUCTIONS.md
 
 Run 'context lint' to check for issues.
 Run 'context serve' to start the MCP server.

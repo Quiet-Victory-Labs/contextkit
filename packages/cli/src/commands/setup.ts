@@ -7,8 +7,7 @@ import { runEnrichSilverStep } from '../setup/steps/enrich-silver.js';
 import { runEnrichGoldStep } from '../setup/steps/enrich-gold.js';
 import { runVerifyStep } from '../setup/steps/verify.js';
 import { runAutofixStep } from '../setup/steps/autofix.js';
-import { runClaudeMdStep } from '../setup/steps/claude-md.js';
-import { runProjectClaudeMdStep } from '../setup/steps/project-claude-md.js';
+import { runAgentInstructionsStep } from '../setup/steps/claude-md.js';
 import { displayTierScore } from '../setup/display.js';
 
 export const setupCommand = new Command('setup')
@@ -35,8 +34,7 @@ export const setupCommand = new Command('setup')
       steps.push(
         { name: 'Verify data', fn: runVerifyStep },
         { name: 'Auto-fix', fn: runAutofixStep },
-        { name: 'Generate agent instructions', fn: runClaudeMdStep },
-        { name: 'Generate project config', fn: runProjectClaudeMdStep },
+        { name: 'Generate agent instructions', fn: runAgentInstructionsStep },
       );
 
       // Run each step
@@ -70,17 +68,20 @@ export const setupCommand = new Command('setup')
       } else if (ctx.targetTier === 'gold' && currentTier !== 'gold') {
         // Gold needs AI curation — show the handoff
         const nextSteps = [
-          `Your metadata is at ${chalk.bold(currentTier.toUpperCase())} — Gold needs curation.`,
+          `Your metadata is at ${chalk.bold(currentTier.toUpperCase())} — Gold needs human curation.`,
           '',
-          `${chalk.bold('To reach Gold, tell your AI assistant:')}`,
+          `${chalk.bold('If you\'re an AI agent:')}`,
+          `  Read ${chalk.cyan('context/AGENT_INSTRUCTIONS.md')} for the full curation guide.`,
+          `  Run ${chalk.cyan('context tier')} → pick a failing check → query the database → fix it → repeat.`,
+          `  Ask the user about ownership, metric intent, and business rules as you go.`,
           '',
-          `  "Read ${chalk.cyan('context/AGENT_INSTRUCTIONS.md')} for curation guidelines.`,
-          `   Run ${chalk.cyan('context tier')} and fix every failing Gold check.`,
-          `   Query the database before writing any metadata.`,
-          `   Keep iterating until ${chalk.cyan('context tier')} reports Gold."`,
+          `${chalk.bold('If you\'re a human:')}`,
+          `  Tell your AI agent: "Read context/AGENT_INSTRUCTIONS.md and get this project to Gold."`,
+          `  The agent will go back and forth with you, asking about your data as it builds.`,
+          `  Or use ${chalk.cyan('context dev --studio')} to edit metadata visually in the browser.`,
         ];
         p.note(nextSteps.join('\n'), 'Next Steps');
-        p.outro(`Run ${chalk.cyan('context dev')} to watch for changes as you edit.`);
+        p.outro(`Run ${chalk.cyan('context tier')} to check your scorecard.`);
       } else {
         p.outro(`Run ${chalk.cyan('context tier')} to check your scorecard.`);
       }

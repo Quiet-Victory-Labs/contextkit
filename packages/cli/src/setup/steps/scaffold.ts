@@ -24,9 +24,33 @@ export async function runScaffoldStep(ctx: SetupContext): Promise<StepResult> {
   });
 
   // Create directories
-  for (const dir of ['models', 'governance', 'owners']) {
+  for (const dir of ['models', 'governance', 'owners', 'reference']) {
     const dirPath = path.join(ctx.contextDir, dir);
     if (!existsSync(dirPath)) mkdirSync(dirPath, { recursive: true });
+  }
+
+  // Create reference README if it doesn't exist
+  const refReadme = path.join(ctx.contextDir, 'reference', 'README.md');
+  if (!existsSync(refReadme)) {
+    writeFileSync(refReadme, `# Reference Documents
+
+Drop files here that help describe your data — the AI agent will read them when curating metadata.
+
+Examples of useful reference documents:
+- Data dictionaries (CSV, Excel, PDF)
+- Confluence or wiki exports
+- ERD diagrams or schema docs
+- Business glossaries from your organization
+- Dashboard screenshots or descriptions
+- Data pipeline documentation
+- Slack/email threads explaining metric definitions
+
+The agent will use these as context when writing descriptions, defining metrics,
+creating glossary terms, and building business context. The more context you
+provide, the better the metadata quality.
+
+Supported formats: .md, .txt, .csv, .json, .yaml, .pdf
+`, 'utf-8');
   }
 
   // Write files
