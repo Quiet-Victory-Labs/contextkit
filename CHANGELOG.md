@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 2026-03-06
+
+### Fixed
+
+- Improved CLI help discoverability — all 9 supported databases now listed in `context setup` and `context introspect` help output
+- Added MCP setup guide to AGENT_INSTRUCTIONS.md
+- Use explicit `@runcontext/cli` in all agent-facing prompts
+
+## [0.4.0] - 2026-03-05
+
+### Added
+
+- **`context new` command** for scaffolding data products
+- **AI Blueprint branding** for `context blueprint` command
+- New documentation pages and data products concept
+- 16 CLI commands total
+
+### Changed
+
+- `context blueprint` renamed with AI Blueprint branding
+
 ## [0.2.0] - 2026-03-02
 
 ### Added

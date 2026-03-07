@@ -82,7 +82,7 @@ export const blueprintCommand = new Command('blueprint')
 /**
  * Emit a single model as a full OSI-compliant data product YAML.
  */
-function emitBlueprint(name: string, manifest: Manifest): string {
+export function emitBlueprint(name: string, manifest: Manifest): string {
   const model = manifest.models[name];
   const governance = manifest.governance[name];
   const rules = manifest.rules[name];

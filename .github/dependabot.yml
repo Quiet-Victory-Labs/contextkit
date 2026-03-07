@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      production:
+        patterns: ["*"]
+        exclude-patterns: ["@types/*"]
+      dev:
+        patterns: ["@types/*", "vitest", "tsup", "typescript"]
+    open-pull-requests-limit: 10
