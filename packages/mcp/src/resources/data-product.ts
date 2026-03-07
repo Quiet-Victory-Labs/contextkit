@@ -3,7 +3,8 @@ import type { Manifest } from '@runcontext/core';
 import { buildModelView } from './model.js';
 
 const DATA_PRODUCT_TEMPLATE = `# data-product.osi.yaml
-# Portable data product blueprint following Open Semantic Interchange (OSI) v1.0
+# AI Blueprint — Open Semantic Interchange (OSI) v1.0
+# The complete semantic spec for a data product, ready for any AI agent.
 # Fill in the sections below to describe your data model.
 
 osi_version: "1.0"
@@ -85,7 +86,7 @@ export function registerDataProductResource(server: McpServer, manifest: Manifes
   server.resource(
     'data-product-template',
     'context://data-product/template',
-    { description: 'Blank OSI-compliant data product YAML template — use as a starting point for new data products' },
+    { description: 'Blank AI Blueprint template — use as a starting point for new data products (OSI v1.0)' },
     async (uri) => ({
       contents: [
         {
@@ -104,12 +105,12 @@ export function registerDataProductResource(server: McpServer, manifest: Manifes
       list: async () => ({
         resources: Object.keys(manifest.models).map((name) => ({
           uri: `context://data-product/${name}`,
-          name: `${name} (data product)`,
-          description: `Export ${name} as an OSI data product YAML`,
+          name: `${name} AI Blueprint`,
+          description: `AI Blueprint for ${name} — full semantic spec as portable OSI YAML`,
         })),
       }),
     }),
-    { description: 'Export a model as a portable OSI data product YAML blueprint' },
+    { description: 'Export a data product as an AI Blueprint — the complete semantic spec in portable OSI YAML' },
     async (uri, { name }) => {
       const modelName = String(name);
       const view = buildModelView(modelName, manifest);
@@ -142,7 +143,8 @@ function modelViewToYaml(name: string, view: Record<string, unknown>, manifest: 
 
   const lines: string[] = [
     `# ${name}.data-product.osi.yaml`,
-    `# Exported from ContextKit — Open Semantic Interchange (OSI) v1.0`,
+    `# AI Blueprint — Open Semantic Interchange (OSI) v1.0`,
+    `# Exported from ContextKit`,
     ``,
     `osi_version: "1.0"`,
     ``,

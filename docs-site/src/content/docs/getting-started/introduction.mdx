@@ -22,6 +22,7 @@ Agent: context tier → "9 checks remaining. What team owns this data?"
 You: "Analytics team, alice@company.com"
 Agent: updates owner file
 Agent: context tier → ... iterates until Gold
+Agent: context blueprint → exports AI Blueprint (portable Gold-tier spec)
 Agent: context serve --stdio → MCP server live
 ```
 
@@ -57,7 +58,7 @@ In Claude Code, Cursor, Windsurf, or any agentic coding platform, just say:
 
 > *"Install @runcontext/cli and build a semantic layer for my database."*
 
-The agent uses the 15 CLI commands to build your semantic layer. The setup wizard generates instruction files that tell the agent exactly what to do:
+The agent uses the 16 CLI commands to build your semantic layer. The setup wizard generates instruction files that tell the agent exactly what to do:
 
 - **`context/AGENT_INSTRUCTIONS.md`** — the complete agent operating manual with workflow, decision trees, curation recipes, and YAML format references
 
@@ -96,10 +97,12 @@ One install, everything you need:
 npm install @runcontext/cli
 ```
 
-- **15 CLI commands** — introspect, enrich, lint, fix, build, tier, verify, serve, and more
+- **16 CLI commands** — introspect, enrich, lint, fix, build, tier, blueprint, new, verify, serve, and more
+- **Data products** — scaffold multiple data products in one project with `context new <name>`
+- **AI Blueprints** — export the Gold-tier outcome as a portable OSI YAML file with `context blueprint`
 - **40 lint rules** — schema validation, governance, security, data accuracy
 - **Bronze/Silver/Gold tier system** — automated metadata maturity scoring
-- **MCP server** — expose your context graph to AI agents via stdio or HTTP
+- **MCP server** — expose your context graph and AI Blueprints to agents via stdio or HTTP
 - **Visual studio editor** — browser-based metadata curation with live tier updates
 - **Static site generator** — browsable documentation from your metadata
 - **9 database adapters** — DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks

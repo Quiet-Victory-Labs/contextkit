@@ -1,5 +1,5 @@
 ---
-title: Data Products
+title: Data Products & AI Blueprints
 description: Portable YAML blueprints for your data models, built on Open Semantic Interchange.
 ---
 
@@ -22,13 +22,17 @@ Most teams scatter metadata across wikis, spreadsheets, dbt YAML, BI tool defini
 Think of a data product YAML as a **portable contract** for your data model. Move it between warehouses, teams, or tools — the meaning travels with the schema.
 </Aside>
 
+## AI Blueprint
+
+The **AI Blueprint** is the Gold-tier deliverable — a single, portable YAML file that captures the complete semantic specification for a data product. Export it with [`context blueprint`](/cli/blueprint/), serve it via MCP at `context://data-product/{name}`, or share it with any OSI-compliant tool.
+
 ## Blueprint format
 
 A data product YAML follows the OSI `semantic_model` structure, extended with ContextKit governance fields. Here's a complete Gold-tier example using a generic SaaS analytics domain:
 
 ```yaml
-# data-product.osi.yaml
-# A portable data product blueprint following Open Semantic Interchange (OSI) v1.0
+# saas_analytics.data-product.osi.yaml
+# AI Blueprint — Open Semantic Interchange (OSI) v1.0
 
 osi_version: "1.0"
 
@@ -409,6 +413,12 @@ Verified SQL examples that serve as templates. AI agents can adapt these for sim
 
 ## Using data products
 
+### Create a new data product
+
+```bash
+context new sales-analytics --source warehouse
+```
+
 ### Generate from a database
 
 ```bash
@@ -417,11 +427,11 @@ context enrich --target gold --apply
 context build
 ```
 
-The built manifest contains your data product. Export it:
+### Export the AI Blueprint
 
 ```bash
-# The compiled context/ directory IS your data product
-ls context/models/
+context blueprint sales-analytics
+# → blueprints/sales-analytics.data-product.osi.yaml
 ```
 
 ### Serve to AI agents via MCP

@@ -1,11 +1,11 @@
 ---
 title: CLI Overview
-description: "Complete reference for all 15 ContextKit CLI commands — setup, introspect, enrich, lint, build, tier, serve, and more."
+description: "Complete reference for all 16 ContextKit CLI commands — setup, new, introspect, enrich, lint, build, tier, blueprint, serve, and more."
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-The ContextKit CLI (`context`) provides 15 commands organized into three groups: **Core Workflow**, **Exploration**, and **Serving**.
+The ContextKit CLI (`context`) provides 16 commands organized into three groups: **Core Workflow**, **Exploration**, and **Serving**.
 
 ## Core Workflow
 
@@ -15,6 +15,10 @@ These commands form the main pipeline for creating and maintaining context files
   <Card title="setup" icon="rocket">
     Interactive wizard that walks you through the full pipeline.
     [Read more](/cli/setup/)
+  </Card>
+  <Card title="new" icon="add-document">
+    Scaffold a new data product inside your project.
+    [Read more](/cli/new/)
   </Card>
   <Card title="introspect" icon="magnifier">
     Scan a database and scaffold Bronze-level metadata.
@@ -81,6 +85,10 @@ Commands for making context available to AI tools and humans.
   <Card title="dev" icon="setting">
     Watch mode — re-lint on file changes.
     [Read more](/cli/dev/)
+  </Card>
+  <Card title="blueprint" icon="star">
+    Export AI Blueprints — portable Gold-tier data product specs.
+    [Read more](/cli/blueprint/)
   </Card>
   <Card title="init" icon="add-document">
     Scaffold a new ContextKit project structure.

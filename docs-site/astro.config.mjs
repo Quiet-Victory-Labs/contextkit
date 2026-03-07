@@ -46,6 +46,7 @@ export default defineConfig({
           items: [
             { label: 'Overview', slug: 'cli/overview' },
             { label: 'setup', slug: 'cli/setup' },
+            { label: 'new', slug: 'cli/new' },
             { label: 'introspect', slug: 'cli/introspect' },
             { label: 'enrich', slug: 'cli/enrich' },
             { label: 'lint & fix', slug: 'cli/lint' },
@@ -54,8 +55,8 @@ export default defineConfig({
             { label: 'rules', slug: 'cli/rules' },
             { label: 'validate-osi', slug: 'cli/validate-osi' },
             { label: 'verify', slug: 'cli/verify' },
+            { label: 'blueprint', slug: 'cli/blueprint' },
             { label: 'serve', slug: 'cli/serve' },
-
             { label: 'site', slug: 'cli/site' },
             { label: 'dev', slug: 'cli/dev' },
             { label: 'init', slug: 'cli/init' },

@@ -1,0 +1,78 @@
+---
+title: context new
+description: Scaffold a new data product inside your existing context directory.
+---
+
+The `new` command scaffolds a new data product — an OSI model with companion governance and rules files — inside your existing project.
+
+## Usage
+
+```bash
+context new <name>
+```
+
+## Arguments
+
+| Argument | Description |
+|---|---|
+| `name` | Name for the data product (e.g. `sales-analytics`, `inventory`) |
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--source <name>` | Bind to a named data source from `contextkit.config.yaml` | — |
+| `--context-dir <path>` | Path to context directory | `context/` |
+
+## Examples
+
+### Scaffold a new data product
+
+```bash
+context new sales-analytics
+```
+
+Creates:
+
+```
+context/
+├── models/sales-analytics.osi.yaml
+├── governance/sales-analytics.governance.yaml
+├── governance/sales-analytics.rules.yaml
+└── owners/default-team.owner.yaml
+```
+
+### Bind to a specific data source
+
+```bash
+context new inventory --source warehouse
+```
+
+The scaffolded model includes a `data_source: warehouse` reference matching your config:
+
+```yaml
+# contextkit.config.yaml
+data_sources:
+  warehouse:
+    adapter: postgres
+    connection: postgres://localhost:5432/warehouse
+```
+
+## Multiple data products
+
+A single ContextKit project can contain multiple data products. Each is an independent model with its own governance, rules, and tier score:
+
+```bash
+context new sales-analytics --source crm
+context new inventory --source warehouse
+context new marketing-attribution --source analytics-db
+```
+
+All data products compile together and are served through the same MCP server. Run `context tier` to see the scorecard for each, or `context blueprint` to export their AI Blueprints.
+
+## Next steps
+
+- Populate from a database: [`context introspect --db <url>`](/cli/introspect/)
+- Auto-fill descriptions: [`context enrich --target silver --apply`](/cli/enrich/)
+- Check progress: `context tier`
+- Export the AI Blueprint: [`context blueprint`](/cli/blueprint/)

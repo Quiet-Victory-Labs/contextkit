@@ -17,13 +17,14 @@ import { enrichCommand } from './commands/enrich.js';
 import { rulesCommand } from './commands/rules.js';
 import { setupCommand } from './commands/setup.js';
 import { blueprintCommand } from './commands/blueprint.js';
+import { newCommand } from './commands/new.js';
 
 const program = new Command();
 
 program
   .name('context')
   .description('ContextKit — AI-ready metadata governance over OSI')
-  .version('0.3.5');
+  .version('0.4.0');
 
 // Register all commands
 program.addCommand(lintCommand);
@@ -42,5 +43,6 @@ program.addCommand(enrichCommand);
 program.addCommand(rulesCommand);
 program.addCommand(setupCommand);
 program.addCommand(blueprintCommand);
+program.addCommand(newCommand);
 
 program.parse();
