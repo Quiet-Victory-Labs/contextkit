@@ -130,59 +130,68 @@ CREATE TABLE / CREATE VIEW / CREATE INDEX
 
 If a query might be expensive and you're not sure, **ask the user first**. "This table looks large — is it OK if I run a COUNT(*)?" is always the right call.
 
-## Reference Documents
+## Mandatory Task Checklist
+
+**You MUST complete every task in order. Do NOT skip any task. Do NOT proceed to the next task until the current one is done.**
+
+This is the full workflow for building a semantic layer. Check off each task as you complete it.
+
+### Phase 1: Discovery (BEFORE touching any YAML)
+
+- [ ] **Task 1: Ask about the project goal.** Ask the user: "What is this data for? What questions do you want to answer with it? Who will be using it?" Do NOT proceed until the user answers.
+
+- [ ] **Task 2: Ask for reference documents.** Tell the user: "Do you have any existing documentation about this data? Data dictionaries, wiki pages, ERDs, spreadsheets, Confluence exports, dashboard screenshots? Drop them in \`context/reference/\` and I'll use them to write much better metadata." Check \`context/reference/\` for any files already there. Read them if present.
+
+- [ ] **Task 3: Ask about ownership.** Ask: "Who owns this data? What team maintains it? What's the best contact email?" Do NOT invent owner info.
+
+- [ ] **Task 4: Ask about data sources.** Ask: "Where does this data come from originally? What upstream systems feed into this database? (e.g., Salesforce, Stripe, internal APIs, CSV imports)"
+
+- [ ] **Task 5: Run \`context tier\`.** Check the current tier score and report it to the user. Summarize which checks are failing.
+
+### Phase 2: Guided Curation (the conversation)
+
+- [ ] **Task 6: Walk through key fields WITH the user.** For each dataset, sample the data (with LIMIT), then ask the user about fields that are ambiguous:
+  - "I see a column called \`stars\` with values 1.0-5.0 — is this a rating that should be averaged, or something else?"
+  - "Should \`revenue\` be summed or averaged? Is it additive across dimensions?"
+  - "What does \`status\` mean in your business? What are the valid values?"
+  - Do NOT silently assign semantic roles without checking ambiguous cases.
+
+- [ ] **Task 7: Ask about metrics the user cares about.** Ask: "What are the key metrics you track? What KPIs matter most to your team? (e.g., revenue, churn rate, conversion, average order value)" — then build metrics around their answers, not just what you find in the data.
+
+- [ ] **Task 8: Ask about business rules and filters.** Ask: "Are there any filters that should always be applied? For example: only active records, exclude test data, only completed orders?"
+
+- [ ] **Task 9: Ask about glossary terms.** Ask: "What business terms do people in your org use that a new analyst might not understand? (e.g., 'MRR', 'churn', 'qualified lead')"
+
+- [ ] **Task 10: Curate to Gold.** Now iterate through failing checks:
+  1. Run \`context tier\` to see what's failing
+  2. Fix the highest-impact failing check
+  3. If you need user input to fix a check, ASK — don't guess
+  4. Run \`context tier\` again
+  5. Repeat until Gold or until you hit something that genuinely requires human input
+
+### Phase 3: Deliver
+
+- [ ] **Task 11: Build the AI Blueprint.** Run \`context blueprint ${modelName}\` to export the Gold-tier data product as a portable YAML file. Show the user where it was saved.
+
+- [ ] **Task 12: Serve the metadata site.** Run \`context dev --studio\` to start the interactive metadata browser. Tell the user: "Your metadata catalog is now live — open the link above to browse your semantic layer in the browser."
+
+- [ ] **Task 13: Summary.** Give the user a final summary:
+  - Current tier score
+  - Number of datasets, fields, metrics, glossary terms, golden queries
+  - What's complete and what still needs human input
+  - Next steps they can take
+
+## Key Principles
+
+### This is a CONVERSATION, not a batch job
+
+The single most important thing: **ask questions and wait for answers.** The user knows the business. You know the data. Together you build the semantic layer. If you silently curate everything without asking, the metadata will be plausible-looking but wrong.
+
+**Ask one question at a time.** Don't batch 10 questions into one message. Ask, wait, incorporate the answer, then ask the next question.
+
+### Reference Documents
 
 Check \`context/reference/\` for any files the user has provided — data dictionaries, Confluence exports, ERDs, business glossaries, dashboard docs, etc. **Read these first** before querying the database. They contain domain knowledge that will dramatically improve your metadata quality.
-
-If the folder is empty, ask the user: "Do you have any existing documentation about this data? Data dictionaries, wiki pages, spreadsheets? Drop them in context/reference/ and I'll use them."
-
-## On Session Start
-
-1. Check \`context/reference/\` for any reference documents — read them if present
-2. Run \`context tier\` to check the current metadata tier (Bronze/Silver/Gold)
-3. Report the current tier and summarize failing checks
-4. Ask the user what they'd like to focus on — don't start changing files unprompted
-5. If the user says "get me to Gold" or "build my semantic layer," follow the iterative workflow below
-
-## The Iterative Workflow
-
-Building a semantic layer is a **conversation**. You and the user go back and forth — you query the data, propose metadata, ask questions, and iterate. Here's the loop:
-
-\`\`\`
-                    ┌─────────────────────────┐
-                    │   context tier           │
-                    │   (check failing checks) │
-                    └──────────┬──────────────┘
-                               │
-                    ┌──────────▼──────────────┐
-                    │  Pick highest-impact     │
-                    │  failing check           │
-                    └──────────┬──────────────┘
-                               │
-                    ┌──────────▼──────────────┐
-                    │  Query the database      │
-                    │  to gather evidence      │
-                    └──────────┬──────────────┘
-                               │
-                    ┌──────────▼──────────────┐
-                    │  Need user input?        │──── YES ──→ Ask the user
-                    └──────────┬──────────────┘              (then continue)
-                               │ NO
-                    ┌──────────▼──────────────┐
-                    │  Edit YAML metadata      │
-                    └──────────┬──────────────┘
-                               │
-                    ┌──────────▼──────────────┐
-                    │  context lint            │
-                    │  context tier            │
-                    └──────────┬──────────────┘
-                               │
-                    ┌──────────▼──────────────┐
-                    │  All Gold checks pass?   │──── NO ──→ Loop back
-                    └──────────┬──────────────┘
-                               │ YES
-                            ✓ DONE
-\`\`\`
 
 ### What to Ask the User About
 
@@ -216,16 +225,25 @@ context serve --stdio           # Start MCP server (for Claude, Cursor, etc.)
 context dev --studio            # Open visual editor in browser
 \`\`\`
 
-### Do NOT Stop Until Gold
+### Do NOT Stop Until Gold (Task 10)
 
 1. Run \`context tier\` and collect every failing check
 2. For each failing check, query the database to gather evidence, then fix the metadata
-3. Run \`context tier\` again
-4. If checks still fail, go back to step 2
-5. **Do NOT stop until every Gold check passes** or you hit something that genuinely requires human input
-6. For checks you cannot fix, ask the user or leave a clear TODO explaining what's needed
+3. **If you need user input to fix a check — ASK.** Do not guess.
+4. Run \`context tier\` again
+5. If checks still fail, go back to step 2
+6. **Do NOT stop until every Gold check passes** or you hit something that genuinely requires human input
+7. For checks you cannot fix, ask the user or leave a clear TODO explaining what's needed
 
 You must iterate — a single pass is never enough. Each \`context tier\` run may reveal new failures after earlier ones are fixed.
+
+### After Gold: Deliver (Tasks 11-13)
+
+**Do NOT skip these.** Once you reach Gold (or as close as possible):
+
+1. Run \`context blueprint ${modelName}\` — export the AI Blueprint
+2. Run \`context dev --studio\` — start the metadata browser for the user
+3. Give the user a summary of what was built and what needs human input
 
 ## How to Curate Metadata (the right way)
 
