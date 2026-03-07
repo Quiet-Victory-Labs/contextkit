@@ -26,7 +26,7 @@ import { registerGuardrailsTool } from './tools/guardrails.js';
 export function createServer(manifest: Manifest, graph: ContextGraph): McpServer {
   const server = new McpServer({
     name: 'contextkit',
-    version: '0.4.1',
+    version: '0.4.2',
   });
 
   // Register resources (5)
