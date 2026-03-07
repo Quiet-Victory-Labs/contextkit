@@ -82,5 +82,7 @@ export interface OsiSemanticModel {
 
 export interface OsiDocument {
   version: '1.0';
+  dialects?: Dialect[];
+  vendors?: Vendor[];
   semantic_model: OsiSemanticModel[];
 }

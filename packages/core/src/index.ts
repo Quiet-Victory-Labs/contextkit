@@ -9,3 +9,4 @@ export * from './config/index.js';
 export * from './fixer/index.js';
 export * from './adapters/index.js';
 export * from './introspect/index.js';
+export { applyYamlEdit, previewYamlEdit } from './yaml-edit.js';

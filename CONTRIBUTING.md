@@ -26,8 +26,8 @@ pnpm typecheck
 
 ```
 packages/
-  core/     — Parser, compiler, linter (37 rules), tier engine, fixer, schemas
-  cli/      — CLI with 16 commands (lint, build, tier, explain, fix, dev, init, site, serve, validate-osi)
+  core/     — Parser, compiler, linter (40 rules), tier engine, fixer, schemas
+  cli/      — CLI with 15 commands (lint, build, tier, explain, fix, dev, init, site, serve, validate-osi, etc.)
   mcp/      — MCP server for AI agent integration
   site/     — Static documentation site generator
 create-contextkit/  — Project scaffolder (pnpm create contextkit)
@@ -55,9 +55,10 @@ pnpm test -- --run packages/core/src/linter/__tests__/bronze-rules.test.ts
 
 Lint rules live in `packages/core/src/linter/rules/`. Each tier has its own file:
 
-- `bronze.ts` — Basic discoverability (7 rules)
-- `silver.ts` — Trusted metadata (6 rules)
-- `gold.ts` — AI-ready completeness (10 rules)
+- `bronze.ts` and related — Basic discoverability (12 rules)
+- `silver.ts` and related — Trusted metadata (3 rules)
+- `gold.ts` and related — AI-ready completeness (14 rules)
+- `data-*.ts` — Data accuracy rules (8 rules)
 - `composite.ts` — Tier threshold rules (3 rules)
 
 To add a new rule:

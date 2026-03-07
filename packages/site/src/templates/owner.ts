@@ -15,12 +15,23 @@ ${TIER_BADGE}
   </div>
 
   <div class="page-header">
-    <h1><%= owner.display_name %></h1>
+    <h1>
+      <% if (typeof studioMode !== 'undefined' && studioMode) { %>
+        <span class="editable" data-file="context/owners/<%= owner.id %>.owner.yaml" data-path="display_name" data-label="<%= owner.id %> display name"><%= owner.display_name || 'Add display name' %></span>
+      <% } else { %>
+        <%= owner.display_name %>
+      <% } %>
+    </h1>
   </div>
 
   <div style="display:flex;gap:1.25rem;font-size:0.82rem;color:var(--text-dim);margin-bottom:1.5rem;">
-    <% if (owner.email) { %><span>Email: <span style="color:var(--text-secondary);"><%= owner.email %></span></span><% } %>
-    <% if (owner.team) { %><span>Team: <span style="color:var(--text-secondary);"><%= owner.team %></span></span><% } %>
+    <% if (typeof studioMode !== 'undefined' && studioMode) { %>
+      <span>Email: <span class="editable" data-file="context/owners/<%= owner.id %>.owner.yaml" data-path="email" data-label="<%= owner.id %> email" style="color:var(--text-secondary);"><%= owner.email || 'Add email' %></span></span>
+      <span>Team: <span class="editable" data-file="context/owners/<%= owner.id %>.owner.yaml" data-path="team" data-label="<%= owner.id %> team" style="color:var(--text-secondary);"><%= owner.team || 'Add team' %></span></span>
+    <% } else { %>
+      <% if (owner.email) { %><span>Email: <span style="color:var(--text-secondary);"><%= owner.email %></span></span><% } %>
+      <% if (owner.team) { %><span>Team: <span style="color:var(--text-secondary);"><%= owner.team %></span></span><% } %>
+    <% } %>
   </div>
 
   <% if (owner.description) { %>

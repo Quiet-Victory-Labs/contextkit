@@ -1,27 +1,28 @@
 ---
 title: Introduction
-description: "Learn how ContextKit transforms database schemas into AI-ready semantic layers with metadata governance, linting, and MCP serving"
+description: "ContextKit — tell your AI agent to build your semantic layer. It uses the CLI to introspect, enrich, lint, and serve AI-ready metadata via MCP."
 ---
 
-Your data already has a schema. ContextKit gives it meaning.
+## Tell Your Agent to Build Your Semantic Layer
 
-## What is ContextKit?
+ContextKit is a CLI that AI agents use to build and serve semantic layers for your databases. Point an agent at your data, and it runs ContextKit commands to introspect the schema, scaffold metadata, enrich it with descriptions and types, and work with you to curate it to Gold tier — where agents can generate correct SQL autonomously.
 
-ContextKit is a metadata governance toolkit built on the **[Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI)** specification. It transforms raw database schemas into AI-ready **data products** — portable YAML blueprints containing descriptions, ownership, lineage, business rules, golden queries, and semantic roles. ContextKit then lints, scores, and serves those data products to AI agents via the Model Context Protocol (MCP).
+```
+You: "Build my semantic layer for this DuckDB"
+Agent: runs context setup → introspects → scaffolds metadata
+Agent: runs context enrich → auto-fills descriptions, types, lineage
+Agent: runs context tier → "You're at Silver. Gold needs semantic roles and golden queries."
+You: "The revenue field should always be SUM'd, never AVG'd"
+Agent: updates governance YAML → runs context lint → "3 issues remaining"
+Agent: runs context tier → "Gold ✓"
+Agent: runs context serve → MCP server live, all agents get curated context
+```
 
-OSI is an open standard for describing semantic models in a vendor-neutral format, backed by Snowflake, dbt Labs, Salesforce, and other industry participants. By building on OSI, your metadata is portable across any compliant tool — not locked into ContextKit.
+Built on the **[Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI)** specification — an open standard for describing semantic models in a vendor-neutral format. Your metadata is portable across any OSI-compliant tool, not locked into ContextKit.
 
 ## The Problem
 
-AI agents querying databases face a fundamental problem: they can see table and column names, but they don't understand what the data *means*.
-
-They don't know:
-- Which filters are required for correct results
-- How metrics should be aggregated
-- Which joins are safe
-- What business terms actually mean in SQL
-
-Without this context, agents guess — and guessing produces wrong SQL.
+AI agents querying databases see table and column names — but they don't understand what the data *means*. They don't know which filters are required, how metrics should be aggregated, or which joins are safe. Every query is a guess.
 
 ## The Solution
 
@@ -37,6 +38,49 @@ With ContextKit, an agent knows:
 - That queries on `transactions` must filter `WHERE status = 'completed'`
 - That `customer_id` joins `orders` to `customers` as many-to-one
 - That "demand signal" means review keywords like *wait*, *crowded*, *busy*
+- Exactly which SQL to use for "show me top customers by revenue last quarter"
+
+## How Agents Use It
+
+### 1. As an MCP server (recommended)
+
+Add ContextKit to your agent's MCP config:
+
+```json
+{
+  "mcpServers": {
+    "contextkit": {
+      "command": "npx",
+      "args": ["@runcontext/cli", "serve", "--stdio"]
+    }
+  }
+}
+```
+
+The agent gets access to `context_search`, `context_explain`, `context_validate`, `context_tier`, `context_golden_queries`, and `context_guardrails` — everything needed to build and verify the metadata interactively.
+
+### 2. As CLI commands
+
+Any agentic coding platform (Claude Code, Cursor, Windsurf) can run ContextKit's 15 commands directly:
+
+```bash
+context setup          # interactive wizard
+context introspect     # scaffold from database
+context enrich         # auto-fill metadata
+context lint           # check what's missing
+context tier           # see maturity score
+context serve          # serve to other agents
+```
+
+### 3. As a visual editor
+
+For humans who want to curate without touching YAML:
+
+```bash
+context dev --studio
+```
+
+Opens an interactive browser UI where you edit descriptions, semantic roles, golden queries, and business rules. Changes save to YAML on disk and the tier scorecard updates live.
 
 ## What's Included
 
@@ -49,11 +93,10 @@ npm install @runcontext/cli
 - **15 CLI commands** — introspect, enrich, lint, fix, build, tier, verify, serve, and more
 - **40 lint rules** — schema validation, governance, security, data accuracy
 - **Bronze/Silver/Gold tier system** — automated metadata maturity scoring
-- **MCP server** — expose your context graph to AI agents, including data product YAML export
-- **Data products** — portable OSI-compliant YAML blueprints for your data models
-- **Static site generator** — browsable docs from your metadata
-- **Database introspection** — DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks
-- **MCP config discovery** — auto-detects databases from Claude Code, Cursor, VS Code, Windsurf, and Claude Desktop configs
-- **Smart driver detection** — automatically offers to install missing database drivers during setup
-- **Interactive table selection** — pick which tables to include when introspecting large databases
-- **AI-guided curation** — generates agent instructions (AGENT_INSTRUCTIONS.md) that guide AI assistants to reach Gold tier
+- **MCP server** — expose your context graph to AI agents via stdio or HTTP
+- **Visual studio editor** — browser-based metadata curation with live tier updates
+- **Static site generator** — browsable documentation from your metadata
+- **9 database adapters** — DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks
+- **MCP config discovery** — auto-detects databases from Claude Code, Cursor, VS Code, Windsurf, and Claude Desktop
+- **Smart driver detection** — offers to install missing database drivers during setup
+- **AI-guided curation** — generates agent instructions that guide AI assistants to reach Gold tier

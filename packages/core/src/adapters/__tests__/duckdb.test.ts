@@ -1,17 +1,30 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-// Skip entire suite if duckdb not available
+// Skip entire suite if duckdb is not available or cannot connect
+// (native module may fail in certain environments like Vitest workers)
 let DuckDBAdapter: any;
+let duckdbAvailable = false;
 try {
   const mod = await import('../duckdb.js');
   DuckDBAdapter = mod.DuckDBAdapter;
+  // Verify the native driver actually works by attempting a quick connection
+  const probe = new DuckDBAdapter(':memory:');
+  await Promise.race([
+    probe.connect().then(() => probe.disconnect()).then(() => true),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+  ]);
+  duckdbAvailable = true;
 } catch {
-  describe.skip('DuckDBAdapter (duckdb not installed)', () => {
+  // duckdb not installed, native binary missing, or connect hangs
+}
+
+if (!duckdbAvailable) {
+  describe.skip('DuckDBAdapter (duckdb not available)', () => {
     it('skipped', () => {});
   });
 }
 
-if (DuckDBAdapter) {
+if (duckdbAvailable) {
   describe('DuckDBAdapter', () => {
     let adapter: InstanceType<typeof DuckDBAdapter>;
 

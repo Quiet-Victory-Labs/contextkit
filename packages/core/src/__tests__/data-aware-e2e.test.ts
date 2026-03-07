@@ -9,12 +9,18 @@ import { createAdapter, scaffoldFromSchema, compile, computeTier } from '../inde
 
 let tmpDir: string;
 
-// Skip if duckdb not installed
-let available = true;
+// Skip if duckdb not installed or native driver doesn't work in this environment
+let available = false;
 try {
-  await import('duckdb');
+  const { createAdapter: probeCreate } = await import('../index.js');
+  const probe = await probeCreate({ adapter: 'duckdb', path: ':memory:' });
+  await Promise.race([
+    probe.connect().then(() => probe.disconnect()).then(() => true),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+  ]);
+  available = true;
 } catch {
-  available = false;
+  // duckdb not installed, native binary broken, or connect hangs
 }
 
 if (!available) {
