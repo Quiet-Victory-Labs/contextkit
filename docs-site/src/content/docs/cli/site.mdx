@@ -1,14 +1,15 @@
 ---
 title: context site
-description: Generate static HTML documentation from your compiled context files.
+description: Generate a browsable documentation site from your compiled context metadata.
 ---
 
-The `site` command generates a browsable static documentation site from your context metadata. It provides a human-friendly way to explore your data models, relationships, and business logic.
+The `site` command generates a browsable static documentation site from your context metadata. It provides a human-friendly way to explore your data models, schemas, business rules, and governance — and in studio mode, edit them directly in the browser.
 
 ## Usage
 
 ```bash
-context site     # compiles context internally and generates site/ directory
+context site                  # build static site using EJS templates
+context site --astro          # build using Astro (component-based, recommended)
 ```
 
 ## Options
@@ -17,35 +18,36 @@ context site     # compiles context internally and generates site/ directory
 |---|---|---|
 | `--context-dir <path>` | Path to context files | `./context` |
 | `--output-dir <path>` | Path to site output directory | `./site` |
+| `--astro` | Use Astro-based site builder | Off (uses EJS legacy) |
 
-## Examples
+## What the site gives you
 
-### Generate with defaults
+### Model pages
 
-```bash
-context site
-```
+Each model gets its own page showing:
+- **Description and AI context** — human and machine-readable summaries
+- **Governance grid** — owner, trust level, security classification, version, tags
+- **Tier scorecard** — Bronze/Silver/Gold checks with pass/fail status
+- **Schema browser** — all datasets and fields with types, descriptions, semantic roles, grain, refresh cadence
+- **Rules & queries** — golden queries (SQL examples), guardrail filters, business rules
+- **Metrics** — defined KPIs with expressions
+- **Relationships** — foreign key relationships between datasets
+- **Lineage** — upstream sources and downstream consumers
 
-Output is written to `./site/`. Open `index.html` in a browser.
+### Other pages
 
-### Custom output directory
+- **Home** — overview with model count, dataset count, field count, term count, and owner count; clickable cards for every model and owner
+- **Glossary** — all business terms with definitions, synonyms, and linked fields
+- **Owner pages** — team contact info and the models they govern
+- **Search** — full-text search across models, fields, terms, and owners
 
-```bash
-context site --output-dir docs/data-catalog
-```
+### Navigation
 
-## What it generates
+- **Sidebar** — browse all models with tier badges at a glance
+- **Top bar** — site title, current page, search link, docs link
+- **Breadcrumbs** — on model, schema, rules, and owner pages
 
-The `site/` directory contains:
-
-- **Sidebar navigation** -- browse all models with tier badges at a glance
-- **Model pages** -- datasets, fields, schema browser, rules, lineage, tier scorecard
-- **Glossary** -- all business terms with filterable definitions, synonyms, linked fields
-- **Owner pages** -- team ownership with governed models
-- **Search** -- full-text search across all entities
-- **Top bar** -- links back to the ContextKit documentation site
-
-## Serving
+## Serving locally
 
 Open directly in a browser:
 
@@ -59,6 +61,56 @@ Or serve with any static file server:
 npx serve site -l 8080
 ```
 
+## Live editing with Studio
+
+The most powerful way to use the site is through Studio mode, which turns the documentation site into an interactive editor:
+
+```bash
+context dev --studio
+```
+
+This launches the site at `http://localhost:4040` with editing capabilities:
+
+### What you can edit in Studio
+
+- **Model description** and **AI context** — click to edit inline
+- **Field descriptions**, **semantic roles**, and **aggregation rules** — click any field value
+- **Governance metadata** — trust level, security, owner, tags
+- **Golden queries** and **guardrail filters** — edit SQL directly
+- **Glossary terms** — definitions, synonyms, field mappings
+- **Model name** — click the ✎ Rename button on any model page to rename the model across all context files (OSI, governance, rules, lineage)
+
+### Editing workflow
+
+1. **Browse** — navigate the site like normal documentation
+2. **Click to edit** — any dashed-underlined value is editable; dropdowns appear for enumerated fields (like semantic role or trust level)
+3. **Stage changes** — edits are staged automatically as you work; a bottom bar shows the count
+4. **Preview diff** — click "Preview & Save" to review a unified diff of every pending change
+5. **Save** — writes changes back to the underlying YAML files, triggers a recompile, and the tier scorecard updates live
+
+### Renaming a model
+
+When your database introspection creates a model named `default`, you can rename it to something meaningful:
+
+1. Open the model page in Studio
+2. Click the **✎ Rename** button next to the model name
+3. Enter the new name (e.g., `saber-alert`)
+4. The rename updates all context files — OSI model, governance, rules, and lineage — and redirects you to the new URL
+
+## Deploying the static site
+
+The generated site is fully static HTML with minimal JavaScript. Deploy anywhere:
+
+```bash
+# Build and deploy
+context site --output-dir public/data-docs
+
+# Works with any host
+cp -r public/data-docs /var/www/html/        # nginx
+netlify deploy --dir public/data-docs         # Netlify
+vercel --cwd public/data-docs                 # Vercel
+```
+
 ## Example workflow
 
 ```bash
@@ -67,17 +119,21 @@ context introspect --db postgres://localhost/myapp
 context enrich --target silver --apply
 context site --output-dir public/data-docs
 
-# Deploy the static site anywhere
-cp -r public/data-docs /var/www/html/
+# Or use Studio for interactive curation
+context dev --studio
+# Edit metadata in the browser, save changes, then build
+context site --astro --output-dir public/data-docs
 ```
 
 ## Notes
 
-- The `site` command compiles context internally -- you do not need to run `context build` first
-- The site is fully static HTML with minimal JavaScript (search, sidebar toggle, expandable sections)
-- Deploy anywhere: Vercel, Netlify, GitHub Pages, S3, or just open locally
+- The `site` command compiles context internally — you do not need to run `context build` first
+- The site uses a dark theme with gold accents optimized for long reading sessions
+- The `--astro` flag uses file-based routing and component architecture for cleaner output
+- Studio mode requires `context dev --studio`, not `context site`
 
 ## Next steps
 
 - Serve context to AI tools with [`context serve`](/cli/serve/)
-- Check your tier status with [`context tier`](/cli/build/)
+- Check your tier status with [`context build`](/cli/build/)
+- Learn about the [tier system](/concepts/tiers/) to understand Bronze → Silver → Gold progression

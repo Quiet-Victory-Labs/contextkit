@@ -15,6 +15,20 @@ export function applyYamlEdit(
   const doc = parseDocument(yamlContent);
   const segments = dotPath.split('.');
 
+  // Handle '+' as array append
+  if (segments[segments.length - 1] === '+') {
+    const parentPath = segments.slice(0, -1).map((s) => (/^\d+$/.test(s) ? Number(s) : s));
+    const parent = parentPath.length > 0 ? doc.getIn(parentPath) : doc.toJS();
+    if (parent && typeof (parent as any).addIn === 'function') {
+      // parent is a YAML node — use addIn
+      (parent as any).add(doc.createNode(value));
+    } else {
+      // Parent doesn't exist or is not a sequence — create as array with the value
+      doc.setIn(parentPath, [value]);
+    }
+    return doc.toString();
+  }
+
   // setIn expects numeric segments as numbers for array indexing
   const path = segments.map((s) => (/^\d+$/.test(s) ? Number(s) : s));
 

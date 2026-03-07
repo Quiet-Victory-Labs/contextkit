@@ -1,0 +1,181 @@
+---
+import Base from '../../layouts/Base.astro';
+import TierBadge from '../../components/TierBadge.astro';
+import manifest from '../../data/manifest.json';
+import siteConfig from '../../data/site-config.json';
+
+export function getStaticPaths() {
+  return Object.keys(manifest.models).map((name) => ({
+    params: { name },
+  }));
+}
+
+const { name } = Astro.params;
+const model = manifest.models[name!];
+const gov = manifest.governance[name!] ?? null;
+const tier = manifest.tiers[name!] ?? null;
+const rules = manifest.rules[name!] ?? null;
+const lineage = manifest.lineage[name!] ?? null;
+const studioMode = (siteConfig as any).studioMode ?? false;
+
+const datasets = model?.datasets ?? [];
+const relationships = model?.relationships ?? [];
+const metrics = model?.metrics ?? [];
+---
+
+<Base title={name!} activeModel={name}>
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>{name}</span>
+  </div>
+
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <h1 id="model-name">{name}</h1>
+      {tier && <TierBadge tier={tier.tier} />}
+      {studioMode && (
+        <button class="rename-btn" data-model-name={name} title="Rename this model">&#9998; Rename</button>
+      )}
+    </div>
+    {studioMode ? (
+      <p class="subtitle">
+        <span class="editable" data-file={`context/models/${name}.osi.yaml`} data-path="semantic_model.0.description" data-label="Model description">
+          {model?.description || 'Add description...'}
+        </span>
+      </p>
+    ) : (
+      model?.description && <p class="subtitle">{model.description}</p>
+    )}
+  </div>
+
+  <!-- Governance Grid -->
+  {gov && (
+    <div class="section">
+      <div class="section-label">Governance</div>
+      <div class="gov-grid">
+        {gov.owner && <div class="gov-cell"><div class="gov-label">Owner</div><div class="gov-value"><a href={`/owners/${gov.owner}.html`}>{gov.owner}</a></div></div>}
+        {gov.trust && <div class="gov-cell"><div class="gov-label">Trust</div><div class="gov-value">{gov.trust}</div></div>}
+        {gov.security && <div class="gov-cell"><div class="gov-label">Security</div><div class="gov-value">{gov.security}</div></div>}
+        {gov.version && <div class="gov-cell"><div class="gov-label">Version</div><div class="gov-value">{gov.version}</div></div>}
+      </div>
+      {gov.tags && gov.tags.length > 0 && (
+        <div style="margin-top:0.75rem;display:flex;gap:0.35rem;flex-wrap:wrap;">
+          {gov.tags.map((t: string) => <span class="tag">{t}</span>)}
+        </div>
+      )}
+    </div>
+  )}
+
+  <!-- Navigation links -->
+  <div class="section">
+    <div class="card-grid">
+      <a href={`/models/${name}/schema.html`} class="card-link">
+        <div class="card">
+          <div style="font-size:0.88rem;font-weight:500;color:var(--accent-light);margin-bottom:0.25rem;">Schema Browser</div>
+          <div style="font-size:0.78rem;color:var(--text-secondary);">{datasets.length} datasets, {datasets.reduce((n: number, ds: any) => n + (ds.fields?.length ?? 0), 0)} fields</div>
+        </div>
+      </a>
+      <a href={`/models/${name}/rules.html`} class="card-link">
+        <div class="card">
+          <div style="font-size:0.88rem;font-weight:500;color:var(--accent-light);margin-bottom:0.25rem;">Rules & Queries</div>
+          <div style="font-size:0.78rem;color:var(--text-secondary);">{rules?.golden_queries?.length ?? 0} golden queries, {rules?.guardrail_filters?.length ?? 0} guardrails</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Tier Scorecard -->
+  {tier && (
+    <div class="section">
+      <div class="section-label">Quality</div>
+      <h2 class="section-title">Tier Scorecard</h2>
+      <div class="scorecard">
+        {['bronze', 'silver', 'gold'].map((t) => {
+          const tierData = (tier as any)[t];
+          if (!tierData) return null;
+          return (
+            <div class="sc-tier">
+              <div class="sc-tier-head">
+                <span class={`sc-tier-name ${t}`}>{t}</span>
+                <span class={`sc-status ${tierData.passed ? 'pass' : 'fail'}`}>{tierData.passed ? 'PASS' : 'FAIL'}</span>
+              </div>
+              <ul class="check-list">
+                {tierData.checks?.map((c: any) => (
+                  <li class="check-item">
+                    <span class={`check-icon ${c.passed ? 'pass' : 'fail'}`}>{c.passed ? '\u2713' : '\u2717'}</span>
+                    <span>{c.label}{c.detail ? ` — ${c.detail}` : ''}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  <!-- Metrics -->
+  {metrics.length > 0 && (
+    <div class="section">
+      <div class="section-label">Analytics</div>
+      <h2 class="section-title">Metrics</h2>
+      {metrics.map((met: any) => (
+        <div class="card" style="margin-bottom:0.75rem;">
+          <div class="metric-name">{met.name}</div>
+          {met.description && <div class="metric-desc">{met.description}</div>}
+          {met.expression && (
+            <div class="metric-formula">
+              {typeof met.expression === 'string' ? met.expression : JSON.stringify(met.expression)}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+
+  <!-- Relationships -->
+  {relationships.length > 0 && (
+    <div class="section">
+      <div class="section-label">Connections</div>
+      <h2 class="section-title">Relationships</h2>
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>From</th><th>To</th><th>Cardinality</th></tr>
+        </thead>
+        <tbody>
+          {relationships.map((rel: any) => (
+            <tr>
+              <td class="mono">{rel.name}</td>
+              <td><span class="mono">{rel.from}</span>.{rel.from_columns?.join(', ')}</td>
+              <td><span class="mono">{rel.to}</span>.{rel.to_columns?.join(', ')}</td>
+              <td>{rel.cardinality || '\u2014'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <!-- Lineage -->
+  {lineage && (lineage.upstream?.length > 0 || lineage.downstream?.length > 0) && (
+    <div class="section">
+      <div class="section-label">Data Flow</div>
+      <h2 class="section-title">Lineage</h2>
+      {lineage.upstream?.map((u: any) => (
+        <div class="card" style="margin-bottom:0.5rem;">
+          <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.25rem;">Upstream</div>
+          <div class="mono" style="font-size:0.85rem;">{u.source}</div>
+          {u.type && <div style="font-size:0.72rem;color:var(--text-dim);margin-top:0.15rem;">{u.type}{u.tool ? ` via ${u.tool}` : ''}</div>}
+        </div>
+      ))}
+      {lineage.downstream?.map((d: any) => (
+        <div class="card" style="margin-bottom:0.5rem;">
+          <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.25rem;">Downstream</div>
+          <div class="mono" style="font-size:0.85rem;">{d.target}</div>
+          {d.type && <div style="font-size:0.72rem;color:var(--text-dim);margin-top:0.15rem;">{d.type}{d.tool ? ` via ${d.tool}` : ''}</div>}
+        </div>
+      ))}
+    </div>
+  )}
+</Base>

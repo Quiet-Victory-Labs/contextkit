@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/site",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Static documentation site generator for ContextKit",
   "license": "MIT",
   "author": "Eric Kittelson",
@@ -11,8 +11,15 @@
     "directory": "packages/site"
   },
   "bugs": "https://github.com/erickittelson/ContextKit/issues",
-  "engines": { "node": ">=18.0.0" },
-  "keywords": ["contextkit", "site-generator", "documentation", "ejs"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "contextkit",
+    "site-generator",
+    "documentation",
+    "astro"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -29,13 +36,17 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "astro"
+  ],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@runcontext/core": "workspace:^",
+    "astro": "^5.18.0",
     "ejs": "^3.1.10",
     "minisearch": "^7.1.0"
   },

@@ -34,6 +34,20 @@ describe('applyYamlEdit', () => {
     const result = applyYamlEdit(input, 'description', 'Brand new');
     expect(result).toContain('description: Brand new');
   });
+
+  it('appends to an existing array with + path', () => {
+    const input = `items:\n  - name: first\n`;
+    const result = applyYamlEdit(input, 'items.+', { name: 'second' });
+    expect(result).toContain('name: first');
+    expect(result).toContain('name: second');
+  });
+
+  it('creates a new array when appending with + to non-existent path', () => {
+    const input = `name: orders\n`;
+    const result = applyYamlEdit(input, 'tags.+', 'analytics');
+    expect(result).toContain('tags:');
+    expect(result).toContain('analytics');
+  });
 });
 
 describe('previewYamlEdit', () => {

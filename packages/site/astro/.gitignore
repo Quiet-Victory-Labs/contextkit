@@ -1,0 +1,3 @@
+# Astro build cache
+.astro/
+search-index.json

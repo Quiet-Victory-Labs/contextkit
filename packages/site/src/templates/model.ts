@@ -16,8 +16,11 @@ ${TIER_BADGE}
 
   <div class="page-header">
     <div style="display:flex;align-items:center;gap:0.6rem;">
-      <h1><%= model.name %></h1>
+      <h1 id="model-name"><%= model.name %></h1>
       <% if (tier) { %><%- tierBadge(tier.tier) %><% } %>
+      <% if (typeof studioMode !== 'undefined' && studioMode) { %>
+        <button class="rename-btn" onclick="renameModel('<%= model.name %>')" title="Rename this model">&#9998; Rename</button>
+      <% } %>
     </div>
     <% if (typeof studioMode !== 'undefined' && studioMode) { %>
       <p class="subtitle"><span class="editable" data-file="context/models/<%= model.name %>.osi.yaml" data-path="semantic_model.0.description" data-label="Model description"><%= model.description || 'Add description...' %></span></p>

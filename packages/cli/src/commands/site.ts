@@ -8,6 +8,7 @@ export const siteCommand = new Command('site')
   .description('Build a static documentation site from compiled context')
   .option('--context-dir <path>', 'Path to context directory')
   .option('--output-dir <path>', 'Path to site output directory')
+  .option('--astro', 'Use Astro-based site builder (default: EJS legacy)')
   .action(async (opts) => {
     try {
       const config = loadConfig(process.cwd());
@@ -21,15 +22,15 @@ export const siteCommand = new Command('site')
 
       // Try to import the site generator
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic import
-      let buildSite: ((...args: any[]) => Promise<void>) | undefined;
+      let builder: ((...args: any[]) => Promise<void>) | undefined;
       try {
         const siteModule = await import('@runcontext/site');
-        buildSite = siteModule.buildSite;
+        builder = opts.astro ? siteModule.buildAstroSite : siteModule.buildSite;
       } catch {
         // @runcontext/site not yet implemented
       }
 
-      if (!buildSite) {
+      if (!builder) {
         console.log(
           chalk.yellow(
             'Site generator is not yet available. Install @runcontext/site to enable this command.',
@@ -42,8 +43,8 @@ export const siteCommand = new Command('site')
         ? path.resolve(opts.outputDir)
         : path.resolve(config.site?.base_path ?? 'site');
 
-      await buildSite(manifest, config, outputDir);
-      console.log(chalk.green(`Site built to ${outputDir}`));
+      await builder(manifest, config, outputDir);
+      console.log(chalk.green(`Site built to ${outputDir}${opts.astro ? ' (Astro)' : ''}`));
     } catch (err) {
       console.error(formatError((err as Error).message));
       process.exit(1);

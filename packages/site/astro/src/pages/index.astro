@@ -1,0 +1,98 @@
+---
+import Base from '../layouts/Base.astro';
+import TierBadge from '../components/TierBadge.astro';
+import manifest from '../data/manifest.json';
+
+const modelNames = Object.keys(manifest.models);
+let totalDatasets = 0;
+let totalFields = 0;
+for (const mn of modelNames) {
+  const m = manifest.models[mn];
+  if (m?.datasets) {
+    totalDatasets += m.datasets.length;
+    for (const ds of m.datasets) {
+      if (ds.fields) totalFields += ds.fields.length;
+    }
+  }
+}
+const totalTerms = Object.keys(manifest.terms).length;
+const totalOwners = Object.keys(manifest.owners).length;
+---
+
+<Base title="Home">
+  <div class="page-header">
+    <h1>Metadata Catalog</h1>
+    <p class="subtitle">Explore semantic models, governed datasets, business glossary, and data quality tiers.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-val">{modelNames.length}</div>
+      <div class="stat-lbl">Models</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">{totalDatasets}</div>
+      <div class="stat-lbl">Datasets</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">{totalFields}</div>
+      <div class="stat-lbl">Fields</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">{totalTerms}</div>
+      <div class="stat-lbl">Terms</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">{totalOwners}</div>
+      <div class="stat-lbl">Owners</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Semantic Models</div>
+    <h2 class="section-title">Models</h2>
+    {modelNames.length === 0 ? (
+      <p style="color:var(--text-secondary);">No models found. Run <code style="font-family:var(--mono);background:var(--bg-card);padding:0.15rem 0.4rem;border-radius:3px;">context introspect</code> to get started.</p>
+    ) : (
+      <div class="card-grid">
+        {modelNames.map((name) => (
+          <a href={`/models/${name}.html`} class="card-link">
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+                <span class="mono" style="font-size:0.88rem;color:var(--accent-light);">{name}</span>
+                {manifest.tiers[name] && <TierBadge tier={manifest.tiers[name]?.tier} />}
+              </div>
+              {manifest.models[name]?.description && (
+                <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.5rem;font-weight:300;">{manifest.models[name].description}</p>
+              )}
+              {manifest.governance[name] && (
+                <div style="display:flex;gap:0.35rem;flex-wrap:wrap;align-items:center;">
+                  {manifest.governance[name]?.owner && <span class="tag">{manifest.governance[name].owner}</span>}
+                  {manifest.governance[name]?.trust && <span class="tag tag-green">{manifest.governance[name].trust}</span>}
+                  {manifest.governance[name]?.tags?.map((t: string) => <span class="tag">{t}</span>)}
+                </div>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+
+  {Object.keys(manifest.owners).length > 0 && (
+    <div class="section">
+      <div class="section-label">Data Stewardship</div>
+      <h2 class="section-title">Owners</h2>
+      <div class="card-grid">
+        {Object.entries(manifest.owners).map(([oid, owner]: [string, any]) => (
+          <a href={`/owners/${oid}.html`} class="card-link">
+            <div class="card">
+              <div style="font-size:0.9rem;font-weight:500;color:var(--text);margin-bottom:0.15rem;">{owner.display_name}</div>
+              {owner.team && <div style="font-size:0.75rem;color:var(--text-dim);">{owner.team}</div>}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+</Base>

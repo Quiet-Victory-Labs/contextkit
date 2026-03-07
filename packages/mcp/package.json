@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/mcp",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "ContextKit MCP server — expose semantic layers and data context to AI agents via Model Context Protocol",
   "license": "MIT",
   "author": "Eric Kittelson",

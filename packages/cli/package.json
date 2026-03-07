@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/cli",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Tell your AI agent to build your semantic layer. CLI for introspecting databases, curating metadata, and serving context via MCP.",
   "license": "MIT",
   "author": "Eric Kittelson",

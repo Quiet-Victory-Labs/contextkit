@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro';
+import TierBadge from '../../components/TierBadge.astro';
+import manifest from '../../data/manifest.json';
+
+export function getStaticPaths() {
+  return Object.keys(manifest.owners).map((id) => ({
+    params: { id },
+  }));
+}
+
+const { id } = Astro.params;
+const owner = (manifest.owners as any)[id!];
+
+// Find models governed by this owner
+const governedModels = Object.entries(manifest.governance)
+  .filter(([, gov]: [string, any]) => gov.owner === id)
+  .map(([modelName]) => ({
+    name: modelName,
+    tier: (manifest.tiers as any)[modelName]?.tier ?? null,
+  }));
+---
+
+<Base title={owner?.display_name || id!}>
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>Owners</span>
+    <span class="breadcrumb-sep">/</span>
+    <span>{owner?.display_name || id}</span>
+  </div>
+
+  <div class="page-header">
+    <h1>{owner?.display_name || id}</h1>
+    {owner?.team && <p class="subtitle">{owner.team}</p>}
+  </div>
+
+  <div class="section">
+    <div class="gov-grid">
+      {owner?.email && <div class="gov-cell"><div class="gov-label">Email</div><div class="gov-value">{owner.email}</div></div>}
+      {owner?.team && <div class="gov-cell"><div class="gov-label">Team</div><div class="gov-value">{owner.team}</div></div>}
+      {owner?.slack && <div class="gov-cell"><div class="gov-label">Slack</div><div class="gov-value">{owner.slack}</div></div>}
+    </div>
+    {owner?.description && <p style="color:var(--text-secondary);font-size:0.85rem;margin-top:0.75rem;">{owner.description}</p>}
+  </div>
+
+  {governedModels.length > 0 && (
+    <div class="section">
+      <div class="section-label">Ownership</div>
+      <h2 class="section-title">Governed Models</h2>
+      <div class="card-grid">
+        {governedModels.map((m) => (
+          <a href={`/models/${m.name}.html`} class="card-link">
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <span class="mono" style="font-size:0.85rem;color:var(--accent-light);">{m.name}</span>
+                {m.tier && <TierBadge tier={m.tier} />}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+</Base>
