@@ -260,6 +260,42 @@ ${datasetList || '(none detected)'}
 
 ${failingSection}
 
+## Serving to Other Agents via MCP
+
+Once the semantic layer reaches Silver or Gold, serve it so other AI agents can use the curated metadata:
+
+\`\`\`bash
+# Start MCP server (agents connect via stdio)
+context serve --stdio
+
+# Or via HTTP for remote/multi-agent setups
+context serve --http --port 3000
+\`\`\`
+
+To add ContextKit as an MCP server in another agent's config:
+
+\`\`\`json
+{
+  "mcpServers": {
+    "contextkit": {
+      "command": "npx",
+      "args": ["@runcontext/cli", "serve", "--stdio"]
+    }
+  }
+}
+\`\`\`
+
+### Exporting AI Blueprints
+
+Export the Gold-tier outcome as a portable YAML file:
+
+\`\`\`bash
+context blueprint ${modelName}
+# → blueprints/${modelName}.data-product.osi.yaml
+\`\`\`
+
+This AI Blueprint contains the complete semantic specification — share it, serve it via MCP, or import it into any OSI-compliant tool.
+
 ## MCP Tools (if using ContextKit as an MCP server)
 
 | Tool | Parameters | What it does |
