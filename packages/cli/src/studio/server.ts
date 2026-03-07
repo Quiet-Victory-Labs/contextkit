@@ -165,9 +165,21 @@ export async function startStudioServer(opts: StudioServerOptions): Promise<{
       const pages = await getPages();
       let pagePath = url.pathname === '/' ? 'index.html' : url.pathname.replace(/^\//, '');
       if (!pagePath.endsWith('.html') && !pagePath.endsWith('.json')) {
-        pagePath += '.html';
+        // Try exact path + .html, then directory index
+        if (pages.has(pagePath + '.html')) {
+          pagePath += '.html';
+        } else {
+          pagePath = pagePath.replace(/\/$/, '') + '/index.html';
+        }
       }
-      const page = pages.get(pagePath);
+      // Redirect bare /models to /models/ index (or first model)
+      let page = pages.get(pagePath);
+      if (!page && pagePath.endsWith('/index.html')) {
+        // No index page for this directory — redirect to site root
+        res.writeHead(302, { Location: '/' });
+        res.end();
+        return;
+      }
       if (page) {
         const ct = pagePath.endsWith('.json') ? 'application/json' : 'text/html; charset=utf-8';
         res.writeHead(200, { 'Content-Type': ct });

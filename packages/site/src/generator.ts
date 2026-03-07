@@ -50,7 +50,7 @@ export function generateSite(
 ): Map<string, string> {
   const files = new Map<string, string>();
   const siteTitle = config?.title ?? 'ContextKit';
-  const basePath = (config?.base_path ?? '').replace(/\/+$/, '') || '.';
+  const basePath = (config?.base_path ?? '').replace(/\/+$/, '');
   const studioMode = options?.studioMode ?? false;
 
   // Common data shared across all pages (includes sidebar data)
