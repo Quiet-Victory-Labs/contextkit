@@ -243,7 +243,7 @@ describe('MCP Server', () => {
     });
 
     it('manifest has version 0.3.5', () => {
-      expect(manifest.version).toBe('0.4.0');
+      expect(manifest.version).toBe('0.4.1');
     });
   });
 

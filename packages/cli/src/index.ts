@@ -24,7 +24,7 @@ const program = new Command();
 program
   .name('context')
   .description('ContextKit — AI-ready metadata governance over OSI')
-  .version('0.4.0');
+  .version('0.4.1');
 
 // Register all commands
 program.addCommand(lintCommand);

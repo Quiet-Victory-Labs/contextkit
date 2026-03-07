@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/core",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "ContextKit core — compiler, linter, tier engine, and database introspection for AI-ready semantic layers",
   "license": "MIT",
   "author": "Eric Kittelson",

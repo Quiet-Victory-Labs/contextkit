@@ -66,10 +66,10 @@ export function parseDbUrl(db: string): DataSourceConfig {
 }
 
 export const introspectCommand = new Command('introspect')
-  .description('Introspect a database and scaffold Bronze-level OSI metadata')
+  .description('Introspect a database and scaffold Bronze-level OSI metadata. Supports: duckdb://, postgres://, mysql://, mssql://, snowflake://, bigquery://, clickhouse://, .sqlite, .duckdb files, and Databricks (via config).')
   .option(
     '--db <url>',
-    'Database URL (e.g., duckdb://path.duckdb or postgres://...)',
+    'Database URL (duckdb://path.duckdb, postgres://user:pass@host/db, mysql://..., mssql://..., snowflake://account/db/schema, bigquery://project/dataset, clickhouse://host, or file.sqlite)',
   )
   .option(
     '--source <name>',

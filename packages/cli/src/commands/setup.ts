@@ -11,7 +11,7 @@ import { runAgentInstructionsStep } from '../setup/steps/claude-md.js';
 import { displayTierScore } from '../setup/display.js';
 
 export const setupCommand = new Command('setup')
-  .description('Interactive wizard to scaffold and enrich metadata from a database')
+  .description('Interactive wizard — detects databases, introspects schema, scaffolds metadata, enriches to Silver, generates agent instructions. Supports DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, and Databricks.')
   .action(async () => {
     p.intro(chalk.bgCyan(chalk.black(' ContextKit Setup ')));
 
