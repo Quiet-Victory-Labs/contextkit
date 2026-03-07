@@ -44,5 +44,5 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: cd docs-site && pnpm install
-      - run: cd docs-site && pnpm build
+      - run: cd docs-site && npm ci
+      - run: cd docs-site && npx astro build
