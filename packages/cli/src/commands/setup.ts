@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { loadConfig } from '@runcontext/core';
+import { brand } from '../brand.js';
 
 export const setupCommand = new Command('setup')
   .description('Build a data product for your semantic plane')
@@ -15,7 +16,7 @@ export const setupCommand = new Command('setup')
     const contextDir = path.resolve(config.context_dir);
     const port = parseInt(opts.port, 10);
 
-    console.log(chalk.cyan('ContextKit — AI-ready data starts here\n'));
+    console.log(chalk.cyan(`${brand.banner}\n`));
     console.log(chalk.dim('Starting setup UI...'));
 
     const { startUIServer } = await import('@runcontext/ui');

@@ -13,6 +13,7 @@ import {
   type Severity,
 } from '@runcontext/core';
 import { formatDiagnostics } from '../formatters/pretty.js';
+import { brand } from '../brand.js';
 
 /** Serialize a diagnostic to a comparable key. */
 function diagKey(d: Diagnostic): string {
@@ -125,6 +126,7 @@ export const devCommand = new Command('dev')
         : path.resolve(config.context_dir);
       const fix = opts.fix === true;
 
+      console.log(chalk.cyan(`${brand.banner}\n`));
       console.log(chalk.blue(`Watching ${contextDir} for changes...`));
       if (fix) console.log(chalk.blue('Auto-fix enabled.'));
       console.log(chalk.gray('Press Ctrl+C to stop.\n'));

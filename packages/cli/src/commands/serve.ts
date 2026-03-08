@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { formatError } from '../formatters/pretty.js';
+import { brand } from '../brand.js';
 
 export const serveCommand = new Command('serve')
   .description('Start the MCP server (stdio or HTTP transport)')
@@ -36,7 +37,7 @@ export const serveCommand = new Command('serve')
         }) => Promise<void>;
 
         const port = parseInt(opts.port, 10);
-        console.log(chalk.blue(`Starting MCP server (HTTP on port ${port})...`));
+        console.log(chalk.blue(`${brand.mcpServing} (HTTP on port ${port})`));
         await startServerHttp({
           contextDir: opts.contextDir,
           rootDir: process.cwd(),
@@ -49,7 +50,7 @@ export const serveCommand = new Command('serve')
           rootDir?: string;
         }) => Promise<unknown>;
 
-        console.log(chalk.blue('Starting MCP server (stdio transport)...'));
+        console.log(chalk.blue(`${brand.mcpServing} (stdio transport)`));
         await startServer({
           contextDir: opts.contextDir,
           rootDir: process.cwd(),

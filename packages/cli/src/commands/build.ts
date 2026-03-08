@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { compile, loadConfig, emitManifest } from '@runcontext/core';
 import { formatJson } from '../formatters/json.js';
 import { formatSuccess, formatError } from '../formatters/pretty.js';
+import { brand } from '../brand.js';
 
 export const buildCommand = new Command('build')
   .description('Compile context files and emit manifest JSON')
@@ -48,10 +49,13 @@ export const buildCommand = new Command('build')
       const outputPath = path.join(outputDir, 'contextkit-manifest.json');
       fs.writeFileSync(outputPath, JSON.stringify(manifest, null, 2), 'utf-8');
 
+      const productCount = graph.models.size;
+
       if (opts.format === 'json') {
         console.log(formatJson({ success: true, outputPath, manifest }));
       } else {
-        console.log(formatSuccess(`Manifest written to ${outputPath}`));
+        console.log(formatSuccess(brand.buildSuccess(productCount)));
+        console.log(chalk.dim(`  Manifest written to ${outputPath}`));
       }
     } catch (err) {
       console.error(formatError((err as Error).message));
