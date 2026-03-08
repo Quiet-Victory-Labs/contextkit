@@ -1,0 +1,43 @@
+{
+  "name": "@runcontext/ui",
+  "version": "0.4.4",
+  "description": "Onboarding and studio UI for ContextKit. Build data products in the browser.",
+  "license": "MIT",
+  "author": "Eric Kittelson",
+  "homepage": "https://github.com/erickittelson/ContextKit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erickittelson/ContextKit.git",
+    "directory": "packages/ui"
+  },
+  "bugs": "https://github.com/erickittelson/ContextKit/issues",
+  "engines": { "node": ">=18.0.0" },
+  "keywords": ["contextkit", "onboarding", "data-product-builder", "wizard", "semantic-plane", "hono", "preact"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "static"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@runcontext/core": "workspace:^",
+    "hono": "^4.7.0",
+    "@hono/node-server": "^1.13.0",
+    "preact": "^10.25.0",
+    "preact-render-to-string": "^6.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0"
+  }
+}
