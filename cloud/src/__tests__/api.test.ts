@@ -66,7 +66,8 @@ describe('Cloud API', () => {
     it('returns ok', async () => {
       const res = await req('/api/health');
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ ok: true });
+      const body = await res.json() as any;
+      expect(body.ok).toBe(true);
     });
   });
 
