@@ -25,6 +25,31 @@ const totalOwners = Object.keys(manifest.owners).length;
     <p class="subtitle">Explore semantic models, governed datasets, business glossary, and data quality tiers.</p>
   </div>
 
+  {(manifest as any).products && Object.keys((manifest as any).products).length > 0 && (
+    <div class="section">
+      <div class="section-label">Semantic Plane</div>
+      <h2 class="section-title">Data Products</h2>
+      <div class="card-grid">
+        {Object.entries((manifest as any).products).map(([name, product]: [string, any]) => (
+          <a href={`/products/${name}.html`} class="card-link">
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+                <span class="mono" style="font-size:0.88rem;color:var(--accent-light);">{name}</span>
+                <span class="tag">{Object.keys(product.models).length} models</span>
+              </div>
+            </div>
+          </a>
+        ))}
+        <a href="/setup" class="card-link">
+          <div class="card" style="border-style:dashed;text-align:center;color:var(--text-secondary);">
+            <span style="font-size:1.2rem;">+</span>
+            <div style="font-size:0.82rem;">Add Data Product</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  )}
+
   <div class="stats-row">
     <div class="stat-item">
       <div class="stat-val">{modelNames.length}</div>

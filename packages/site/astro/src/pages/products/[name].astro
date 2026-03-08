@@ -1,0 +1,74 @@
+---
+import Base from '../../layouts/Base.astro';
+import TierBadge from '../../components/TierBadge.astro';
+import manifest from '../../data/manifest.json';
+
+export function getStaticPaths() {
+  if (!(manifest as any).products) return [];
+  return Object.keys((manifest as any).products).map((name) => ({
+    params: { name },
+  }));
+}
+
+const { name } = Astro.params;
+const product = (manifest as any).products?.[name];
+if (!product) return Astro.redirect('/');
+
+const modelNames = Object.keys(product.models);
+let totalDatasets = 0;
+let totalFields = 0;
+for (const mn of modelNames) {
+  const m = product.models[mn];
+  if (m?.datasets) {
+    totalDatasets += m.datasets.length;
+    for (const ds of m.datasets) {
+      if (ds.fields) totalFields += ds.fields.length;
+    }
+  }
+}
+---
+
+<Base title={name}>
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+      <a href="/" style="color:var(--text-secondary);text-decoration:none;font-size:0.82rem;">&larr; All Products</a>
+    </div>
+    <h1>{name}</h1>
+    <p class="subtitle">Data product &mdash; {modelNames.length} model{modelNames.length === 1 ? '' : 's'}</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-val">{modelNames.length}</div>
+      <div class="stat-lbl">Models</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">{totalDatasets}</div>
+      <div class="stat-lbl">Datasets</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">{totalFields}</div>
+      <div class="stat-lbl">Fields</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Models in {name}</div>
+    <h2 class="section-title">Models</h2>
+    <div class="card-grid">
+      {modelNames.map((mn) => (
+        <a href={`/models/${mn}.html`} class="card-link">
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+              <span class="mono" style="font-size:0.88rem;color:var(--accent-light);">{mn}</span>
+              {(manifest as any).tiers[mn] && <TierBadge tier={(manifest as any).tiers[mn]?.tier} />}
+            </div>
+            {product.models[mn]?.description && (
+              <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:0.5rem;font-weight:300;">{product.models[mn].description}</p>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>

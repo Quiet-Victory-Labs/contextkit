@@ -14,6 +14,7 @@ const siteTitle = siteConfig.title || 'ContextKit';
 const studioMode = (siteConfig as any).studioMode ?? false;
 const models = manifest.models;
 const tiers = manifest.tiers;
+const products = (manifest as any).products;
 ---
 
 <!DOCTYPE html>
@@ -28,7 +29,7 @@ const tiers = manifest.tiers;
 </head>
 <body>
   <Topbar {siteTitle} {title} />
-  <Sidebar {models} {tiers} {title} {activeModel} />
+  <Sidebar {models} {tiers} {title} {activeModel} {products} />
 
   <div class="main">
     <slot />

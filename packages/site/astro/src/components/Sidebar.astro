@@ -4,8 +4,9 @@ interface Props {
   tiers: Record<string, any>;
   title: string;
   activeModel?: string;
+  products?: Record<string, { models: Record<string, any> }>;
 }
-const { models, tiers, title, activeModel } = Astro.props;
+const { models, tiers, title, activeModel, products } = Astro.props;
 const modelNames = Object.keys(models);
 
 function tierClass(tier: string | undefined): string {
@@ -28,20 +29,41 @@ function tierClass(tier: string | undefined): string {
       <span>Search</span>
     </a>
   </div>
-  {modelNames.length > 0 && (
-    <div class="sidebar-section">
-      <div class="sidebar-heading">Models</div>
-      {modelNames.map((name) => (
-        <a href={`/models/${name}.html`} class:list={['sidebar-item', { active: activeModel === name }]}>
-          <span class="mono" style="font-size:0.78rem;">{name}</span>
-          {tiers[name] && (
-            <span class={`sidebar-badge ${tierClass(tiers[name]?.tier)}`}>
-              {tiers[name]?.tier || '\u2014'}
-            </span>
-          )}
+  {products && Object.keys(products).length > 0 ? (
+    Object.entries(products).map(([productName, product]) => (
+      <div class="sidebar-section">
+        <div class="sidebar-heading">{productName}</div>
+        <a href={`/products/${productName}.html`} class:list={['sidebar-item', { active: title === productName }]}>
+          <span style="font-size:0.78rem;">Overview</span>
         </a>
-      ))}
-    </div>
+        {Object.keys(product.models).map((name) => (
+          <a href={`/models/${name}.html`} class:list={['sidebar-item', { active: activeModel === name }]}>
+            <span class="mono" style="font-size:0.78rem;">{name}</span>
+            {tiers[name] && (
+              <span class={`sidebar-badge ${tierClass(tiers[name]?.tier)}`}>
+                {tiers[name]?.tier || '\u2014'}
+              </span>
+            )}
+          </a>
+        ))}
+      </div>
+    ))
+  ) : (
+    modelNames.length > 0 && (
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Models</div>
+        {modelNames.map((name) => (
+          <a href={`/models/${name}.html`} class:list={['sidebar-item', { active: activeModel === name }]}>
+            <span class="mono" style="font-size:0.78rem;">{name}</span>
+            {tiers[name] && (
+              <span class={`sidebar-badge ${tierClass(tiers[name]?.tier)}`}>
+                {tiers[name]?.tier || '\u2014'}
+              </span>
+            )}
+          </a>
+        ))}
+      </div>
+    )
   )}
 </nav>
 
