@@ -594,6 +594,38 @@ body {
   color: var(--text-muted);
 }
 
+/* ---- Existing Products Banner ---- */
+
+.existing-products-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.banner-title {
+  color: var(--text);
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.product-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-chip {
+  display: inline-block;
+  background: rgba(79, 158, 255, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(79, 158, 255, 0.3);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
 /* ---- Responsive ---- */
 
 @media (max-width: 480px) {

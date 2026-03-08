@@ -398,6 +398,41 @@
     }, 1000);
   }
 
+  // ---- Existing Products Banner ----
+
+  async function checkExistingProducts() {
+    try {
+      var res = await fetch('/api/products');
+      var products = await res.json();
+      if (products.length > 0) {
+        var banner = document.createElement('div');
+        banner.className = 'existing-products-banner';
+
+        var title = document.createElement('p');
+        title.className = 'banner-title';
+        title.textContent = 'Your semantic plane has ' + products.length + ' data product' + (products.length === 1 ? '' : 's') + '. Adding another.';
+        banner.appendChild(title);
+
+        var list = document.createElement('div');
+        list.className = 'product-chips';
+        for (var i = 0; i < products.length; i++) {
+          var chip = document.createElement('span');
+          chip.className = 'product-chip';
+          chip.textContent = products[i].name;
+          list.appendChild(chip);
+        }
+        banner.appendChild(list);
+
+        var step1 = document.getElementById('step-1');
+        if (step1) {
+          step1.parentNode.insertBefore(banner, step1);
+        }
+      }
+    } catch (e) {
+      // ignore - not critical
+    }
+  }
+
   // ---- Init ----
 
   function init() {
@@ -415,6 +450,7 @@
     setupSensitivity();
     setupUpload();
     setupVoice();
+    checkExistingProducts();
     goToStep(1);
   }
 
