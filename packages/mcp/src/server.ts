@@ -17,6 +17,8 @@ import { registerValidateTool } from './tools/validate.js';
 import { registerTierTool } from './tools/tier.js';
 import { registerGoldenQueryTool } from './tools/golden-query.js';
 import { registerGuardrailsTool } from './tools/guardrails.js';
+import { registerListProductsTool } from './tools/list-products.js';
+import { registerGetProductTool } from './tools/get-product.js';
 
 /**
  * Create and configure an MCP server with all ContextKit resources and tools.
@@ -36,13 +38,15 @@ export function createServer(manifest: Manifest, graph: ContextGraph): McpServer
   registerTierResource(server, manifest);
   registerDataProductResource(server, manifest);
 
-  // Register tools (6)
+  // Register tools (8)
   registerSearchTool(server, manifest);
   registerExplainTool(server, manifest);
   registerValidateTool(server, graph);
   registerTierTool(server, graph);
   registerGoldenQueryTool(server, manifest);
   registerGuardrailsTool(server, manifest);
+  registerListProductsTool(server, manifest);
+  registerGetProductTool(server, manifest);
 
   return server;
 }

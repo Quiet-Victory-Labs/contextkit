@@ -19,3 +19,6 @@ export { findGoldenQueries } from './tools/golden-query.js';
 export type { GoldenQueryMatch } from './tools/golden-query.js';
 export { findGuardrails } from './tools/guardrails.js';
 export type { GuardrailMatch } from './tools/guardrails.js';
+export { listProducts } from './tools/list-products.js';
+export type { ProductSummary } from './tools/list-products.js';
+export { getProduct } from './tools/get-product.js';

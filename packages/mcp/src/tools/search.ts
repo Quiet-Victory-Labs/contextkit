@@ -106,9 +106,18 @@ export function registerSearchTool(server: McpServer, manifest: Manifest): void 
   server.tool(
     'context_search',
     'Search across all ContextKit nodes (models, datasets, fields, terms, owners) by keyword',
-    { query: z.string().describe('Keyword to search for') },
-    async ({ query }) => {
-      const results = searchManifest(manifest, query);
+    {
+      query: z.string().describe('Keyword to search for'),
+      product: z.string().optional().describe('Optional data product name to scope search to'),
+    },
+    async ({ query, product }) => {
+      let target = manifest;
+      if (product && manifest.products?.[product]) {
+        // Create a filtered manifest scoped to the specified product
+        const p = manifest.products[product];
+        target = { ...manifest, models: p.models };
+      }
+      const results = searchManifest(target, query);
       return {
         content: [
           {
