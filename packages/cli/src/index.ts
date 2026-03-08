@@ -18,6 +18,7 @@ import { rulesCommand } from './commands/rules.js';
 import { setupCommand } from './commands/setup.js';
 import { blueprintCommand } from './commands/blueprint.js';
 import { newCommand } from './commands/new.js';
+import { publishCommand } from './commands/publish.js';
 
 const program = new Command();
 
@@ -44,5 +45,6 @@ program.addCommand(rulesCommand);
 program.addCommand(setupCommand);
 program.addCommand(blueprintCommand);
 program.addCommand(newCommand);
+program.addCommand(publishCommand);
 
 program.parse();
