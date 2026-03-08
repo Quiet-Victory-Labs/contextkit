@@ -85,6 +85,13 @@ export default defineConfig({
           label: 'Blog',
           items: [
             { label: 'Why AI Agents Write Wrong SQL', slug: 'blog/why-ai-agents-write-wrong-sql' },
+            { label: 'How to Build a Semantic Layer for AI Agents', slug: 'blog/how-to-build-semantic-layer-for-ai-agents' },
+            { label: 'Open Semantic Interchange', slug: 'blog/open-semantic-interchange' },
+            { label: 'BYOMCP: Connecting Data to Every AI Tool', slug: 'blog/byomcp-connecting-data-to-every-ai-tool' },
+            { label: 'From Bronze to Gold: Curating Data Products', slug: 'blog/bronze-to-gold-curating-data-products-with-ai' },
+            { label: 'Institutional Knowledge is Your AI\'s Missing Context', slug: 'blog/institutional-knowledge-is-your-ais-missing-context' },
+            { label: 'ContextKit vs Alation vs Atlan', slug: 'blog/contextkit-vs-alation-vs-atlan' },
+            { label: 'Serve Data Catalog to Claude Code via MCP', slug: 'blog/how-to-serve-data-catalog-to-claude-code-via-mcp' },
           ],
         },
       ],

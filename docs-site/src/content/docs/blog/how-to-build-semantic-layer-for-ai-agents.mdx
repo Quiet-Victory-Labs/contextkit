@@ -1,0 +1,183 @@
+---
+title: "How to Build a Semantic Layer for AI Agents"
+description: "Learn how to build a semantic layer that gives AI agents the data context they need to write correct queries. Step-by-step guide using ContextKit."
+---
+
+import { Aside, Card } from '@astrojs/starlight/components';
+
+AI agents can connect to your database in seconds. They can read your schema, generate SQL, and return results — all without human intervention. But there is a gap between *accessing* data and *understanding* it, and that gap is where every silent data error lives.
+
+The fix is a semantic layer: a structured metadata layer that tells AI agents what your data means, not just what it is named. This post walks through what a semantic layer for AI agents looks like, why it matters, and how to build one step by step with ContextKit.
+
+## What Is a Semantic Layer for AI?
+
+A semantic layer is a machine-readable description of your data's meaning. It sits between your raw database schema and the AI tools that query it, providing context that schemas alone cannot convey.
+
+Traditional semantic layers — like those in Looker or dbt Metrics — are designed to serve BI dashboards and pre-defined metrics. A semantic layer for AI agents is different. It needs to support *ad hoc* queries: the unpredictable, natural-language questions that users throw at coding assistants, chat interfaces, and autonomous agents.
+
+That means the semantic layer must describe:
+
+- **Business definitions.** What does "revenue" mean in this context? Is it gross or net? Does it include refunds?
+- **Aggregation rules.** Should this column be summed, averaged, or counted? What is the correct grain?
+- **Required filters.** Are there rows that should always be excluded — test data, cancelled orders, internal accounts?
+- **Relationships.** How do tables join? What is the cardinality? Which foreign keys are safe to use?
+- **Golden queries.** For common business questions, what does the correct SQL actually look like?
+
+Without this information, an AI agent is left to guess. It guesses based on column names, training data patterns, and statistical probability. Sometimes the guesses are right. Often they are not.
+
+## Why AI Agents Need More Than Schemas
+
+When an LLM connects to a database — whether through MCP, a SQL plugin, or direct access — it receives the schema: table names, column names, and data types. This is roughly equivalent to handing someone a spreadsheet with column headers but no instructions.
+
+Consider a table called `transactions` with a column called `amount`. From the schema alone, the agent knows there is a decimal column. It does not know:
+
+- Whether `amount` is in dollars or cents
+- Whether it represents gross revenue, net revenue, or payment amount
+- Whether cancelled transactions should be filtered out
+- Whether the table has replaced a deprecated `legacy_transactions` table
+- What the correct join path is to `customers`
+
+Each missing piece of context is an opportunity for a wrong answer. Multiply that across dozens of tables and hundreds of columns, and the probability of a correct ad hoc query drops sharply.
+
+This is not a prompting problem. No amount of prompt engineering can teach an agent that `status = 3` means "cancelled" in your system. The agent needs structured, queryable metadata — a semantic layer.
+
+## Step by Step: Building Your Semantic Layer with ContextKit
+
+ContextKit is an open-source CLI that builds semantic layers for AI agents. It follows a tiered approach — Bronze, Silver, Gold — so you can start fast and improve incrementally.
+
+### Step 1: Install and initialize
+
+```bash
+npx create-contextkit
+```
+
+Or install globally:
+
+```bash
+npm install -g @runcontext/cli
+context setup
+```
+
+This creates a `.context/` directory in your project with the configuration scaffold.
+
+### Step 2: Connect to your database and introspect
+
+```bash
+context introspect
+```
+
+ContextKit connects to your database (Postgres, MySQL, SQL Server, SQLite, and more), reads the schema, and generates YAML files for every table and column. This is your **Bronze tier** — raw schema metadata, automatically generated.
+
+The output looks like this:
+
+```yaml
+tables:
+  - name: transactions
+    columns:
+      - name: amount
+        type: decimal
+        nullable: false
+      - name: status
+        type: varchar
+        nullable: false
+      - name: customer_id
+        type: integer
+        nullable: false
+```
+
+Bronze is useful on its own — it gives AI agents a structured view of your schema. But it does not yet contain the semantic context that prevents wrong queries.
+
+### Step 3: Enrich with business context (Silver tier)
+
+```bash
+context enrich
+```
+
+This is where your AI coding agent becomes your co-author. Running `enrich` in an agentic tool like Claude Code or Cursor triggers an interactive process. The agent proposes descriptions, semantic roles, and tags based on what it can infer. You confirm, correct, or expand.
+
+After enrichment, your metadata looks like:
+
+```yaml
+tables:
+  - name: transactions
+    description: "Completed customer purchase transactions"
+    columns:
+      - name: amount
+        type: decimal
+        description: "Transaction total in USD cents"
+        semantic_role: measure
+        aggregation: SUM
+        tags: [revenue, financial]
+```
+
+Silver tier means every table has a description, every column has a semantic role, and the metadata is lint-clean.
+
+### Step 4: Add guardrails and golden queries (Gold tier)
+
+Gold tier is where the semantic layer becomes truly powerful. You add:
+
+**Guardrails** — required filters that prevent common errors:
+
+```yaml
+guardrails:
+  - column: status
+    operator: "="
+    value: "completed"
+    reason: "Exclude cancelled, refunded, and test transactions"
+```
+
+**Golden queries** — verified SQL for common business questions:
+
+```yaml
+golden_queries:
+  - question: "What is total revenue this quarter?"
+    sql: |
+      SELECT SUM(amount) / 100.0 AS revenue_usd
+      FROM transactions
+      WHERE status = 'completed'
+        AND created_at >= date_trunc('quarter', current_date)
+```
+
+Run `context build` to validate your metadata against the tier requirements, and `context lint` to catch issues.
+
+### Step 5: Serve via MCP
+
+```bash
+context serve --stdio
+```
+
+This starts a Model Context Protocol server that any MCP-compatible AI tool can connect to — Claude Code, Cursor, Windsurf, GitHub Copilot, and others. The agent queries the semantic layer before writing SQL, getting structured context instead of guessing.
+
+## What Changes After You Have a Semantic Layer
+
+The difference is not subtle. Before the semantic layer, every AI-generated query is a gamble. After it, the agent has access to:
+
+- The correct aggregation for every metric
+- Required filters that prevent data leakage
+- Verified golden queries for common questions
+- Human-authored descriptions of what each table and column means
+- Relationship metadata that prevents unsafe joins
+
+This does not make the agent perfect. But it moves the baseline from "frequently wrong in invisible ways" to "correct for any question the semantic layer covers." And because the layer is versioned YAML files in your repo, it evolves with your schema.
+
+## The 15-Minute Starting Point
+
+You do not need to build a complete semantic layer on day one. Start with your most-queried data product — the one that powers your revenue dashboard or your customer reports. Introspect it, enrich it to Silver, add a few guardrails, and serve it.
+
+That single data product, properly described, will prevent more AI data errors than any prompt engineering technique. And because ContextKit is designed for incremental improvement, you can expand coverage over time.
+
+```bash
+npx create-contextkit
+```
+
+Or tell your AI agent:
+
+> *"Install @runcontext/cli and build a semantic layer for my database."*
+
+Your data has meaning. A semantic layer makes sure your AI agents know it.
+
+---
+
+<Aside type="tip">
+ContextKit is open-source and free for local use. See [Pricing](/pricing/) for team and enterprise plans, or check the [Quick Start guide](/getting-started/quick-start/) to get started in 5 minutes.
+</Aside>
