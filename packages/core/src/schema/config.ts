@@ -35,4 +35,7 @@ export const contextKitConfigSchema = z.object({
   site: siteConfigSchema.optional(),
   mcp: mcpConfigSchema.optional(),
   data_sources: z.record(z.string(), dataSourceConfigSchema).optional(),
+  products: z.array(z.string()).optional(),
+  glossary_dir: z.string().optional(),
+  owners_dir: z.string().optional(),
 });

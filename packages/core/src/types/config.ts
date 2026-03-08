@@ -27,4 +27,7 @@ export interface ContextKitConfig {
   site?: SiteConfig;
   mcp?: McpConfig;
   data_sources?: Record<string, DataSourceConfig>;
+  products?: string[];
+  glossary_dir?: string;
+  owners_dir?: string;
 }
