@@ -91,14 +91,15 @@ describe('Studio routes', () => {
         models: { users: { description: 'User table' } },
       }, []);
 
-      // Verify the API endpoints the studio JS will call
-      const manifestRes = await app.request('/api/orgs/demo/manifest');
+      // Verify the API endpoints the studio JS will call (with auth header)
+      const authHeaders = { Authorization: 'Bearer test-key' };
+      const manifestRes = await app.request('/api/orgs/demo/manifest', { headers: authHeaders });
       expect(manifestRes.status).toBe(200);
       const manifest = await manifestRes.json() as Record<string, unknown>;
       expect(manifest).toHaveProperty('org', 'demo');
       expect(manifest).toHaveProperty('version', 1);
 
-      const productsRes = await app.request('/api/orgs/demo/products');
+      const productsRes = await app.request('/api/orgs/demo/products', { headers: authHeaders });
       expect(productsRes.status).toBe(200);
       const products = await productsRes.json() as Record<string, unknown>;
       expect(products).toHaveProperty('products');

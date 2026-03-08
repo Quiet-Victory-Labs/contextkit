@@ -2,9 +2,16 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import app from '../index.js';
 import { storage } from '../storage.js';
 
-/** Helper to make requests against the Hono app. */
+/** Helper to make requests against the Hono app, with optional auth. */
 function req(path: string, init?: RequestInit) {
   return app.request(path, init);
+}
+
+/** Helper to make authenticated GET requests (fallback mode). */
+function authReq(path: string) {
+  return app.request(path, {
+    headers: { Authorization: 'Bearer test-key' },
+  });
 }
 
 /** Helper to POST JSON with auth. */
@@ -121,13 +128,13 @@ describe('Cloud API', () => {
   // -- Get Manifest --
   describe('GET /api/orgs/:org/manifest', () => {
     it('returns 404 for unknown org', async () => {
-      const res = await req('/api/orgs/unknown/manifest');
+      const res = await authReq('/api/orgs/unknown/manifest');
       expect(res.status).toBe(404);
     });
 
     it('returns the published manifest', async () => {
       await postPublish({ org: 'acme', manifest: sampleManifest, files: sampleFiles });
-      const res = await req('/api/orgs/acme/manifest');
+      const res = await authReq('/api/orgs/acme/manifest');
       expect(res.status).toBe(200);
       const body = await res.json() as any;
       expect(body.org).toBe('acme');
@@ -139,13 +146,13 @@ describe('Cloud API', () => {
   // -- List Products --
   describe('GET /api/orgs/:org/products', () => {
     it('returns 404 for unknown org', async () => {
-      const res = await req('/api/orgs/unknown/products');
+      const res = await authReq('/api/orgs/unknown/products');
       expect(res.status).toBe(404);
     });
 
     it('lists product names', async () => {
       await postPublish({ org: 'acme', manifest: sampleManifest, files: sampleFiles });
-      const res = await req('/api/orgs/acme/products');
+      const res = await authReq('/api/orgs/acme/products');
       expect(res.status).toBe(200);
       const body = await res.json() as any;
       expect(body.products).toEqual(['player-engagement']);
@@ -155,19 +162,19 @@ describe('Cloud API', () => {
   // -- Get Product --
   describe('GET /api/orgs/:org/products/:name', () => {
     it('returns 404 for unknown org', async () => {
-      const res = await req('/api/orgs/unknown/products/foo');
+      const res = await authReq('/api/orgs/unknown/products/foo');
       expect(res.status).toBe(404);
     });
 
     it('returns 404 for unknown product', async () => {
       await postPublish({ org: 'acme', manifest: sampleManifest, files: sampleFiles });
-      const res = await req('/api/orgs/acme/products/nonexistent');
+      const res = await authReq('/api/orgs/acme/products/nonexistent');
       expect(res.status).toBe(404);
     });
 
     it('returns product detail', async () => {
       await postPublish({ org: 'acme', manifest: sampleManifest, files: sampleFiles });
-      const res = await req('/api/orgs/acme/products/player-engagement');
+      const res = await authReq('/api/orgs/acme/products/player-engagement');
       expect(res.status).toBe(200);
       const body = await res.json() as any;
       expect(body.name).toBe('player-engagement');
@@ -178,13 +185,13 @@ describe('Cloud API', () => {
   // -- Search --
   describe('GET /api/orgs/:org/search', () => {
     it('returns 404 for unknown org', async () => {
-      const res = await req('/api/orgs/unknown/search?q=test');
+      const res = await authReq('/api/orgs/unknown/search?q=test');
       expect(res.status).toBe(404);
     });
 
     it('returns empty results for empty query', async () => {
       await postPublish({ org: 'acme', manifest: sampleManifest, files: sampleFiles });
-      const res = await req('/api/orgs/acme/search?q=');
+      const res = await authReq('/api/orgs/acme/search?q=');
       expect(res.status).toBe(200);
       const body = await res.json() as any;
       expect(body.results).toEqual([]);
@@ -192,7 +199,7 @@ describe('Cloud API', () => {
 
     it('finds models by name', async () => {
       await postPublish({ org: 'acme', manifest: sampleManifest, files: sampleFiles });
-      const res = await req('/api/orgs/acme/search?q=sessions');
+      const res = await authReq('/api/orgs/acme/search?q=sessions');
       expect(res.status).toBe(200);
       const body = await res.json() as any;
       expect(body.results.length).toBeGreaterThan(0);
@@ -201,7 +208,7 @@ describe('Cloud API', () => {
 
     it('finds terms by content', async () => {
       await postPublish({ org: 'acme', manifest: sampleManifest, files: sampleFiles });
-      const res = await req('/api/orgs/acme/search?q=daily+active');
+      const res = await authReq('/api/orgs/acme/search?q=daily+active');
       expect(res.status).toBe(200);
       const body = await res.json() as any;
       expect(body.results.some((r: any) => r.type === 'terms' && r.name === 'dau')).toBe(true);

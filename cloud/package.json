@@ -16,11 +16,13 @@
     "hono": "^4.7.0"
   },
   "peerDependencies": {
+    "@clerk/backend": "^1.0.0",
     "pg": "^8.0.0",
     "snowflake-sdk": "^1.0.0",
     "@google-cloud/bigquery": "^7.0.0"
   },
   "peerDependenciesMeta": {
+    "@clerk/backend": { "optional": true },
     "pg": { "optional": true },
     "snowflake-sdk": { "optional": true },
     "@google-cloud/bigquery": { "optional": true }
