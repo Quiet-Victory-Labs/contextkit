@@ -1,5 +1,5 @@
 import type { ContextGraph, ContextKitConfig, Diagnostic } from '../types/index.js';
-import { discoverFiles } from '../parser/discover.js';
+import { discoverFiles, discoverFilesMultiProduct } from '../parser/discover.js';
 import { parseFile } from '../parser/parse.js';
 import { validate } from './validate.js';
 import { buildGraph } from './graph.js';
@@ -25,7 +25,11 @@ export async function compile(options: {
   const ignorePatterns = options.rootDir
     ? loadIgnorePatterns(options.rootDir, options.config?.lint?.ignore)
     : (options.config?.lint?.ignore ?? []);
-  const discovered = await discoverFiles(options.contextDir, ignorePatterns);
+  const discovered = await discoverFilesMultiProduct(
+    options.contextDir,
+    ignorePatterns,
+    { glossary_dir: options.config?.glossary_dir, owners_dir: options.config?.owners_dir },
+  );
 
   // 2. Parse each file
   const parsed = await Promise.all(
