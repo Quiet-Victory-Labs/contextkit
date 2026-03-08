@@ -1,2 +1,2 @@
-// @runcontext/ui — placeholder for Hono + Preact setup server
-export {};
+export { createApp, startUIServer } from './server.js';
+export type { UIServerOptions } from './server.js';
