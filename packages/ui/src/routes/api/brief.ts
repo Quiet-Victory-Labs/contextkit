@@ -1,8 +1,10 @@
 import { Hono } from 'hono';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { stringify } from 'yaml';
+import { stringify, parse } from 'yaml';
 import { validateBrief } from '@runcontext/core';
+
+const PRODUCT_NAME_RE = /^[a-zA-Z0-9_-]+$/;
 
 export function briefRoutes(contextDir: string): Hono {
   const app = new Hono();
@@ -17,13 +19,16 @@ export function briefRoutes(contextDir: string): Hono {
     const productDir = path.join(contextDir, 'products', body.product_name);
     fs.mkdirSync(productDir, { recursive: true });
     fs.writeFileSync(path.join(productDir, 'context-brief.yaml'), stringify(body), 'utf-8');
-    return c.json({ ok: true, path: path.join(productDir, 'context-brief.yaml') });
+    return c.json({ ok: true, path: `products/${body.product_name}/context-brief.yaml` });
   });
 
   app.get('/api/brief/:name', async (c) => {
-    const briefPath = path.join(contextDir, 'products', c.req.param('name'), 'context-brief.yaml');
+    const name = c.req.param('name');
+    if (!PRODUCT_NAME_RE.test(name)) {
+      return c.json({ error: 'Invalid product name' }, 400);
+    }
+    const briefPath = path.join(contextDir, 'products', name, 'context-brief.yaml');
     if (!fs.existsSync(briefPath)) return c.json({ error: 'Not found' }, 404);
-    const { parse } = await import('yaml');
     return c.json(parse(fs.readFileSync(briefPath, 'utf-8')));
   });
 
