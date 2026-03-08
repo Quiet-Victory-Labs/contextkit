@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { publish } from './routes/publish.js';
 import { api } from './routes/api.js';
 import { studio } from './routes/studio.js';
+import { mcp } from './mcp/server.js';
 
 const app = new Hono();
 
@@ -15,5 +16,6 @@ app.get('/api/health', (c) => c.json({ ok: true }));
 app.route('', publish);
 app.route('', api);
 app.route('', studio);
+app.route('', mcp);
 
 export default app;
