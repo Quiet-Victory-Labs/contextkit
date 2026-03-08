@@ -15,6 +15,16 @@
   "dependencies": {
     "hono": "^4.7.0"
   },
+  "peerDependencies": {
+    "pg": "^8.0.0",
+    "snowflake-sdk": "^1.0.0",
+    "@google-cloud/bigquery": "^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "pg": { "optional": true },
+    "snowflake-sdk": { "optional": true },
+    "@google-cloud/bigquery": { "optional": true }
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250212.0",
     "typescript": "^5.7.0",
