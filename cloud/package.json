@@ -1,0 +1,24 @@
+{
+  "name": "@runcontext/cloud",
+  "version": "0.5.0",
+  "description": "RunContext Cloud API server — publish and query semantic planes.",
+  "license": "MIT",
+  "author": "Eric Kittelson",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "hono": "^4.7.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250212.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.0.0"
+  }
+}
