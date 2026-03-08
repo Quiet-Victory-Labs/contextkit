@@ -45,4 +45,6 @@ export interface ContextGraph {
   };
   /** Optional data validation results from introspecting a live database. */
   dataValidation?: DataValidationInfo;
+  /** Maps model/resource names to their product name (for multi-product planes). */
+  productMap?: Map<string, string>;
 }

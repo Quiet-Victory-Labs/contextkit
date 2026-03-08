@@ -21,6 +21,7 @@ export function createEmptyGraph(): ContextGraph {
     owners: new Map<string, OwnerFile>(),
     tiers: new Map<string, TierScore>(),
     sourceMap: new Map<string, SourceFileInfo>(),
+    productMap: new Map<string, string>(),
     indexes: {
       byOwner: new Map<string, string[]>(),
       byTag: new Map<string, string[]>(),

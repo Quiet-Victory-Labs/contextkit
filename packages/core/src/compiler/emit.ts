@@ -8,9 +8,19 @@ import type { LineageFile } from '../types/lineage.js';
 import type { TermFile } from '../types/term.js';
 import type { OwnerFile } from '../types/owner.js';
 
+export interface ManifestProductGroup {
+  models: Record<string, OsiSemanticModel>;
+  governance: Record<string, GovernanceFile>;
+  rules: Record<string, RulesFile>;
+  lineage: Record<string, LineageFile>;
+}
+
 export interface Manifest {
   version: string;
   generatedAt: string;
+  /** Grouped by product (present when multi-product). */
+  products?: Record<string, ManifestProductGroup>;
+  /** Flat model map (always present for backward compat). */
   models: Record<string, OsiSemanticModel>;
   governance: Record<string, GovernanceFile>;
   rules: Record<string, RulesFile>;
@@ -35,7 +45,7 @@ function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
  * Converts all internal Maps to plain Records suitable for `JSON.stringify`.
  */
 export function emitManifest(graph: ContextGraph, _config: ContextKitConfig): Manifest {
-  return {
+  const manifest: Manifest = {
     version: '0.5.0',
     generatedAt: new Date().toISOString(),
     models: mapToRecord(graph.models),
@@ -46,4 +56,44 @@ export function emitManifest(graph: ContextGraph, _config: ContextKitConfig): Ma
     owners: mapToRecord(graph.owners),
     tiers: mapToRecord(graph.tiers),
   };
+
+  // Group by product if productMap has entries
+  if (graph.productMap && graph.productMap.size > 0) {
+    const products: Record<string, ManifestProductGroup> = {};
+    const productNames = new Set(graph.productMap.values());
+
+    for (const productName of productNames) {
+      const productModels: Record<string, OsiSemanticModel> = {};
+      const productGovernance: Record<string, GovernanceFile> = {};
+      const productRules: Record<string, RulesFile> = {};
+      const productLineage: Record<string, LineageFile> = {};
+
+      for (const [name, product] of graph.productMap) {
+        if (product !== productName) continue;
+
+        const model = graph.models.get(name);
+        if (model) productModels[name] = model;
+
+        const gov = graph.governance.get(name);
+        if (gov) productGovernance[name] = gov;
+
+        const rules = graph.rules.get(name);
+        if (rules) productRules[name] = rules;
+
+        const lineage = graph.lineage.get(name);
+        if (lineage) productLineage[name] = lineage;
+      }
+
+      products[productName] = {
+        models: productModels,
+        governance: productGovernance,
+        rules: productRules,
+        lineage: productLineage,
+      };
+    }
+
+    manifest.products = products;
+  }
+
+  return manifest;
 }

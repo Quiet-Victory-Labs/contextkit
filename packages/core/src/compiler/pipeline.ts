@@ -47,6 +47,25 @@ export async function compile(options: {
   // 4. Build graph from successful validations
   const graph = buildGraph(validated);
 
+  // 4b. Populate product map from discovered files
+  for (let i = 0; i < discovered.length; i++) {
+    const file = discovered[i]!;
+    const result = validated[i]!;
+    if (file.product && result.data) {
+      let name: string | undefined;
+      switch (file.kind) {
+        case 'model': name = (result.data as any).name; break;
+        case 'governance': name = (result.data as any).model; break;
+        case 'rules': name = (result.data as any).model; break;
+        case 'lineage': name = (result.data as any).model; break;
+        // terms and owners don't have products
+      }
+      if (name) {
+        graph.productMap?.set(name, file.product);
+      }
+    }
+  }
+
   // 5. Resolve references
   const refDiagnostics = resolveReferences(graph);
   allDiagnostics.push(...refDiagnostics);
