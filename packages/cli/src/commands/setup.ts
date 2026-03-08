@@ -26,13 +26,17 @@ export const setupCommand = new Command('setup')
       host: opts.host,
     });
 
-    const url = `http://localhost:${port}/setup`;
+    const displayHost = (opts.host === '0.0.0.0' || opts.host === '::') ? '127.0.0.1' : opts.host;
+    const url = `http://${displayHost}:${port}/setup`;
     console.log(chalk.green(`\n  Setup UI ready at ${url}\n`));
 
     if (opts.browser !== false) {
-      const openCmd = process.platform === 'darwin' ? 'open'
-        : process.platform === 'win32' ? 'start'
-        : 'xdg-open';
-      execFile(openCmd, [url], () => {});
+      if (process.platform === 'darwin') {
+        execFile('open', [url], () => {});
+      } else if (process.platform === 'win32') {
+        execFile('cmd.exe', ['/c', 'start', '', url], () => {});
+      } else {
+        execFile('xdg-open', [url], () => {});
+      }
     }
   });
