@@ -81,6 +81,12 @@ export default defineConfig({
             { label: 'Config File', slug: 'reference/config' },
           ],
         },
+        {
+          label: 'Blog',
+          items: [
+            { label: 'Why AI Agents Write Wrong SQL', slug: 'blog/why-ai-agents-write-wrong-sql' },
+          ],
+        },
       ],
     }),
   ],
