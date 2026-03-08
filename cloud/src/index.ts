@@ -9,7 +9,8 @@ import { billing } from './routes/billing.js';
 
 const app = new Hono();
 
-app.use('*', cors());
+app.use('/api/*', cors());
+app.use('/mcp/*', cors());
 
 // ---------------------------------------------------------------------------
 // Public routes (no auth required)

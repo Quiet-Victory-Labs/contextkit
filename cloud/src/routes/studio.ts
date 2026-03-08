@@ -2,6 +2,22 @@ import { Hono } from 'hono';
 
 const studio = new Hono();
 
+// CSP: allow inline scripts/styles (used by pageShell), block everything else
+studio.use('/studio/*', async (c, next) => {
+  await next();
+  c.header(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'",
+  );
+});
+studio.use('/studio', async (c, next) => {
+  await next();
+  c.header(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'",
+  );
+});
+
 // ---------------------------------------------------------------------------
 // Shared HTML helpers
 // ---------------------------------------------------------------------------
