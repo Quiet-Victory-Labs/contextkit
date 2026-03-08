@@ -1,0 +1,24 @@
+name: 'ContextKit Lint'
+description: 'Validate your semantic plane with ContextKit'
+inputs:
+  context-dir:
+    description: 'Path to your context directory'
+    required: false
+    default: 'context/'
+  fail-on-warning:
+    description: 'Fail the check on warnings (not just errors)'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Install ContextKit
+      run: npm install -g @runcontext/cli
+      shell: bash
+    - name: Lint semantic plane
+      run: context lint --context-dir ${{ inputs.context-dir }} ${{ inputs.fail-on-warning == 'true' && '--fail-on-warning' || '' }}
+      shell: bash
