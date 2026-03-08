@@ -11,7 +11,8 @@ import path from 'node:path';
 import os from 'node:os';
 
 describe('resolvePublishOptions', () => {
-  const originalEnv = { ...process.env };
+  const savedApiKey = process.env.RUNCONTEXT_API_KEY;
+  const savedOrg = process.env.RUNCONTEXT_ORG;
 
   beforeEach(() => {
     delete process.env.RUNCONTEXT_API_KEY;
@@ -19,7 +20,10 @@ describe('resolvePublishOptions', () => {
   });
 
   afterEach(() => {
-    process.env = { ...originalEnv };
+    if (savedApiKey !== undefined) process.env.RUNCONTEXT_API_KEY = savedApiKey;
+    else delete process.env.RUNCONTEXT_API_KEY;
+    if (savedOrg !== undefined) process.env.RUNCONTEXT_ORG = savedOrg;
+    else delete process.env.RUNCONTEXT_ORG;
   });
 
   it('throws when no API key is provided', () => {

@@ -33,22 +33,34 @@ export function collectYamlFiles(
     return results;
   }
 
+  const resolvedRoot = fs.realpathSync(dir);
+
   function walk(current: string) {
     const entries = fs.readdirSync(current, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(current, entry.name);
-      if (entry.isDirectory()) {
+      // Resolve symlinks and verify path stays within context dir
+      let resolvedFull: string;
+      try {
+        resolvedFull = fs.realpathSync(fullPath);
+      } catch {
+        continue; // broken symlink — skip
+      }
+      if (resolvedFull !== resolvedRoot && !resolvedFull.startsWith(resolvedRoot + path.sep)) {
+        continue; // symlink escapes context dir — skip
+      }
+      if (entry.isDirectory() || (fs.statSync(resolvedFull).isDirectory())) {
         walk(fullPath);
       } else if (/\.ya?ml$/i.test(entry.name)) {
         results.push({
-          path: path.relative(dir, fullPath),
-          content: fs.readFileSync(fullPath, 'utf-8'),
+          path: path.relative(resolvedRoot, fullPath),
+          content: fs.readFileSync(resolvedFull, 'utf-8'),
         });
       }
     }
   }
 
-  walk(dir);
+  walk(resolvedRoot);
   return results;
 }
 
@@ -107,21 +119,14 @@ export const publishCommand = new Command('publish')
   .option('--context-dir <path>', 'Path to context directory')
   .action(async (opts: PublishOptions) => {
     try {
-      // Validate required options
-      let resolved: ReturnType<typeof resolvePublishOptions>;
-      try {
-        resolved = resolvePublishOptions(opts);
-      } catch (err) {
-        console.error(formatError((err as Error).message));
-        process.exit(1);
-        return; // unreachable but helps TS
-      }
-
-      const { apiKey, org, apiUrl } = resolved;
+      // Load config first (before credential validation)
       const config = loadConfig(process.cwd());
       const contextDir = opts.contextDir
         ? path.resolve(opts.contextDir)
         : path.resolve(config.context_dir);
+
+      // Validate required options
+      const { apiKey, org, apiUrl } = resolvePublishOptions(opts);
 
       // Step 1: Compile the semantic plane
       console.log(chalk.dim('Compiling semantic plane...'));
