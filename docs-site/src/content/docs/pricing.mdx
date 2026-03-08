@@ -1,0 +1,114 @@
+---
+title: Pricing
+description: "ContextKit pricing — Free for local use, Team and Enterprise plans for hosted semantic planes with shared MCP, connectors, and RBAC."
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+## Choose Your Plan
+
+ContextKit is open-source and free for local use. When your team needs shared access, hosted serving, or managed connectors, upgrade to a paid plan.
+
+<CardGrid>
+  <Card title="Free" icon="open-book">
+    **$0 / month**
+
+    Everything you need for local development. Run the full CLI, build your semantic plane, and serve it via BYOMCP (Bring Your Own MCP).
+
+    - Unlimited data products
+    - All 16 CLI commands
+    - Local MCP server (stdio + HTTP)
+    - 9 database adapters
+    - 40 lint rules with auto-fix
+    - Visual Studio editor
+    - Community support (GitHub Issues)
+  </Card>
+  <Card title="Team" icon="rocket">
+    **$49 / month**
+
+    Hosted semantic plane for shared team access. No self-hosting, no infrastructure to manage.
+
+    - Everything in Free, plus:
+    - Hosted semantic plane at `mcp.runcontext.dev`
+    - Hosted MCP endpoint (Streamable HTTP)
+    - 3 database connectors
+    - 5 team seats
+    - Email support
+  </Card>
+  <Card title="Enterprise" icon="star">
+    **$299 / month**
+
+    Full platform with unlimited scale, role-based access, and priority support.
+
+    - Everything in Team, plus:
+    - Unlimited database connectors
+    - Unlimited team seats
+    - RBAC (role-based access control)
+    - Priority support (dedicated Slack channel)
+    - Custom SSO integration
+  </Card>
+</CardGrid>
+
+---
+
+## Feature Comparison
+
+| Feature | Free | Team | Enterprise |
+|---------|------|------|------------|
+| **Data products** | Unlimited | Unlimited | Unlimited |
+| **CLI commands** | All 16 | All 16 | All 16 |
+| **Database adapters** | All 9 | All 9 | All 9 |
+| **Lint rules** | All 40 | All 40 | All 40 |
+| **Visual Studio editor** | Yes | Yes | Yes |
+| **Local MCP server** | Yes | Yes | Yes |
+| **Hosted semantic plane** | -- | Yes | Yes |
+| **Hosted MCP endpoint** | -- | Yes | Yes |
+| **Database connectors** | BYOMCP | 3 included | Unlimited |
+| **Team seats** | 1 (local) | 5 | Unlimited |
+| **RBAC** | -- | -- | Yes |
+| **SSO** | -- | -- | Yes |
+| **Support** | Community (GitHub) | Email | Priority (Slack) |
+
+---
+
+## BYOMCP vs Hosted MCP
+
+<Card title="What is BYOMCP?" icon="information">
+  **BYOMCP** (Bring Your Own MCP) means you run the MCP server yourself — locally via `context serve --stdio` or self-hosted via `context serve --http`. Your semantic plane stays on your machine or your infrastructure. This is the default for the Free tier and works perfectly for solo developers.
+
+  **Hosted MCP** means ContextKit runs the MCP server for you at `mcp.runcontext.dev`. Your AI tools connect to a managed endpoint with authentication, so your whole team shares the same semantic plane without anyone running a local server. Available on Team and Enterprise plans.
+</Card>
+
+---
+
+## FAQ
+
+### Is the CLI really free?
+
+Yes. The ContextKit CLI is open-source (MIT license). You can introspect databases, build your semantic plane, lint, enrich, and serve via local MCP — all for free, forever. No API keys, no cloud account, no time limits.
+
+### What counts as a "connector"?
+
+A connector is a managed database connection hosted by ContextKit. On the Team plan, you get 3 connectors — for example, one PostgreSQL, one Snowflake, and one BigQuery. The Enterprise plan includes unlimited connectors. On the Free plan, you connect to databases directly from your machine (BYOMCP).
+
+### Can I try Team features for free?
+
+Contact us for a 14-day trial of the Team plan. No credit card required.
+
+### What happens if I exceed my seat limit?
+
+Additional seats on the Team plan are $10/seat/month. Enterprise plans include unlimited seats.
+
+### Do you offer annual billing?
+
+Yes. Annual billing saves 20% on Team and Enterprise plans. Contact us for details.
+
+---
+
+## Get Started
+
+```bash
+npx create-contextkit
+```
+
+Start building your semantic plane for free. Upgrade when your team is ready.

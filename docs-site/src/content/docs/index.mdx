@@ -3,7 +3,7 @@ title: ContextKit
 description: "Tell your AI agent to build your semantic layer. ContextKit — the open-source CLI for introspecting databases, curating metadata, and serving AI-ready context via MCP."
 template: splash
 hero:
-  tagline: "Tell your AI agent: 'Install @runcontext/cli and build a semantic layer for my database.' The agent connects to your data, works with you to build Gold-tier metadata, and serves it to every AI tool via MCP."
+  tagline: "Tell your AI agent: 'Build a semantic layer for my database.' The agent connects, curates Gold-tier metadata, and serves it to every AI tool via MCP — so every query is correct by default."
   image:
     dark: ../../assets/logo-dark.svg
     light: ../../assets/logo-light.svg
@@ -21,15 +21,22 @@ hero:
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <div style="text-align:center;margin:1rem 0 2.5rem;">
-  <div class="hero-install" onclick="navigator.clipboard.writeText('npm install -g @runcontext/cli').then(()=>{this.querySelector('.copy-badge').textContent='copied!'})">
-    <span class="prompt">$ </span><span class="cmd">npm install -g @runcontext/cli</span>
+  <div class="hero-install" onclick="navigator.clipboard.writeText('npx create-contextkit').then(()=>{this.querySelector('.copy-badge').textContent='copied!'})">
+    <span class="prompt">$ </span><span class="cmd">npx create-contextkit</span>
     <span class="copy-badge">copy</span>
   </div>
 </div>
 
-## How It Works
+## The Semantic Plane for Your Data
 
-You tell your AI agent to build it. The agent runs CLI commands, asks you about your data, and iterates until Gold. You provide the business knowledge. The agent does the rest.
+AI agents see table and column names, but they don't understand what the data **means**. They don't know which filters are required, how metrics should be aggregated, or which joins are safe. Every query is a guess.
+
+ContextKit creates a **semantic plane** — a structured layer of metadata that sits between your database and your AI tools. It tells agents the meaning behind the schema so they generate correct SQL on the first try.
+
+```
+Database  →  Semantic Plane  →  AI Agent
+(schema)     (meaning)          (correct SQL)
+```
 
 <div class="comparison">
   <div class="without">
@@ -48,22 +55,98 @@ WHERE status='completed' ← required (guardrail)</code></pre>
   </div>
 </div>
 
+---
+
+## How It Works
+
+You tell your AI agent to build it. The agent runs CLI commands, asks you about your data, and iterates until Gold. You provide the business knowledge — the agent does the rest.
+
+```
+You: "Install @runcontext/cli and build a semantic layer for my database"
+Agent: npm install @runcontext/cli
+Agent: context setup → connects → introspects → scaffolds metadata
+Agent: context enrich --target silver --apply → auto-fills descriptions, types, lineage
+Agent: context tier → "Silver. 12 Gold checks remaining."
+Agent: "I see a revenue column — should this be SUM'd or AVG'd?"
+You: "Always SUM. And filter out refunded orders."
+Agent: updates governance YAML, adds guardrail filter
+Agent: context tier → ... iterates until Gold
+Agent: context serve --stdio → MCP server live
+```
+
+---
+
 ## Three Tiers to AI-Ready
 
 <CardGrid>
   <Card title="Bronze — Discoverable" icon="document">
-    Descriptions, ownership, security, grain. Achieved automatically via `context introspect`.
+    Descriptions, ownership, security classification, grain. Achieved automatically via `context introspect`. Your data is findable, but AI doesn't yet know how to use it.
   </Card>
   <Card title="Silver — Trusted" icon="approve-check">
-    Trust status, glossary, lineage, sample values. Achieved via `context enrich --target silver`.
+    Trust status, business glossary, lineage, sample values. Achieved via `context enrich --target silver`. AI can interpret the data but still lacks guardrails.
   </Card>
   <Card title="Gold — AI-Ready" icon="star">
-    Semantic roles, aggregation rules, guardrails, golden queries, business rules. Curated by you and your agent.
+    Semantic roles, aggregation rules, guardrails, golden queries, business rules. Curated by you and your agent. AI generates correct SQL on the first try.
   </Card>
   <Card title="40 Lint Rules" icon="list-format">
-    Schema validation, governance, security, data accuracy — all tier-aware with auto-fix.
+    Schema validation, governance checks, security classification, data accuracy — all tier-aware with auto-fix via `context fix`.
   </Card>
 </CardGrid>
+
+---
+
+## Architecture
+
+ContextKit runs **local-first** — your metadata lives in your repo as YAML files. No cloud account needed, no vendor lock-in. When you're ready for teams, connect the hosted semantic plane.
+
+```
+┌─────────────────────────────────────────────────┐
+│  Your Repository                                │
+│  context/                                       │
+│    products/                                    │
+│      my_product/                                │
+│        osi.yaml          ← OSI spec (portable)  │
+│        governance.yaml   ← rules & guardrails   │
+│        owner.yaml        ← ownership            │
+│    contextkit.config.yaml                       │
+└───────────────┬─────────────────────────────────┘
+                │
+    ┌───────────┼───────────┐
+    ▼           ▼           ▼
+  CLI        MCP Server   Static Site
+ (build,     (serve to    (browsable
+  lint,       agents)      docs)
+  enrich)
+```
+
+**Local-first.** Everything runs on your machine. No API keys, no cloud dependency.
+
+**Cloud-ready.** When your team needs shared access, connect the hosted semantic plane at `mcp.runcontext.dev` for centralized serving with RBAC and connectors.
+
+---
+
+## Works With
+
+<CardGrid>
+  <Card title="Claude Code" icon="rocket">
+    Add ContextKit as an MCP server in `.claude/mcp.json` — the agent discovers your semantic layer automatically.
+  </Card>
+  <Card title="Cursor" icon="rocket">
+    Configure in `.cursor/mcp.json`. Cursor's agent uses `context_search` and `context_explain` to write correct queries.
+  </Card>
+  <Card title="VS Code" icon="rocket">
+    Works with Copilot Chat via `.vscode/mcp.json`. Your semantic metadata is available to any VS Code agent.
+  </Card>
+  <Card title="Windsurf" icon="rocket">
+    Add to `~/.codeium/windsurf/mcp_config.json`. Windsurf's AI uses guardrails and golden queries from your context.
+  </Card>
+</CardGrid>
+
+Also works with OpenAI Codex, any MCP-compatible client, and any agent that can run CLI commands.
+
+See the full [Integrations guide](/integrations/) for setup instructions.
+
+---
 
 ## Everything in One Install
 
@@ -72,7 +155,7 @@ WHERE status='completed' ← required (guardrail)</code></pre>
     `setup`, `new`, `introspect`, `enrich`, `lint`, `fix`, `build`, `tier`, `blueprint`, `explain`, `verify`, `serve`, `site`, `dev`, `init`, `rules`, `validate-osi`
   </Card>
   <Card title="MCP Server" icon="rocket">
-    Serve your semantic layer to Claude Code, Cursor, Windsurf, and any MCP-compatible agent via stdio or HTTP.
+    Serve your semantic layer to AI agents via stdio or HTTP. Exposes search, explain, validate, tier, golden queries, and guardrails as MCP tools.
   </Card>
   <Card title="Visual Studio Editor" icon="pen">
     `context dev --studio` — edit metadata in the browser, see tier updates live, save back to YAML.
@@ -82,22 +165,26 @@ WHERE status='completed' ← required (guardrail)</code></pre>
   </Card>
 </CardGrid>
 
+---
+
 ## Quick Start
 
-Tell your AI agent: *"Install @runcontext/cli and build a semantic layer for my database."*
-
-Or do it yourself:
-
 ```bash
+npx create-contextkit
+# or manually:
 npm install -g @runcontext/cli
-context setup           # connect → introspect → scaffold → enrich → generate agent instructions
+context setup           # connect → introspect → scaffold → enrich
 context tier            # check your Bronze/Silver/Gold score
 context serve --stdio   # serve to AI agents via MCP
 ```
 
+Or just tell your AI agent:
+
+> *"Install @runcontext/cli and build a semantic layer for my database."*
+
 <CardGrid>
   <LinkCard title="Introduction" description="How agents use ContextKit" href="/getting-started/introduction/" />
   <LinkCard title="Quick Start" description="Up and running in 5 minutes" href="/getting-started/quick-start/" />
-  <LinkCard title="OSI Specification" description="The open standard behind it" href="/concepts/osi/" />
-  <LinkCard title="MCP Server" description="Serve context to AI agents" href="/mcp/overview/" />
+  <LinkCard title="Pricing" description="Free, Team, and Enterprise plans" href="/pricing/" />
+  <LinkCard title="Integrations" description="Connect your AI tools" href="/integrations/" />
 </CardGrid>

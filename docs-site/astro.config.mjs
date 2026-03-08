@@ -24,6 +24,8 @@ export default defineConfig({
         { tag: 'link', attrs: { href: 'https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap', rel: 'stylesheet' } },
       ],
       sidebar: [
+        { label: 'Pricing', slug: 'pricing' },
+        { label: 'Integrations', slug: 'integrations' },
         {
           label: 'Getting Started',
           items: [
