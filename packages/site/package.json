@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/site",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Generate browsable documentation sites from your semantic plane. Auto-built data catalog with search, tier badges, and lineage diagrams.",
   "license": "MIT",
   "author": "Eric Kittelson",

@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/ui",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Browser-based onboarding wizard and visual metadata editor for ContextKit. Fill out a Context Brief and let AI curate your semantic plane.",
   "license": "MIT",
   "author": "Eric Kittelson",
