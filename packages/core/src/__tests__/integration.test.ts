@@ -142,7 +142,7 @@ describe('integration: manifest emit', () => {
     const manifest = emitManifest(graph, config);
 
     // Check manifest structure
-    expect(manifest.version).toBe('0.4.4');
+    expect(manifest.version).toBe('0.5.0');
     expect(manifest.generatedAt).toBeDefined();
     expect(typeof manifest.generatedAt).toBe('string');
 
@@ -168,7 +168,7 @@ describe('integration: manifest emit', () => {
     // JSON round-trip should succeed without errors
     const json = JSON.stringify(manifest);
     const parsed = JSON.parse(json) as Manifest;
-    expect(parsed.version).toBe('0.4.4');
+    expect(parsed.version).toBe('0.5.0');
     expect(parsed.models['retail-sales']).toBeDefined();
   });
 });
@@ -199,7 +199,7 @@ describe('integration: full CLI-like flow (compile -> lint -> tier -> emit)', ()
     // Step 4: Emit manifest
     const config = loadConfig(FIXTURES_VALID);
     const manifest = emitManifest(graph, config);
-    expect(manifest.version).toBe('0.4.4');
+    expect(manifest.version).toBe('0.5.0');
     expect(Object.keys(manifest.models).length).toBeGreaterThanOrEqual(1);
     expect(Object.keys(manifest.tiers).length).toBeGreaterThanOrEqual(1);
   });

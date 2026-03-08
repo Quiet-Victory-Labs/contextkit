@@ -11,7 +11,7 @@ function makeManifest(overrides: {
   terms?: Manifest['terms'];
 } = {}): Manifest {
   return {
-    version: '0.4.4',
+    version: '0.5.0',
     generatedAt: new Date().toISOString(),
     models: overrides.models ?? {},
     governance: overrides.governance ?? {},
