@@ -36,14 +36,19 @@ export function createApp(opts: UIServerOptions): Hono {
   return app;
 }
 
-export async function startUIServer(opts: UIServerOptions): Promise<void> {
-  const app = createApp(opts);
+export function startUIServer(opts: UIServerOptions): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const app = createApp(opts);
 
-  serve({
-    fetch: app.fetch,
-    port: opts.port,
-    hostname: opts.host,
-  }, (info) => {
-    console.log(`ContextKit UI running at http://${opts.host === '0.0.0.0' ? 'localhost' : opts.host}:${info.port}/setup`);
+    const server = serve({
+      fetch: app.fetch,
+      port: opts.port,
+      hostname: opts.host,
+    }, (info) => {
+      console.log(`ContextKit UI running at http://${opts.host === '0.0.0.0' ? 'localhost' : opts.host}:${info.port}/setup`);
+      resolve();
+    });
+
+    server.on('error', reject);
   });
 }
