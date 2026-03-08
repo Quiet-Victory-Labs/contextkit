@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
+export const PRODUCT_NAME_RE = /^[a-zA-Z0-9_-]+$/;
+
 export const SensitivityLevel = z.enum(['public', 'internal', 'confidential', 'restricted']);
 export type SensitivityLevel = z.infer<typeof SensitivityLevel>;
 
 export const ContextBriefSchema = z.object({
-  product_name: z.string().min(1).regex(/^[a-zA-Z0-9_-]+$/),
+  product_name: z.string().min(1).regex(PRODUCT_NAME_RE),
   description: z.string().min(1),
   owner: z.object({
     name: z.string().min(1),

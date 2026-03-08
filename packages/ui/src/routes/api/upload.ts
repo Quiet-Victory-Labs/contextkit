@@ -1,8 +1,7 @@
 import { Hono } from 'hono';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-
-const PRODUCT_NAME_RE = /^[a-zA-Z0-9_-]+$/;
+import { PRODUCT_NAME_RE } from '@runcontext/core';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_EXTENSIONS = ['.md', '.txt', '.pdf', '.csv', '.json', '.yaml', '.yml', '.sql', '.html'];
 

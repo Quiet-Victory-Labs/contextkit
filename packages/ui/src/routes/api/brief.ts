@@ -2,9 +2,7 @@ import { Hono } from 'hono';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { stringify, parse } from 'yaml';
-import { validateBrief, ContextBriefSchema } from '@runcontext/core';
-
-const PRODUCT_NAME_RE = /^[a-zA-Z0-9_-]+$/;
+import { validateBrief, ContextBriefSchema, PRODUCT_NAME_RE } from '@runcontext/core';
 
 export function briefRoutes(contextDir: string): Hono {
   const app = new Hono();
