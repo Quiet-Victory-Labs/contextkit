@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "@runcontext/core": "workspace:^",
+    "@runcontext/ui": "workspace:^",
     "@runcontext/mcp": "workspace:^",
     "@runcontext/site": "workspace:^",
     "chalk": "^5.4.0",
