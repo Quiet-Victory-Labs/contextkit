@@ -326,6 +326,17 @@ body {
   margin-top: 0.2rem;
 }
 
+.source-card.selected {
+  border-color: var(--accent);
+  background: rgba(79, 158, 255, 0.08);
+  cursor: pointer;
+}
+
+.source-card:hover {
+  border-color: var(--accent);
+  cursor: pointer;
+}
+
 .source-status.detected {
   background: rgba(34, 197, 94, 0.15);
   color: var(--success);

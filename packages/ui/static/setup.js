@@ -149,8 +149,18 @@
           createElement('span', { className: 'source-type', textContent: src.type || '' }),
           createElement('span', { className: 'source-status detected', textContent: 'Detected' }),
         ]);
+        card.addEventListener('click', function () {
+          $$('#sources-list .source-card').forEach(function (c) { c.classList.remove('selected'); });
+          card.classList.add('selected');
+          state.brief.data_source = src.type + ':' + (src.name || src.type);
+        });
         container.appendChild(card);
       });
+      // Auto-select if only one source detected
+      if (state.sources.length === 1) {
+        var only = container.querySelector('.source-card');
+        if (only) only.click();
+      }
     } catch (e) {
       container.textContent = '';
       container.appendChild(createElement('p', { className: 'muted', textContent: 'Could not detect sources.' }));
@@ -285,7 +295,7 @@
       ['Team', state.brief.owner.team || '(not set)'],
       ['Email', state.brief.owner.email || '(not set)'],
       ['Sensitivity', state.brief.sensitivity],
-      ['Data Sources', state.sources.length + ' detected'],
+      ['Data Source', state.brief.data_source || '(none selected) — ' + state.sources.length + ' detected'],
       ['Uploaded Docs', state.brief.docs.length > 0 ? state.brief.docs.join(', ') : '(none)'],
     ];
     rows.forEach(function (r) {
