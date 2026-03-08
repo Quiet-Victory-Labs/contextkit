@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
 import { briefRoutes } from './routes/api/brief.js';
+import { sourcesRoutes } from './routes/api/sources.js';
+import { uploadRoutes } from './routes/api/upload.js';
 
 export interface UIServerOptions {
   rootDir: string;
@@ -16,6 +18,8 @@ export function createApp(opts: UIServerOptions): Hono {
   app.use('*', cors());
 
   app.route('', briefRoutes(opts.contextDir));
+  app.route('', sourcesRoutes(opts.rootDir, opts.contextDir));
+  app.route('', uploadRoutes(opts.contextDir));
 
   app.get('/api/health', (c) => c.json({ ok: true }));
 
