@@ -28,6 +28,9 @@ export interface Storage {
 
   /** Simple text search across an org's manifest (models, terms, etc.). */
   search(org: string, query: string): Array<{ type: string; name: string; match: string }>;
+
+  /** Clear all stored data. Used for testing. */
+  clear(): void;
 }
 
 export class InMemoryStorage implements Storage {
@@ -73,6 +76,7 @@ export class InMemoryStorage implements Storage {
     const products = plane.manifest['products'] as Record<string, Record<string, unknown>> | undefined;
     if (!products || typeof products !== 'object') return undefined;
 
+    if (!Object.prototype.hasOwnProperty.call(products, name)) return undefined;
     return products[name];
   }
 
@@ -99,6 +103,10 @@ export class InMemoryStorage implements Storage {
     }
 
     return results;
+  }
+
+  clear(): void {
+    this.planes.clear();
   }
 }
 

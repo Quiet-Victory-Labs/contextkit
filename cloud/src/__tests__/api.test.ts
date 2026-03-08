@@ -51,8 +51,7 @@ const sampleFiles = [
 
 describe('Cloud API', () => {
   beforeEach(() => {
-    // Reset in-memory storage between tests
-    (storage as any).planes = new Map();
+    storage.clear();
   });
 
   // -- Health --
