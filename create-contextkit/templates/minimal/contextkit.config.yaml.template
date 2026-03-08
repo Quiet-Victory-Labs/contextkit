@@ -1,3 +1,6 @@
-context_dir: context
+context_dir: .
 output_dir: dist
-minimum_tier: bronze
+products:
+  - example-product
+glossary_dir: glossary
+owners_dir: owners

@@ -1,0 +1,8 @@
+product_name: example-product
+description: "{{PROJECT_DISPLAY_NAME}} — describe your data product here."
+owner:
+  name: Your Name
+  team: Your Team
+  email: you@example.com
+sensitivity: internal
+docs: []
