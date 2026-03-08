@@ -2,8 +2,13 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: ['src/index.ts'],
-  format: ['esm'],
-  dts: true,
+  format: ['esm', 'cjs'],
+  dts: { resolve: true, compilerOptions: { composite: false } },
+  splitting: true,
+  sourcemap: true,
   clean: true,
   external: ['@runcontext/core'],
+  outExtension({ format }) {
+    return { js: format === 'esm' ? '.mjs' : '.cjs' };
+  },
 });
