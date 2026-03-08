@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/cli",
-  "version": "0.5.1",
-  "description": "Tell your AI agent to build a semantic layer for your database. Introspect schema, curate metadata to Gold tier, and serve AI-ready context to Claude Code, Cursor, and Copilot via MCP.",
+  "version": "0.5.2",
+  "description": "Turn your database into an AI-ready data product. Browser-based Context Brief wizard, automatic schema introspection, Bronze-to-Gold tier enrichment, and MCP server for Claude Code, Cursor, and Copilot.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",

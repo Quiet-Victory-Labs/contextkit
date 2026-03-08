@@ -1,7 +1,7 @@
 {
   "name": "create-contextkit",
-  "version": "0.5.1",
-  "description": "Scaffold a new ContextKit project. One command to start building AI-ready semantic metadata for your database. npx create-contextkit",
+  "version": "0.5.2",
+  "description": "Scaffold a new ContextKit data product. Run npx create-contextkit, fill out a Context Brief in your browser, and the pipeline builds your semantic plane automatically.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",

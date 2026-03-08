@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/ui",
-  "version": "0.5.1",
-  "description": "Browser-based onboarding wizard and visual metadata editor for ContextKit. Fill out a Context Brief and let AI curate your semantic plane.",
+  "version": "0.5.2",
+  "description": "5-step browser wizard for creating data products and visual studio for curating metadata to Gold tier. Part of ContextKit.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",

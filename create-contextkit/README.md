@@ -1,26 +1,23 @@
 # create-contextkit
 
-Scaffold a new [ContextKit](https://github.com/Quiet-Victory-Labs/contextkit) project — AI-ready semantic metadata for your database in one command.
+Scaffold a new [ContextKit](https://github.com/Quiet-Victory-Labs/contextkit) project — one command to start building an AI-ready data product from your database.
 
 ## Usage
 
 ```bash
-# Create a new ContextKit project
 npx create-contextkit my-project
 cd my-project
-
-# Start working
-context lint
-context tier
-context build
+context setup
 ```
+
+The setup wizard opens in your browser. Fill out a Context Brief (name, owner, sensitivity, database connection), and the pipeline builds your semantic plane automatically.
 
 ## What it creates
 
 ```
 my-project/
 ├── context/
-│   ├── models/          # OSI semantic models
+│   ├── models/          # Semantic models (OSI YAML)
 │   ├── governance/      # Ownership, trust, security, semantic roles
 │   ├── rules/           # Golden queries, business rules, guardrails
 │   ├── lineage/         # Upstream/downstream lineage
@@ -30,7 +27,12 @@ my-project/
 └── package.json
 ```
 
-Includes example files to get started. Run `context setup` after scaffolding to connect a database and auto-generate metadata.
+## What happens next
+
+1. **`context setup`** — Browser wizard guides you through the Context Brief
+2. **Pipeline runs** — Introspect database → scaffold Bronze → enrich to Silver
+3. **`context dev --studio`** — Visual editor to curate metadata to Gold tier
+4. **`context serve`** — MCP server live, AI agents get full context
 
 ## Part of ContextKit
 

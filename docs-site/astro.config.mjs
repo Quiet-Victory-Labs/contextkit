@@ -12,7 +12,7 @@ export default defineConfig({
         replacesTitle: false,
       },
       favicon: '/favicon.svg',
-      description: 'ContextKit — tell your AI agent to build your semantic layer. Open-source CLI for introspecting databases, curating metadata to Gold tier, and serving AI-ready context via MCP. Built on the Open Semantic Interchange (OSI) specification.',
+      description: 'ContextKit — turn your database into an AI-ready data product. Fill out a Context Brief, connect your database, and the pipeline builds a semantic plane automatically. Serve it to Claude Code, Cursor, and Copilot via MCP.',
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/Quiet-Victory-Labs/contextkit' },
       ],
