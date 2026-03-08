@@ -1,7 +1,7 @@
 {
   "name": "create-contextkit",
   "version": "0.5.0",
-  "description": "Scaffold a new ContextKit project",
+  "description": "Scaffold a new semantic plane. AI-ready data starts here",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/erickittelson/ContextKit",
@@ -12,7 +12,7 @@
   },
   "bugs": "https://github.com/erickittelson/ContextKit/issues",
   "engines": { "node": ">=18.0.0" },
-  "keywords": ["contextkit", "scaffolder", "create", "init"],
+  "keywords": ["create", "scaffold", "semantic-plane"],
   "type": "module",
   "bin": { "create-contextkit": "./dist/index.js" },
   "files": ["dist", "templates"],
