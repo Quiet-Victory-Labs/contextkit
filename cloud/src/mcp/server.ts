@@ -53,8 +53,13 @@ const mcp = new Hono();
 // Require auth on all MCP requests
 mcp.use('/mcp/:org', requireAuth);
 
+const ORG_SLUG_RE = /^[a-z0-9][a-z0-9_-]{0,63}$/;
+
 mcp.post('/mcp/:org', async (c) => {
   const org = c.req.param('org');
+  if (!ORG_SLUG_RE.test(org)) {
+    return c.json(jsonrpcError(null, INVALID_PARAMS, 'Invalid org identifier'), 200);
+  }
 
   // Parse the JSON-RPC request body
   let body: unknown;
@@ -93,8 +98,11 @@ mcp.post('/mcp/:org', async (c) => {
       );
 
     case 'notifications/initialized':
-      // Notification — no response needed, but we return an empty 200
-      return c.body(null, 204);
+      // Notifications have no id — return 204. If id is present, reply normally.
+      if (req.id === undefined) {
+        return c.body(null, 204);
+      }
+      return c.json(jsonrpcResult(req.id, {}), 200);
 
     case 'tools/list':
       return c.json(
@@ -143,7 +151,7 @@ mcp.post('/mcp/:org', async (c) => {
       }
 
       try {
-        const result = handleToolCall(toolName, toolArgs, org, storage);
+        const result = await handleToolCall(toolName, toolArgs, org, storage);
         return c.json(jsonrpcResult(req.id, result), 200);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Internal error';

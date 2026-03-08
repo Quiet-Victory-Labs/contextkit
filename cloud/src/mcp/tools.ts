@@ -124,12 +124,12 @@ type ToolArgs = Record<string, unknown>;
 /**
  * Dispatch a tool call to the appropriate handler.
  */
-export function handleToolCall(
+export async function handleToolCall(
   toolName: string,
   args: ToolArgs,
   org: string,
   storage: Storage,
-): ToolResult {
+): Promise<ToolResult> {
   switch (toolName) {
     case 'context_search':
       return handleSearch(org, args, storage);
@@ -157,6 +157,9 @@ export function handleToolCall(
 
 function handleSearch(org: string, args: ToolArgs, storage: Storage): ToolResult {
   const query = String(args.query ?? '');
+  if (!query) {
+    return { content: [{ type: 'text', text: 'query is required' }], isError: true };
+  }
   const results = storage.search(org, query);
   return {
     content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
@@ -181,6 +184,7 @@ function handleExplain(org: string, args: ToolArgs, storage: Storage): ToolResul
   if (!model) {
     return {
       content: [{ type: 'text', text: JSON.stringify({ error: `Model '${modelName}' not found` }) }],
+      isError: true,
     };
   }
 
@@ -246,7 +250,11 @@ function handleGoldenQuery(org: string, args: ToolArgs, storage: Storage): ToolR
 }
 
 function handleGuardrails(org: string, args: ToolArgs, storage: Storage): ToolResult {
-  const tables = (args.tables ?? []) as string[];
+  const rawTables = args.tables;
+  if (!Array.isArray(rawTables) || rawTables.some((t) => typeof t !== 'string')) {
+    return { content: [{ type: 'text', text: 'tables must be an array of strings' }], isError: true };
+  }
+  const tables = rawTables as string[];
   const plane = storage.getPlane(org);
 
   if (!plane) {
@@ -299,7 +307,10 @@ function handleListProducts(org: string, storage: Storage): ToolResult {
   }
 
   // Build summaries with model counts
-  const plane = storage.getPlane(org)!;
+  const plane = storage.getPlane(org);
+  if (!plane) {
+    return { content: [{ type: 'text', text: '[]' }] };
+  }
   const products = (plane.manifest['products'] ?? {}) as Record<
     string,
     Record<string, unknown>
