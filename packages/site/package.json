@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/site",
   "version": "0.5.0",
-  "description": "Documentation site generator for semantic planes",
+  "description": "Generate browsable documentation sites from your semantic plane. Auto-built data catalog with search, tier badges, and lineage diagrams.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
@@ -14,7 +14,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["docs-generator", "data-catalog", "semantic-layer"],
+  "keywords": ["contextkit", "docs-generator", "data-catalog", "semantic-layer", "documentation-site", "data-product", "metadata-documentation"],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

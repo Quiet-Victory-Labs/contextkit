@@ -1,11 +1,11 @@
 <h1 align="center">ContextKit</h1>
 
 <p align="center">
-  <strong>Build AI-ready semantic planes from your data</strong>
+  <strong>Tell your AI agent to build your semantic layer.</strong>
 </p>
 
 <p align="center">
-  ContextKit turns your database into a semantic plane — a structured layer of metadata that AI agents can read, trust, and act on. Introspect your schema, curate meaning, and serve context to any AI tool via MCP. No more guessing. No more hallucinated SQL.
+  ContextKit turns your database into a <b>semantic plane</b> — a structured layer of metadata that AI agents can read, trust, and act on. Introspect your schema, curate meaning to Gold tier, and serve context to Claude Code, Cursor, Copilot, or any MCP-compatible tool. No more guessing. No more hallucinated SQL.
 </p>
 
 <p align="center">
@@ -33,6 +33,10 @@ context setup
 # AI curates your semantic plane automatically
 ```
 
+Or tell your AI agent:
+
+> *"Install @runcontext/cli and build a semantic layer for my database."*
+
 ---
 
 ## What is a Semantic Plane?
@@ -51,11 +55,17 @@ A semantic plane is a structured metadata layer that sits between your database 
 
 ---
 
+## Database Support
+
+PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks.
+
+---
+
 ## Local-first, Cloud-ready
 
 ContextKit runs entirely on your machine. Bring your own MCP server, connect any database, curate metadata locally — free and open source.
 
-Need collaboration, hosted MCP, or team workflows? **RunContext Cloud** adds multi-user curation, hosted serving, and managed infrastructure on top of the same open core.
+Need collaboration, hosted MCP, or team workflows? **[RunContext Cloud](https://runcontext.dev)** adds multi-user curation, hosted serving, and managed infrastructure on top of the same open core.
 
 ---
 
@@ -82,7 +92,7 @@ ContextKit metadata follows the [Open Semantic Interchange (OSI)](https://github
 
 - [Documentation](https://contextkit.dev)
 - [npm](https://www.npmjs.com/package/@runcontext/cli)
-- [RunContext Cloud](https://runcontext.io)
+- [RunContext Cloud](https://runcontext.dev)
 
 ## License
 

@@ -1,6 +1,6 @@
 # create-contextkit
 
-Project scaffolder for [ContextKit](https://github.com/Quiet-Victory-Labs/contextkit) — AI-ready metadata governance over OSI.
+Scaffold a new [ContextKit](https://github.com/Quiet-Victory-Labs/contextkit) project — AI-ready semantic metadata for your database in one command.
 
 ## Usage
 

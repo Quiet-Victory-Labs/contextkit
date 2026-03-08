@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/core",
   "version": "0.5.0",
-  "description": "Compiler and linter for AI-ready semantic metadata",
+  "description": "Compiler, linter, and tier engine for AI-ready semantic metadata. 40 lint rules, Bronze/Silver/Gold scoring, and OSI-compliant data product validation.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
@@ -12,7 +12,7 @@
   },
   "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
   "engines": { "node": ">=18.0.0" },
-  "keywords": ["semantic-layer", "ai-metadata", "osi", "data-governance", "mcp"],
+  "keywords": ["contextkit", "semantic-layer", "semantic-plane", "ai-metadata", "osi", "open-semantic-interchange", "data-governance", "data-catalog", "data-product", "mcp", "model-context-protocol", "schema-validation", "metadata-compiler", "tier-system"],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

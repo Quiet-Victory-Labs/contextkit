@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/cli",
   "version": "0.5.0",
-  "description": "Build semantic planes from your data. AI-ready metadata in minutes",
+  "description": "Tell your AI agent to build a semantic layer for your database. Introspect schema, curate metadata to Gold tier, and serve AI-ready context to Claude Code, Cursor, and Copilot via MCP.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
@@ -12,7 +12,7 @@
   },
   "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
   "engines": { "node": ">=18.0.0" },
-  "keywords": ["contextkit", "semantic-plane", "data-product", "ai-ready-data", "cli"],
+  "keywords": ["contextkit", "semantic-plane", "semantic-layer", "data-product", "ai-ready-data", "data-catalog", "data-governance", "mcp", "model-context-protocol", "ai-agent", "database-metadata", "schema-introspection", "claude-code", "cursor", "copilot", "dbt-alternative", "osi", "open-semantic-interchange", "cli"],
   "type": "module",
   "bin": {
     "context": "./dist/index.js"

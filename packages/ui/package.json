@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/ui",
   "version": "0.5.0",
-  "description": "Onboarding and studio UI for ContextKit",
+  "description": "Browser-based onboarding wizard and visual metadata editor for ContextKit. Fill out a Context Brief and let AI curate your semantic plane.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
@@ -15,9 +15,14 @@
     "node": ">=18.0.0"
   },
   "keywords": [
+    "contextkit",
     "onboarding",
     "data-product-builder",
-    "wizard"
+    "wizard",
+    "semantic-plane",
+    "context-brief",
+    "browser-ui",
+    "metadata-editor"
   ],
   "type": "module",
   "main": "./dist/index.cjs",

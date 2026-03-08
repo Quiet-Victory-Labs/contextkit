@@ -1,7 +1,7 @@
 {
   "name": "@runcontext/mcp",
   "version": "0.5.0",
-  "description": "MCP server for AI agents. Serve semantic metadata to Claude Code, Cursor, and more",
+  "description": "MCP server that serves semantic metadata to AI agents. Connect your data catalog to Claude Code, Cursor, Copilot, Windsurf, and any MCP-compatible tool.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
@@ -12,7 +12,7 @@
   },
   "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
   "engines": { "node": ">=18.0.0" },
-  "keywords": ["mcp", "model-context-protocol", "ai-agent", "semantic-layer"],
+  "keywords": ["mcp", "model-context-protocol", "ai-agent", "semantic-layer", "semantic-plane", "contextkit", "claude-code", "cursor", "copilot", "windsurf", "ai-ready-data", "data-catalog", "mcp-server"],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

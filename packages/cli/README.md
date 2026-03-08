@@ -6,6 +6,8 @@ Tell your AI agent: *"Install @runcontext/cli and build a semantic layer for my 
 
 The agent introspects your database, scaffolds metadata, and goes back and forth with you — asking about metrics, ownership, and business rules — while it builds the semantic layer using CLI commands. When it reaches Gold tier, it exports an **AI Blueprint** and serves the metadata to other AI agents via MCP.
 
+Works with Claude Code, Cursor, Copilot, Windsurf, Codex, and any MCP-compatible AI tool. Supports PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, and Databricks.
+
 ## Installation
 
 ```bash
