@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { stringify, parse } from 'yaml';
-import { validateBrief } from '@runcontext/core';
+import { validateBrief, ContextBriefSchema } from '@runcontext/core';
 
 const PRODUCT_NAME_RE = /^[a-zA-Z0-9_-]+$/;
 
@@ -15,11 +15,12 @@ export function briefRoutes(contextDir: string): Hono {
     if (!validation.ok) {
       return c.json({ error: 'Invalid brief', details: validation.errors }, 400);
     }
-    body.created_at = body.created_at || new Date().toISOString();
-    const productDir = path.join(contextDir, 'products', body.product_name);
+    const brief = ContextBriefSchema.parse(body);
+    brief.created_at = brief.created_at || new Date().toISOString();
+    const productDir = path.join(contextDir, 'products', brief.product_name);
     fs.mkdirSync(productDir, { recursive: true });
-    fs.writeFileSync(path.join(productDir, 'context-brief.yaml'), stringify(body), 'utf-8');
-    return c.json({ ok: true, path: `products/${body.product_name}/context-brief.yaml` });
+    fs.writeFileSync(path.join(productDir, 'context-brief.yaml'), stringify(brief), 'utf-8');
+    return c.json({ ok: true, path: `products/${brief.product_name}/context-brief.yaml` });
   });
 
   app.get('/api/brief/:name', async (c) => {

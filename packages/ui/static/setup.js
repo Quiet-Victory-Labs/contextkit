@@ -369,7 +369,8 @@
     try {
       await api('POST', '/api/brief', state.brief);
       var result = await api('POST', '/api/pipeline/start', {
-        product_name: state.brief.product_name,
+        productName: state.brief.product_name,
+        targetTier: 'gold',
       });
       state.pipelineId = result.id || result.pipelineId;
       pollPipeline();
