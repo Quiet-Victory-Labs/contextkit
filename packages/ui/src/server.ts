@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
+import { briefRoutes } from './routes/api/brief.js';
 
 export interface UIServerOptions {
   rootDir: string;
@@ -13,6 +14,8 @@ export function createApp(opts: UIServerOptions): Hono {
   const app = new Hono();
 
   app.use('*', cors());
+
+  app.route('', briefRoutes(opts.contextDir));
 
   app.get('/api/health', (c) => c.json({ ok: true }));
 

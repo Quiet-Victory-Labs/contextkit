@@ -183,6 +183,9 @@ importers:
       preact-render-to-string:
         specifier: ^6.5.0
         version: 6.6.6(preact@10.28.4)
+      yaml:
+        specifier: ^2.7.0
+        version: 2.8.2
     devDependencies:
       '@types/node':
         specifier: ^25.3.3
