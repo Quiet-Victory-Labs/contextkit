@@ -39,9 +39,7 @@
     "@runcontext/core": "workspace:^",
     "hono": "^4.7.0",
     "@hono/node-server": "^1.13.0",
-    "yaml": "^2.7.0",
-    "preact": "^10.25.0",
-    "preact-render-to-string": "^6.5.0"
+    "yaml": "^2.7.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
