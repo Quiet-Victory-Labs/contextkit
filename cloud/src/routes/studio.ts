@@ -60,8 +60,13 @@ studio.get('/studio', (c) => {
 // GET /studio/:org — org dashboard
 // ---------------------------------------------------------------------------
 
+const ORG_SLUG_RE = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/;
+
 studio.get('/studio/:org', (c) => {
   const org = c.req.param('org');
+  if (!ORG_SLUG_RE.test(org)) {
+    return c.redirect('/studio');
+  }
   const html = pageShell(`${escapeHtml(org)} — ContextKit Studio`, `
   <div class="studio-container studio-dashboard">
     <header class="studio-header">
@@ -114,7 +119,7 @@ studio.get('/studio/:org', (c) => {
       <p>Powered by ContextKit &middot; Open Semantic Interchange</p>
     </footer>
   </div>`, {
-    scripts: `<script>var STUDIO_ORG=${JSON.stringify(org)};${dashboardJS()}</script>`,
+    scripts: `<script>var STUDIO_ORG=${safeJsonForScript(org)};${dashboardJS()}</script>`,
   });
   return c.html(html);
 });
@@ -421,7 +426,10 @@ function dashboardJS(): string {
       // Load products
       return fetch('/api/orgs/' + encodeURIComponent(org) + '/products');
     })
-    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (!r.ok) throw new Error('Failed to load products.');
+      return r.json();
+    })
     .then(function(data) {
       renderProducts(data.products || []);
       showDashboard();
@@ -438,7 +446,12 @@ function dashboardJS(): string {
 // ---------------------------------------------------------------------------
 
 function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+}
+
+/** Safely encode a value for embedding in an inline <script> block. */
+function safeJsonForScript(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 }
 
 export { studio };

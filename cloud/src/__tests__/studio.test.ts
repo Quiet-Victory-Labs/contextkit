@@ -56,13 +56,10 @@ describe('Studio routes', () => {
       expect(html).toContain('var STUDIO_ORG="test-org"');
     });
 
-    it('escapes HTML in org name', async () => {
+    it('rejects invalid org slugs with redirect', async () => {
       const res = await app.request('/studio/%3Cscript%3E');
-      const html = await res.text();
-      // The org name in the visible text (id="org-name") should be escaped
-      expect(html).toContain('&lt;script&gt;');
-      // The title should also be escaped
-      expect(html).toContain('<title>&lt;script&gt; ');
+      expect(res.status).toBe(302);
+      expect(res.headers.get('Location')).toBe('/studio');
     });
 
     it('includes back link to /studio', async () => {
