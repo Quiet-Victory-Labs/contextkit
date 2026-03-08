@@ -72,7 +72,7 @@ studio.get('/studio/:org', (c) => {
     <header class="studio-header">
       <a href="/studio" class="back-link">&larr; Back</a>
       <h1>ContextKit <span class="accent">Studio</span></h1>
-      <p class="tagline">Org: <strong id="org-name">${escapeHtml(org)}</strong></p>
+      <p class="tagline"><strong id="org-name">${escapeHtml(org)}</strong> Semantic Plane</p>
     </header>
 
     <div id="loading" class="card loading-card">

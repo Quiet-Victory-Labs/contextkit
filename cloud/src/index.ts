@@ -14,7 +14,7 @@ app.use('*', cors());
 // ---------------------------------------------------------------------------
 // Public routes (no auth required)
 // ---------------------------------------------------------------------------
-app.get('/api/health', (c) => c.json({ ok: true }));
+app.get('/api/health', (c) => c.json({ ok: true, service: 'ContextKit Cloud' }));
 
 // Studio is public
 app.route('', studio);
