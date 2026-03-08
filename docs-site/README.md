@@ -1,6 +1,6 @@
 # ContextKit Documentation Site
 
-The official documentation site for [ContextKit](https://github.com/erickittelson/ContextKit), built with [Astro Starlight](https://starlight.astro.build).
+The official documentation site for [ContextKit](https://github.com/Quiet-Victory-Labs/contextkit), built with [Astro Starlight](https://starlight.astro.build).
 
 ## Development
 

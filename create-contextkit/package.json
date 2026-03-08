@@ -4,13 +4,13 @@
   "description": "Scaffold a new semantic plane. AI-ready data starts here",
   "license": "MIT",
   "author": "Eric Kittelson",
-  "homepage": "https://github.com/erickittelson/ContextKit",
+  "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erickittelson/ContextKit.git",
+    "url": "https://github.com/Quiet-Victory-Labs/contextkit.git",
     "directory": "create-contextkit"
   },
-  "bugs": "https://github.com/erickittelson/ContextKit/issues",
+  "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
   "engines": { "node": ">=18.0.0" },
   "keywords": ["create", "scaffold", "semantic-plane"],
   "type": "module",

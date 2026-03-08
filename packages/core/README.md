@@ -6,4 +6,4 @@
 npm install @runcontext/cli
 ```
 
-See the [ContextKit repository](https://github.com/erickittelson/ContextKit) for full documentation.
+See the [ContextKit repository](https://github.com/Quiet-Victory-Labs/contextkit) for full documentation.

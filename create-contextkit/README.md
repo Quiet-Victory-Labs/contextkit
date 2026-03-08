@@ -1,6 +1,6 @@
 # create-contextkit
 
-Project scaffolder for [ContextKit](https://github.com/erickittelson/ContextKit) — AI-ready metadata governance over OSI.
+Project scaffolder for [ContextKit](https://github.com/Quiet-Victory-Labs/contextkit) — AI-ready metadata governance over OSI.
 
 ## Usage
 
@@ -34,7 +34,7 @@ Includes example files to get started. Run `context setup` after scaffolding to 
 
 ## Part of ContextKit
 
-See the [ContextKit repository](https://github.com/erickittelson/ContextKit) for full documentation.
+See the [ContextKit repository](https://github.com/Quiet-Victory-Labs/contextkit) for full documentation.
 
 ## License
 

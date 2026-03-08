@@ -6,7 +6,7 @@ Thanks for your interest in contributing to ContextKit! This guide will help you
 
 ```bash
 # Clone the repo
-git clone https://github.com/erickittelson/ContextKit.git
+git clone https://github.com/Quiet-Victory-Labs/contextkit.git
 cd ContextKit
 
 # Install dependencies (requires pnpm)

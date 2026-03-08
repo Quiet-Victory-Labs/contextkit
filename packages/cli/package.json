@@ -4,13 +4,13 @@
   "description": "Build semantic planes from your data. AI-ready metadata in minutes",
   "license": "MIT",
   "author": "Eric Kittelson",
-  "homepage": "https://github.com/erickittelson/ContextKit",
+  "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erickittelson/ContextKit.git",
+    "url": "https://github.com/Quiet-Victory-Labs/contextkit.git",
     "directory": "packages/cli"
   },
-  "bugs": "https://github.com/erickittelson/ContextKit/issues",
+  "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
   "engines": { "node": ">=18.0.0" },
   "keywords": ["contextkit", "semantic-plane", "data-product", "ai-ready-data", "cli"],
   "type": "module",

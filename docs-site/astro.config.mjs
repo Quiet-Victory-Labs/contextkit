@@ -14,7 +14,7 @@ export default defineConfig({
       favicon: '/favicon.svg',
       description: 'ContextKit — tell your AI agent to build your semantic layer. Open-source CLI for introspecting databases, curating metadata to Gold tier, and serving AI-ready context via MCP. Built on the Open Semantic Interchange (OSI) specification.',
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/erickittelson/ContextKit' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/Quiet-Victory-Labs/contextkit' },
       ],
       // editLink removed — not needed for public docs
       customCss: ['./src/styles/custom.css'],

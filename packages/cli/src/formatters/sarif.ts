@@ -89,7 +89,7 @@ export function formatSarif(diagnostics: Diagnostic[]): string {
           driver: {
             name: 'ContextKit',
             version: '0.5.0',
-            informationUri: 'https://github.com/erickittelson/ContextKit',
+            informationUri: 'https://github.com/Quiet-Victory-Labs/contextkit',
             rules: Array.from(ruleMap.values()),
           },
         },

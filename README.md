@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/erickittelson/ContextKit/actions/workflows/ci.yml"><img src="https://github.com/erickittelson/ContextKit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/Quiet-Victory-Labs/contextkit/actions/workflows/ci.yml"><img src="https://github.com/Quiet-Victory-Labs/contextkit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://www.npmjs.com/package/@runcontext/cli"><img src="https://img.shields.io/npm/v/@runcontext/cli" alt="npm" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
   <a href="https://github.com/open-semantic-interchange/OSI"><img src="https://img.shields.io/badge/OSI-Open_Semantic_Interchange-c9a55a" alt="OSI" /></a>

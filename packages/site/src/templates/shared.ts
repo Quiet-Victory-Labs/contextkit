@@ -742,7 +742,7 @@ export const TOPBAR = `<div class="topbar">
   </div>
   <div class="topbar-right">
     <a href="<%= basePath %>/search.html" class="topbar-link">Search</a>
-    <a href="https://github.com/erickittelson/ContextKit#readme" class="topbar-docs" target="_blank" rel="noopener">Docs &nearr;</a>
+    <a href="https://github.com/Quiet-Victory-Labs/contextkit#readme" class="topbar-docs" target="_blank" rel="noopener">Docs &nearr;</a>
   </div>
 </div>`;
 
@@ -784,7 +784,7 @@ export const SIDEBAR = `<div class="overlay" id="sidebar-overlay" onclick="toggl
 // ---------------------------------------------------------------------------
 
 export const FOOTER = `<footer class="site-footer">
-  Powered by <a href="https://github.com/erickittelson/ContextKit">ContextKit</a>
+  Powered by <a href="https://github.com/Quiet-Victory-Labs/contextkit">ContextKit</a>
   &nbsp;&middot;&nbsp;
   Open Semantic Interchange
 </footer>`;

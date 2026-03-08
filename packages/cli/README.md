@@ -74,7 +74,7 @@ DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, 
 
 ## Documentation
 
-[contextkit.dev](https://contextkit.dev) | [GitHub](https://github.com/erickittelson/ContextKit)
+[contextkit.dev](https://contextkit.dev) | [GitHub](https://github.com/Quiet-Victory-Labs/contextkit)
 
 ## License
 

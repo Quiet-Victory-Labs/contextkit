@@ -4,15 +4,21 @@
   "description": "Onboarding and studio UI for ContextKit",
   "license": "MIT",
   "author": "Eric Kittelson",
-  "homepage": "https://github.com/erickittelson/ContextKit",
+  "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erickittelson/ContextKit.git",
+    "url": "https://github.com/Quiet-Victory-Labs/contextkit.git",
     "directory": "packages/ui"
   },
-  "bugs": "https://github.com/erickittelson/ContextKit/issues",
-  "engines": { "node": ">=18.0.0" },
-  "keywords": ["onboarding", "data-product-builder", "wizard"],
+  "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "onboarding",
+    "data-product-builder",
+    "wizard"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -29,16 +35,19 @@
       }
     }
   },
-  "files": ["dist", "static"],
+  "files": [
+    "dist",
+    "static"
+  ],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist",
     "dev": "tsup --watch"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.11",
     "@runcontext/core": "workspace:^",
-    "hono": "^4.7.0",
-    "@hono/node-server": "^1.13.0",
+    "hono": "^4.12.5",
     "yaml": "^2.7.0"
   },
   "devDependencies": {
