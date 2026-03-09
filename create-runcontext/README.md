@@ -1,11 +1,11 @@
-# create-contextkit
+# create-runcontext
 
 Scaffold a new [RunContext](https://github.com/RunContext/runcontext) project — one command to start building an AI-ready data product from your database.
 
 ## Usage
 
 ```bash
-npx create-contextkit my-project
+npx create-runcontext my-project
 cd my-project
 context setup
 ```
@@ -23,7 +23,7 @@ my-project/
 │   ├── lineage/         # Upstream/downstream lineage
 │   ├── glossary/        # Business term definitions
 │   └── owners/          # Team ownership records
-├── contextkit.config.yaml
+├── runcontext.config.yaml
 └── package.json
 ```
 

@@ -45,7 +45,7 @@
 ## Quickstart
 
 ```bash
-npx create-contextkit my-data
+npx create-runcontext my-data
 cd my-data
 context setup
 ```
@@ -144,7 +144,7 @@ RunContext metadata follows the [Open Semantic Interchange (OSI)](https://github
 | [`@runcontext/mcp`](https://www.npmjs.com/package/@runcontext/mcp) | MCP server — 8 tools for AI agents |
 | [`@runcontext/ui`](https://www.npmjs.com/package/@runcontext/ui) | Browser-based Context Brief wizard and visual studio |
 | [`@runcontext/site`](https://www.npmjs.com/package/@runcontext/site) | Documentation site generator with search and tier badges |
-| [`create-contextkit`](https://www.npmjs.com/package/create-contextkit) | Project scaffolder — `npx create-contextkit` |
+| [`create-runcontext`](https://www.npmjs.com/package/create-runcontext) | Project scaffolder — `npx create-runcontext` |
 
 ---
 

@@ -47,11 +47,11 @@ function main(): void {
   const projectNameArg = process.argv[2];
 
   if (!projectNameArg) {
-    console.log('Usage: create-contextkit <project-name>');
+    console.log('Usage: create-runcontext <project-name>');
     console.log('');
     console.log('Example:');
-    console.log('  npm create contextkit my-project');
-    console.log('  pnpm create contextkit my-project');
+    console.log('  npm create runcontext my-project');
+    console.log('  pnpm create runcontext my-project');
     process.exit(1);
   }
 

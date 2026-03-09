@@ -1,6 +1,6 @@
 packages:
   - packages/*
-  - create-contextkit
+  - create-runcontext
 
 onlyBuiltDependencies:
   - esbuild

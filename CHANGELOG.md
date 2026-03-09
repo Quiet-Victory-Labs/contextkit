@@ -36,7 +36,7 @@ All notable changes to this project will be documented in this file.
 - **Bronze / Silver / Gold tier engine** — 25 lint rules compute metadata maturity automatically
 - **MCP server** — 4 resources and 6 tools for exposing context to AI agents via the Model Context Protocol
 - **Static site generator** — browsable documentation with tier badges, schema browser, and full-text search
-- **Project scaffolder** — `pnpm create contextkit my-project` for instant project setup
+- **Project scaffolder** — `pnpm create runcontext my-project` for instant project setup
 - **10 CLI commands** — `lint`, `build`, `tier`, `explain`, `fix`, `dev`, `init`, `site`, `serve`, `validate-osi`
 - **Auto-fixer** — `context fix --write` applies safe fixes for common lint issues
 

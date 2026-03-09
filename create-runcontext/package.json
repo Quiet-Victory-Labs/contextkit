@@ -1,20 +1,20 @@
 {
-  "name": "create-contextkit",
+  "name": "create-runcontext",
   "version": "0.5.2",
-  "description": "Scaffold a new RunContext data product. Run npx create-contextkit, fill out a Context Brief in your browser, and the pipeline builds your semantic plane automatically.",
+  "description": "Scaffold a new RunContext data product. Run npx create-runcontext, fill out a Context Brief in your browser, and the pipeline builds your semantic plane automatically.",
   "license": "MIT",
   "author": "Eric Kittelson",
   "homepage": "https://github.com/RunContext/runcontext",
   "repository": {
     "type": "git",
     "url": "https://github.com/RunContext/runcontext.git",
-    "directory": "create-contextkit"
+    "directory": "create-runcontext"
   },
   "bugs": "https://github.com/RunContext/runcontext/issues",
   "engines": { "node": ">=18.0.0" },
-  "keywords": ["create", "scaffold", "semantic-plane", "semantic-layer", "contextkit", "data-product", "ai-ready-data", "npx", "project-generator", "mcp", "data-catalog"],
+  "keywords": ["create", "scaffold", "semantic-plane", "semantic-layer", "runcontext", "data-product", "ai-ready-data", "npx", "project-generator", "mcp", "data-catalog"],
   "type": "module",
-  "bin": { "create-contextkit": "./dist/index.js" },
+  "bin": { "create-runcontext": "./dist/index.js" },
   "files": ["dist", "templates"],
   "scripts": {
     "build": "tsup",

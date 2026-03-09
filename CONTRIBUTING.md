@@ -30,10 +30,10 @@ packages/
   cli/      — CLI with 15 commands (lint, build, tier, explain, fix, dev, init, site, serve, validate-osi, etc.)
   mcp/      — MCP server for AI agent integration
   site/     — Static documentation site generator
-create-contextkit/  — Project scaffolder (pnpm create contextkit)
+create-runcontext/  — Project scaffolder (pnpm create runcontext)
 ```
 
-All packages are published under `@runcontext/*` except the scaffolder (`create-contextkit`).
+All packages are published under `@runcontext/*` except the scaffolder (`create-runcontext`).
 
 ## Running Tests
 
