@@ -1,0 +1,131 @@
+---
+title: RunContext Cloud
+description: "Hosted semantic planes for teams. Publish your data products, share an MCP endpoint, and manage metadata together — without running any infrastructure."
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+## Why Cloud?
+
+The ContextKit CLI is powerful for solo work — you build a semantic plane on your machine and serve it locally. But when your team needs to share that context, things get complicated:
+
+- **Who runs the MCP server?** Someone has to keep it up 24/7
+- **How do you share updates?** Git works, but agents need a live endpoint
+- **Who can edit what?** No access controls on local YAML files
+- **Which version is live?** Multiple people editing the same metadata
+
+RunContext Cloud solves all of this. Publish your semantic plane to a hosted endpoint, and every team member's AI tools connect to the same source of truth.
+
+---
+
+## What You Get
+
+<CardGrid>
+  <Card title="Hosted MCP Endpoint" icon="rocket">
+    A managed MCP server at `api.runcontext.dev` that your AI tools connect to. No local server to run, no ports to open, no uptime to manage. Just add the endpoint to your MCP config and every query has context.
+  </Card>
+  <Card title="Web Dashboard" icon="setting">
+    A browser-based dashboard at `app.runcontext.dev` where you can view your published semantic planes, browse data products, check tier scores, and manage your team. See everything at a glance without touching the CLI.
+  </Card>
+  <Card title="Team Collaboration" icon="pen">
+    Invite teammates by email. Everyone connects their AI tools to the same hosted endpoint. When someone publishes an updated semantic plane, every agent on the team gets the latest context immediately.
+  </Card>
+  <Card title="Managed Connectors" icon="laptop">
+    Connect databases directly to the cloud — PostgreSQL, Snowflake, BigQuery, and more. RunContext Cloud introspects your schema on a schedule, so your semantic plane stays fresh as your database evolves.
+  </Card>
+</CardGrid>
+
+---
+
+## How It Works
+
+### 1. Build locally, publish to cloud
+
+You still use the ContextKit CLI to build your semantic plane. Nothing changes about your local workflow. When you're ready to share, publish:
+
+```bash
+context publish --org my-team
+```
+
+This uploads your compiled semantic plane to RunContext Cloud. Your metadata is now hosted and available to your whole team.
+
+### 2. Connect your AI tools
+
+Every team member adds the cloud MCP endpoint to their tool config:
+
+```json
+{
+  "mcpServers": {
+    "contextkit-cloud": {
+      "url": "https://api.runcontext.dev/mcp/my-team",
+      "headers": {
+        "Authorization": "Bearer <your-api-key>"
+      }
+    }
+  }
+}
+```
+
+That's it. Their agents now have full access to your team's semantic planes — search, explain, guardrails, golden queries, everything.
+
+### 3. Manage in the dashboard
+
+Log in at `app.runcontext.dev` to:
+
+- **Browse** your published data products and their tier scores
+- **Invite** team members and manage access
+- **Monitor** usage — which tools are querying, which data products are most used
+- **Configure** managed database connectors for automatic introspection
+- **View** billing and manage your subscription
+
+---
+
+## The Dashboard
+
+When you sign in, you'll see:
+
+**Home** — Overview of all your published semantic planes, their tier scores (Bronze/Silver/Gold), and recent activity.
+
+**Data Products** — Browse each data product in detail. View models, fields, descriptions, semantic roles, guardrails, and golden queries. See what Silver and Gold checks are still missing.
+
+**Team** — Invite members, set roles (Admin, Editor, Viewer), and manage API keys for each team member's tools.
+
+**Connectors** — Set up managed database connections. Choose which tables to introspect and how often to refresh. The cloud runs the introspection pipeline for you.
+
+**Usage** — See how many MCP queries your team is making, which tools are connected, and which data products are most accessed.
+
+**Billing** — View your current plan, manage payment methods, and upgrade or downgrade.
+
+---
+
+## Getting Started with Cloud
+
+<Aside type="tip">
+You don't need a cloud account to use ContextKit. The CLI is free and runs entirely on your machine. Cloud is for teams that want shared access and managed infrastructure.
+</Aside>
+
+1. **Sign up** at [app.runcontext.dev](https://app.runcontext.dev) — create an account with your email or GitHub
+2. **Create an organization** — this is your team's namespace (e.g. `my-company`)
+3. **Get an API key** — generated in the dashboard under Settings
+4. **Publish** your semantic plane: `context publish --org my-company --token <key>`
+5. **Share** the MCP endpoint URL with your team
+
+See [Sign Up & Onboarding](/cloud/signup/) for the full walkthrough.
+
+---
+
+## Plans
+
+| | Free | Team ($49/mo) | Enterprise ($299/mo) |
+|---|---|---|---|
+| **Local CLI** | All features | All features | All features |
+| **Hosted MCP endpoint** | — | Yes | Yes |
+| **Web dashboard** | — | Yes | Yes |
+| **Published data products** | — | 10 | Unlimited |
+| **Database connectors** | — | 3 | Unlimited |
+| **Team seats** | 1 (local) | 5 (+$10/seat) | Unlimited |
+| **RBAC** | — | — | Yes |
+| **SSO** | — | — | Yes |
+| **Support** | GitHub Issues | Email | Priority Slack |
+
+See [Pricing](/pricing/) for full details and FAQ.

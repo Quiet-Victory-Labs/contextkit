@@ -1,0 +1,80 @@
+---
+title: context setup
+description: "Browser-based wizard that guides you through creating a data product — fill out a Context Brief, connect your database, and the pipeline builds your semantic plane."
+---
+
+The `setup` command is the fastest way to get started with ContextKit. It opens a 5-step wizard in your browser that creates a data product from scratch.
+
+## Usage
+
+```bash
+context setup
+context setup --port 4040      # custom port (default: 4040)
+context setup --no-browser     # don't auto-open the browser
+```
+
+## What it does
+
+The setup wizard opens at `http://localhost:4040/setup` and walks through five steps:
+
+### Step 1: Product Definition
+
+Name your data product and provide a description. The name becomes the directory under `context/products/`.
+
+### Step 2: Owner Information
+
+Set the owner name, team, and email. This metadata is used for governance tracking and shows up in the tier scorecard.
+
+### Step 3: Context & Sensitivity
+
+- **Sensitivity level**: Choose from public, internal (default), confidential, or restricted
+- **Data sources**: Auto-detected from environment variables (`DATABASE_URL`, `POSTGRES_URL`, etc.) and local database files (`.duckdb`, `.sqlite`)
+- **Documentation upload**: Drag-and-drop SQL files, data dictionaries, markdown, CSV, or YAML to give the enrichment engine more context
+
+### Step 4: Review
+
+Review all your inputs before submitting. Edit any field before proceeding.
+
+### Step 5: Build Pipeline
+
+The pipeline runs automatically in the browser with real-time progress:
+
+1. **Introspect** — connect to database, read schema
+2. **Scaffold** — generate Bronze-tier OSI YAML files
+3. **Enrich to Silver** — add glossary, lineage, sample values, trust status
+4. **Enrich to Gold** — suggest semantic roles, aggregation rules, guardrails
+5. **Verify** — lint and validate the result
+6. **Auto-fix** — apply automatic fixes for common issues
+7. **Agent Instructions** — generate `AGENT_INSTRUCTIONS.md` for AI curation
+
+## Output
+
+The wizard saves a **Context Brief** at `context/products/{name}/context-brief.yaml` and scaffolds all associated metadata files.
+
+```yaml
+# context-brief.yaml
+product_name: sales-analytics
+description: "Revenue and order metrics for the analytics team"
+owner:
+  name: Alice Chen
+  team: Analytics
+  email: alice@company.com
+sensitivity: internal
+created_at: "2026-03-08T..."
+```
+
+## When to use setup vs. individual commands
+
+| Scenario | Recommendation |
+|---|---|
+| First time with ContextKit | `context setup` (browser wizard) |
+| Adding a new database source | `context introspect --db <url>` |
+| Upgrading existing context to Gold | `context dev --studio` (visual editor) |
+| CI/CD pipeline | `context lint && context build` |
+| Let an AI agent build it | Tell the agent: *"Install @runcontext/cli and build a semantic layer"* |
+
+## Next steps
+
+- Open the visual studio: [`context dev --studio`](/cli/dev/)
+- Check your tier: [`context tier`](/cli/build/)
+- Start serving: [`context serve`](/cli/serve/)

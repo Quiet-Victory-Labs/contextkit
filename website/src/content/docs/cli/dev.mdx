@@ -1,0 +1,80 @@
+---
+title: context dev
+description: Watch mode that re-runs lint on file changes for live feedback during metadata authoring.
+---
+
+The `dev` command starts a file watcher that re-runs the linter every time you save a context file. This gives you instant feedback while editing metadata YAML.
+
+## Usage
+
+```bash
+context dev
+```
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--context-dir <path>` | Path to context directory | `./context` |
+| `--fix` | Auto-fix problems on each re-lint | Off |
+| `--studio` | Launch the visual metadata editor in your browser | Off |
+| `--port <number>` | Port for the Studio dev server | `4400` |
+| `--host <address>` | Host address for the Studio dev server | `localhost` |
+
+## Examples
+
+### Watch with live linting
+
+```bash
+context dev
+```
+
+Edit any `.yaml` file in `context/` and the linter runs automatically on save.
+
+### Watch with auto-fix
+
+```bash
+context dev --fix
+```
+
+Fixable lint violations are corrected automatically each time a file changes.
+
+## Studio Mode
+
+Pass `--studio` to open an interactive metadata editor in your browser:
+
+```bash
+context dev --studio
+```
+
+Studio gives you a visual interface for curating metadata without hand-editing YAML. The editing workflow:
+
+1. **Browse** — navigate your models, columns, and governance files in a tree view.
+2. **Click to edit** — select any field to modify it inline. Editable fields include descriptions, semantic roles, aggregation rules, trust status, golden queries, guardrails, lineage, and glossary terms.
+3. **Stage changes** — edits are staged automatically as you work.
+4. **Preview diff** — review a unified diff of every pending change before saving.
+5. **Save** — writes changes back to the underlying YAML files, triggers a recompile, and the tier scorecard updates live.
+
+### Custom port or host
+
+```bash
+context dev --studio --port 5000
+context dev --studio --host 0.0.0.0
+```
+
+## Typical workflow
+
+```bash
+# Terminal 1: Start dev mode
+context dev
+
+# Terminal 2: Edit metadata files
+# (lint results appear in Terminal 1 on every save)
+```
+
+This is especially useful when curating metadata toward Gold tier — edit a governance file, see the lint results instantly, fix issues, repeat.
+
+## Next steps
+
+- Run a one-time lint check with [`context lint`](/cli/lint/)
+- Check your tier score with [`context tier`](/cli/build/)

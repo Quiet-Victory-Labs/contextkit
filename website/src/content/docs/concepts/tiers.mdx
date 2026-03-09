@@ -1,0 +1,96 @@
+---
+title: Tier System
+description: Bronze, Silver, and Gold metadata maturity tiers
+---
+
+ContextKit uses a three-tier maturity model to measure how complete and AI-ready your metadata is. Each tier builds on the previous one, adding more context and governance until your semantic layer is fully prepared for autonomous AI consumption.
+
+You can check your current score at any time with:
+
+```bash
+context tier
+```
+
+This command evaluates every dataset and field against the tier requirements below, producing a per-model and aggregate score.
+
+## Bronze -- Discoverable
+
+Bronze is the baseline. It means the data exists in your semantic layer and has enough metadata for a human or AI to find it and understand what it is at a surface level.
+
+**How to achieve it:** Run `context introspect` against your data source. ContextKit will connect to your warehouse, read table and column metadata, and generate OSI and governance files automatically.
+
+```bash
+context introspect --source my_warehouse
+```
+
+### Bronze requirements
+
+| Requirement | Description |
+|---|---|
+| **Description** | Every dataset and field must have a human-readable description. |
+| **Ownership** | At least one owner (team or individual) is assigned to the dataset. |
+| **Security classification** | Each field has a sensitivity level (e.g., `public`, `internal`, `confidential`, `restricted`). |
+| **Grain** | The dataset declares its grain -- the set of columns that uniquely identify a row. |
+| **Table type** | The dataset is classified as `fact`, `dimension`, `staging`, `snapshot`, or another recognized type. |
+
+At Bronze, you know *what* exists and *who* owns it. You do not yet know whether to trust it or how an AI should use it.
+
+## Silver -- Trusted
+
+Silver adds the context needed to trust and correctly interpret the data. Fields are linked to business definitions, lineage is documented, and enough metadata exists for an AI to use the data without hallucinating relationships.
+
+**How to achieve it:** After introspection, run the enrich command targeting Silver. ContextKit uses LLM-assisted enrichment to fill in gaps automatically.
+
+```bash
+context enrich --target silver
+```
+
+### Silver requirements
+
+All Bronze requirements, plus:
+
+| Requirement | Description |
+|---|---|
+| **Trust status** | Each dataset has an explicit trust status (`trusted`, `verified`, `unverified`, `deprecated`). |
+| **Glossary links** | Fields are linked to terms in the business glossary, connecting technical column names to business language. |
+| **Lineage** | Upstream sources are documented -- where the data comes from and what transformations produced it. |
+| **Sample values** | Representative sample values are recorded for each field, so consumers can understand format and range without querying the warehouse. |
+| **Refresh cadence** | The dataset declares how often it is updated (`hourly`, `daily`, `weekly`, `manual`, etc.). |
+| **Tags** | Datasets and fields carry categorical tags for discovery and filtering. |
+
+At Silver, you have a semantic layer that a careful analyst could work with confidently. Automated tools can query it without needing to guess at meaning.
+
+## Gold -- AI-Ready
+
+Gold is the highest tier. Every field carries explicit instructions for how AI agents should interpret and use it. Ambiguities are resolved, guardrails are in place, and golden queries provide tested examples of correct usage.
+
+**How to achieve it:** Gold requires human curation. While `context enrich` can suggest semantic roles and draft guardrails, a data team must review, adjust, and approve them. There is no single command that produces Gold automatically -- this is by design.
+
+### Gold requirements
+
+All Silver requirements, plus:
+
+| Requirement | Description |
+|---|---|
+| **Semantic roles** | Every field has an explicit role: `identifier`, `measure`, `attribute`, `date`, `currency`, `status`, `flag`, `category`, `foreign_key`, etc. |
+| **Aggregation rules** | Measures declare their default aggregation (`sum`, `avg`, `count`, `min`, `max`, `count_distinct`) so AI agents never sum an average or average a count. |
+| **Guardrail filters** | Required filters are declared on datasets (e.g., "always filter on `is_deleted = false`") to prevent AI from returning misleading results. |
+| **Golden queries** | Tested, approved SQL or semantic-layer queries that demonstrate correct usage of the dataset. AI agents can reference these as examples. |
+| **Business rules** | Prose or structured rules explaining business logic (e.g., "revenue is recognized at shipment, not at order"). |
+| **Hierarchies** | Dimensional hierarchies are defined (e.g., `country > region > city`) so AI agents can drill up and down correctly. |
+| **Relationships** | All foreign-key and logical relationships between datasets are explicitly declared with cardinality. |
+| **AI context** | Fields and datasets carry `ai_context` blocks with instructions, synonyms, and usage examples specifically written for LLM consumption. |
+
+## The path from Bronze to Gold
+
+The key insight is that **introspect + enrich gets you to Silver automatically**. The jump from Silver to Gold is intentionally manual -- it requires domain expertise that only your data team has.
+
+```
+context introspect     -->  Bronze (automated)
+context enrich         -->  Silver (automated)
+Human curation         -->  Gold   (manual)
+```
+
+Most teams reach Silver within minutes of setting up ContextKit. Gold is an ongoing process of refinement, typically prioritized for the most business-critical datasets first.
+
+Use `context tier` regularly to track progress and identify which datasets need attention to reach the next level.

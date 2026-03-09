@@ -1,0 +1,53 @@
+---
+title: context init
+description: Scaffold a new ContextKit project structure with default configuration.
+---
+
+The `init` command creates the directory structure and configuration files for a new ContextKit project.
+
+## Usage
+
+```bash
+context init
+```
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--dir <path>` | Root directory for the project | `.` (current directory) |
+
+## Examples
+
+### Initialize in current directory
+
+```bash
+context init
+```
+
+### Initialize in a new directory
+
+```bash
+context init --dir my-project
+```
+
+## What it creates
+
+```
+context/
+├── models/          # OSI semantic model files
+├── governance/      # Ownership, trust, security, semantic roles
+├── glossary/        # Business term definitions
+└── owners/          # Team ownership records
+
+contextkit.config.yaml   # Project configuration
+```
+
+## When to use
+
+Use `init` when you want to create the project structure manually before connecting to a database. For a fully guided experience that also introspects your database and scaffolds metadata, use [`context setup`](/cli/setup/) instead.
+
+## Next steps
+
+- Connect to a database with [`context introspect`](/cli/introspect/)
+- Or run the full wizard with [`context setup`](/cli/setup/)

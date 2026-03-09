@@ -1,0 +1,99 @@
+---
+title: Introduction
+description: "ContextKit turns your database into an AI-ready data product. Fill out a Context Brief, connect your database, and the pipeline builds your semantic plane automatically."
+---
+
+## Turn Your Database Into an AI-Ready Data Product
+
+ContextKit builds a **semantic plane** between your database and your AI tools — a structured metadata layer that captures what your data means, not just what it's named. AI agents use it to generate correct SQL on the first try.
+
+### The Problem
+
+AI agents see table and column names, but they don't understand what the data *means*. They don't know:
+- That `revenue` should be `SUM`'d, never `AVG`'d
+- That queries on `transactions` must filter `WHERE status = 'completed'`
+- That `customer_id` joins `orders` to `customers` as many-to-one
+- Exactly which SQL to use for "show me top customers by revenue last quarter"
+
+Every query is a guess. And guesses are wrong often enough to be dangerous.
+
+### The Solution
+
+```
+1. context setup          → Browser wizard opens
+2. Fill out Context Brief → Name, owner, sensitivity, database
+3. Pipeline auto-runs     → Introspect → Scaffold → Enrich → Verify
+4. context serve          → MCP server live — agents have full context
+```
+
+**Step 1 — Context Brief.** Run `context setup` and a 5-step wizard opens in your browser. Name your data product, set an owner, choose a sensitivity level, and connect your database. Upload any existing documentation (SQL files, data dictionaries, markdown).
+
+**Step 2 — Automatic Pipeline.** ContextKit introspects your schema, scaffolds Bronze-tier metadata, then auto-enriches toward Silver (trust status, glossary, lineage, sample values). You watch each stage complete in the browser.
+
+**Step 3 — Curate to Gold.** Open the visual studio (`context dev --studio`) to add semantic roles, aggregation rules, guardrails, golden queries, and business rules. Or tell your AI agent to curate for you — the generated `AGENT_INSTRUCTIONS.md` tells it exactly what to do.
+
+**Step 4 — Serve via MCP.** Run `context serve` and every AI tool in your stack gets full context. Agents can search metadata, look up business terms, retrieve guardrails, and find golden queries.
+
+## Three Ways to Use It
+
+### 1. Browser wizard (recommended for getting started)
+
+```bash
+context setup
+```
+
+Opens a 5-step form in your browser. Fill out the Context Brief, connect your database, and the pipeline handles the rest.
+
+### 2. AI agent runs CLI commands
+
+In Claude Code, Cursor, Windsurf, or any agentic coding platform:
+
+> *"Install @runcontext/cli and build a semantic layer for my database."*
+
+The agent uses CLI commands and reads `AGENT_INSTRUCTIONS.md` to build your semantic plane. It goes back and forth with you — asking about metrics, ownership, and business rules.
+
+### 3. Visual studio for humans
+
+```bash
+context dev --studio
+```
+
+Browser-based editor for descriptions, semantic roles, golden queries, and business rules. Changes save to disk and the tier scorecard updates live.
+
+## As an MCP Server
+
+For agents that need to *query* an existing semantic plane:
+
+```json
+{
+  "mcpServers": {
+    "contextkit": {
+      "command": "npx",
+      "args": ["@runcontext/cli", "serve", "--stdio"]
+    }
+  }
+}
+```
+
+Exposes 8 MCP tools: search, explain, validate, tier, golden-queries, guardrails, list-products, get-product.
+
+## What's Included
+
+One install, everything you need:
+
+```bash
+npm install @runcontext/cli
+```
+
+- **Browser setup wizard** — 5-step Context Brief form with automatic pipeline
+- **Visual studio editor** — curate metadata in the browser with live tier updates
+- **16 CLI commands** — introspect, enrich, lint, fix, build, tier, blueprint, serve, and more
+- **MCP server with 8 tools** — serve your semantic plane to AI agents via stdio or HTTP
+- **40 lint rules** — schema validation, governance, security, data accuracy
+- **Bronze/Silver/Gold tier system** — automated metadata maturity scoring
+- **AI Blueprints** — export Gold-tier metadata as portable OSI YAML
+- **Static site generator** — browsable documentation from your metadata
+- **9 database adapters** — DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks
+- **Agent instruction generation** — setup creates `AGENT_INSTRUCTIONS.md` so any AI agent knows how to curate
+
+Built on the **[Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI)** specification — your metadata is portable, not locked in.

@@ -1,0 +1,92 @@
+---
+title: context enrich
+description: Suggest or apply Silver and Gold tier enrichments to your context files using AI-generated descriptions and metadata.
+---
+
+The `enrich` command upgrades your context files from Bronze (schema-only) to Silver or Gold by adding descriptions, semantic tags, business logic, and usage guidance.
+
+## Usage
+
+```bash
+context enrich --target <tier>
+```
+
+## Options
+
+| Option | Description | Default |
+|---|---|---|
+| `--target <tier>` | Target tier: `silver` or `gold` | `silver` |
+| `--apply` | Write changes directly to files | Off (preview mode) |
+| `--source <name>` | Data source name from config for sample values | First configured source |
+| `--db <url>` | Database URL for context-aware enrichment | `$DATABASE_URL` |
+| `--context-dir <path>` | Path to context files | `./context` |
+
+## Examples
+
+### Preview Silver enrichments
+
+```bash
+context enrich --target silver
+```
+
+This prints suggested changes without modifying any files.
+
+### Apply Silver enrichments
+
+```bash
+context enrich --target silver --apply
+```
+
+### Enrich to Gold tier
+
+```bash
+context enrich --target gold --apply --db postgres://localhost/myapp
+```
+
+Gold-tier enrichment connects to the database to sample data and generate richer metadata.
+
+### Enrich a specific source
+
+```bash
+context enrich --target silver --apply --source analytics
+```
+
+## What each tier adds
+
+### Silver
+
+- Human-readable descriptions for tables and columns
+- Semantic type annotations (e.g., `email`, `currency`, `timestamp`)
+- Common query patterns
+- Column-level tags
+
+### Gold
+
+- Business logic documentation
+- Data quality expectations
+- Sensitive data classification (PII, PHI, financial)
+- Suggested access policies
+- Usage examples and caveats
+- Relationship descriptions with cardinality notes
+
+## Example diff
+
+```diff
+ model:
+   name: users
++  description: "Registered user accounts. One row per unique user."
+   columns:
+     - name: email
+       type: varchar(255)
++      description: "Primary email address, used for login and notifications."
++      semantic_type: email
++      pii: true
+     - name: created_at
+       type: timestamp
++      description: "Timestamp when the account was created (UTC)."
+```
+
+## Next steps
+
+- Check your enrichments with [`context lint`](/cli/lint/)
+- Build the final manifest with [`context build`](/cli/build/)

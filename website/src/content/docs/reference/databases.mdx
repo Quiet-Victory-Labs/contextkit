@@ -1,0 +1,254 @@
+---
+title: Database Support
+description: Connect ContextKit to any data warehouse — PostgreSQL, DuckDB, Snowflake, BigQuery, MySQL, and more.
+---
+
+import { Tabs, TabItem, Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+ContextKit connects to your database to introspect schemas, validate metadata against live data, and verify golden queries. It supports a wide range of databases through optional peer dependencies — install only the driver you need.
+
+## Supported databases
+
+<CardGrid>
+  <Card title="PostgreSQL" icon="laptop">
+    Also works with **Neon**, **Supabase**, **Redshift**, **CockroachDB**, **AlloyDB**, and any Postgres wire-compatible database.
+  </Card>
+  <Card title="DuckDB" icon="document">
+    Local `.duckdb` files, in-memory databases, Parquet/CSV/JSON via DuckDB views. Also works with **MotherDuck**.
+  </Card>
+  <Card title="MySQL / MariaDB" icon="setting">
+    MySQL 5.7+, 8.x, MariaDB 10.x+. Works with **PlanetScale**, **TiDB**, and other MySQL-compatible services.
+  </Card>
+  <Card title="SQL Server" icon="laptop">
+    Microsoft SQL Server 2016+. Also works with **Azure SQL Database**.
+  </Card>
+  <Card title="Snowflake" icon="star">
+    Full support for Snowflake accounts with warehouse/database/schema selection.
+  </Card>
+  <Card title="BigQuery" icon="rocket">
+    Google BigQuery with service account authentication and dataset selection.
+  </Card>
+  <Card title="ClickHouse" icon="list-format">
+    ClickHouse HTTP interface. Works with **ClickHouse Cloud**.
+  </Card>
+  <Card title="Databricks" icon="magnifier">
+    Databricks SQL warehouses via server hostname and HTTP path.
+  </Card>
+  <Card title="SQLite" icon="document">
+    Local `.sqlite` / `.db` files for lightweight or embedded databases.
+  </Card>
+</CardGrid>
+
+## Quick setup
+
+The fastest way to connect is the interactive wizard:
+
+```bash
+context setup
+```
+
+It will auto-detect databases from your environment, MCP configs (Claude Code, Cursor, VS Code, Windsurf), and `contextkit.config.yaml`.
+
+## Configuration
+
+### Connection string databases
+
+PostgreSQL, MySQL, and SQL Server use standard connection strings:
+
+<Tabs>
+  <TabItem label="PostgreSQL">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  warehouse:
+    adapter: postgres
+    connection: postgresql://user:pass@host:5432/dbname
+```
+
+Also works for **Neon**, **Supabase**, **Redshift**, **CockroachDB** — they all speak the PostgreSQL wire protocol.
+  </TabItem>
+  <TabItem label="MySQL">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  warehouse:
+    adapter: mysql
+    connection: mysql://user:pass@host:3306/dbname
+```
+
+Install the driver: `npm install mysql2`
+  </TabItem>
+  <TabItem label="SQL Server">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  warehouse:
+    adapter: mssql
+    connection: mssql://user:pass@host:1433/dbname
+```
+
+Install the driver: `npm install mssql`
+  </TabItem>
+</Tabs>
+
+### File-based databases
+
+<Tabs>
+  <TabItem label="DuckDB">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  analytics:
+    adapter: duckdb
+    path: ./data/warehouse.duckdb
+```
+
+DuckDB is included by default — no extra install needed.
+  </TabItem>
+  <TabItem label="SQLite">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  local:
+    adapter: sqlite
+    path: ./data/app.sqlite
+```
+
+Install the driver: `npm install better-sqlite3`
+  </TabItem>
+</Tabs>
+
+### Cloud warehouses
+
+<Tabs>
+  <TabItem label="Snowflake">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  snowflake:
+    adapter: snowflake
+    account: xy12345.us-east-1
+    username: analyst
+    password: ${SNOWFLAKE_PASSWORD}
+    warehouse: COMPUTE_WH
+    database: ANALYTICS
+    schema: PUBLIC
+```
+
+Install the driver: `npm install snowflake-sdk`
+  </TabItem>
+  <TabItem label="BigQuery">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  bigquery:
+    adapter: bigquery
+    project: my-gcp-project
+    dataset: analytics
+    keyFilename: ./service-account.json
+```
+
+Install the driver: `npm install @google-cloud/bigquery`
+  </TabItem>
+  <TabItem label="ClickHouse">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  clickhouse:
+    adapter: clickhouse
+    host: localhost
+    port: 8123
+    database: analytics
+    username: default
+    password: ${CLICKHOUSE_PASSWORD}
+```
+
+Install the driver: `npm install @clickhouse/client`
+  </TabItem>
+  <TabItem label="Databricks">
+```yaml title="contextkit.config.yaml"
+data_sources:
+  databricks:
+    adapter: databricks
+    serverHostname: dbc-abc123.cloud.databricks.com
+    httpPath: /sql/1.0/warehouses/abcdef
+    token: ${DATABRICKS_TOKEN}
+```
+
+Install the driver: `npm install @databricks/sql`
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+Never commit credentials to version control. Use `${ENV_VAR}` syntax in your config — ContextKit expands environment variables at runtime.
+</Aside>
+
+## Driver installation
+
+ContextKit uses optional peer dependencies — install only the driver for your database:
+
+| Database | Driver Package | Install Command |
+|---|---|---|
+| DuckDB | `duckdb` | Included by default |
+| PostgreSQL | `pg` | `npm install pg` |
+| MySQL / MariaDB | `mysql2` | `npm install mysql2` |
+| SQL Server | `mssql` | `npm install mssql` |
+| Snowflake | `snowflake-sdk` | `npm install snowflake-sdk` |
+| BigQuery | `@google-cloud/bigquery` | `npm install @google-cloud/bigquery` |
+| ClickHouse | `@clickhouse/client` | `npm install @clickhouse/client` |
+| Databricks | `@databricks/sql` | `npm install @databricks/sql` |
+| SQLite | `better-sqlite3` | `npm install better-sqlite3` |
+
+If a driver is missing, ContextKit will tell you exactly which package to install.
+
+## MCP config auto-detection
+
+When you run `context setup`, ContextKit scans your IDE MCP configs to find databases you've already connected:
+
+| IDE | Config Location |
+|---|---|
+| Claude Code | `~/.claude.json`, `<project>/.mcp.json` |
+| Cursor | `~/.cursor/mcp.json`, `<project>/.cursor/mcp.json` |
+| VS Code / Copilot | `<project>/.vscode/mcp.json` |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+
+If a database MCP server is found, `context setup` offers it as the first option — no connection string needed.
+
+## Introspect via CLI
+
+For non-interactive use, pass a connection string directly:
+
+```bash
+# PostgreSQL (also Neon, Supabase, Redshift)
+context introspect --db postgres://user:pass@host:5432/db
+
+# DuckDB
+context introspect --db ./warehouse.duckdb
+
+# MySQL
+context introspect --db mysql://user:pass@host:3306/db
+
+# SQL Server
+context introspect --db mssql://user:pass@host:1433/db
+
+# Snowflake (via config)
+context introspect --source snowflake
+
+# BigQuery (via config)
+context introspect --source bigquery
+```
+
+Cloud warehouses (Snowflake, BigQuery, ClickHouse, Databricks) require multiple credentials and should be configured in `contextkit.config.yaml` rather than passed as a single URL.
+
+## Multiple data sources
+
+Configure multiple databases if your models span different systems:
+
+```yaml title="contextkit.config.yaml"
+data_sources:
+  events:
+    adapter: clickhouse
+    host: click.example.com
+    database: events
+  users:
+    adapter: postgres
+    connection: ${USERS_DB_URL}
+  analytics:
+    adapter: duckdb
+    path: ./data/analytics.duckdb
+```
+
+Each model's `source` field determines which data source is used for validation and introspection.
