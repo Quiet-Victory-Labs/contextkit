@@ -320,7 +320,9 @@ export function checkGold(modelName: string, graph: ContextGraph): TierCheckResu
       if (missing.length === 0) {
         results.push(pass(id, label));
       } else {
-        results.push(fail(id, label, `Missing semantic_role: ${missing.join(', ')}`));
+        const shown = missing.slice(0, 5).join(', ');
+        const extra = missing.length > 5 ? ` and ${missing.length - 5} more` : '';
+        results.push(fail(id, label, `Missing semantic_role: ${shown}${extra}`));
       }
     }
   }
@@ -340,7 +342,9 @@ export function checkGold(modelName: string, graph: ContextGraph): TierCheckResu
         if (missing.length === 0) {
           results.push(pass(id, label));
         } else {
-          results.push(fail(id, label, `Missing default_aggregation: ${missing.map(([k]) => k).join(', ')}`));
+          const shown = missing.slice(0, 5).map(([k]) => k).join(', ');
+          const extra = missing.length > 5 ? ` and ${missing.length - 5} more` : '';
+          results.push(fail(id, label, `Missing default_aggregation: ${shown}${extra}`));
         }
       }
     }
@@ -361,7 +365,9 @@ export function checkGold(modelName: string, graph: ContextGraph): TierCheckResu
         if (missing.length === 0) {
           results.push(pass(id, label));
         } else {
-          results.push(fail(id, label, `Missing additive flag: ${missing.map(([k]) => k).join(', ')}`));
+          const shown = missing.slice(0, 5).map(([k]) => k).join(', ');
+          const extra = missing.length > 5 ? ` and ${missing.length - 5} more` : '';
+          results.push(fail(id, label, `Missing additive flag: ${shown}${extra}`));
         }
       }
     }
