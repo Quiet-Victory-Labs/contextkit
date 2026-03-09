@@ -27,6 +27,13 @@ export default defineConfig({
         { label: 'Pricing', slug: 'pricing' },
         { label: 'Integrations', slug: 'integrations' },
         {
+          label: 'Legal',
+          items: [
+            { label: 'Privacy Policy', slug: 'legal/privacy' },
+            { label: 'Terms of Service', slug: 'legal/terms' },
+          ],
+        },
+        {
           label: 'Getting Started',
           items: [
             { label: 'Introduction', slug: 'getting-started/introduction' },

@@ -1,0 +1,89 @@
+---
+title: Privacy Policy
+description: "ContextKit privacy policy — how we handle your data, what we collect, and your rights."
+---
+
+*Last updated: March 8, 2026*
+
+## Overview
+
+ContextKit is an open-source tool that runs locally on your machine. The open-source CLI does not send data to any external server. This privacy policy covers the optional RunContext Cloud service and the contextkit.dev documentation website.
+
+## What We Collect
+
+### ContextKit CLI (Open Source)
+
+The ContextKit CLI runs entirely on your machine. It does **not**:
+- Send telemetry or usage data
+- Phone home to any server
+- Require an account or API key
+- Access your data outside your local environment
+
+Your database credentials, metadata, and semantic planes stay on your machine.
+
+### RunContext Cloud (Paid Service)
+
+If you use RunContext Cloud, we collect:
+
+- **Account information**: Email address, name, and organization name when you create an account
+- **Semantic plane metadata**: The metadata you publish to the hosted service (model descriptions, field definitions, governance rules). This is the data you explicitly choose to host with us.
+- **Usage data**: API request counts, feature usage, and error logs for service reliability
+- **Payment information**: Processed by Stripe. We do not store credit card numbers.
+
+We do **not** collect:
+- Your database credentials (connections are made from your machine)
+- Your raw database content
+- Query results or row-level data
+
+### Documentation Website (contextkit.dev)
+
+The documentation site uses standard web analytics (page views, referrers) to understand which pages are useful. No personal information is collected from documentation visitors.
+
+## How We Use Your Data
+
+- **Account data**: To provide and maintain your RunContext Cloud account
+- **Semantic plane metadata**: To serve your published metadata via the hosted MCP endpoint
+- **Usage data**: To improve the service, debug issues, and enforce rate limits
+- **Payment data**: To process billing through Stripe
+
+## Data Storage and Security
+
+- Semantic plane metadata is stored in Neon PostgreSQL with encryption at rest
+- The API runs on Cloudflare Workers with TLS encryption in transit
+- We follow industry-standard security practices for access control and key management
+
+## Your Rights
+
+You can:
+- **Export** your data at any time using `context blueprint` (your metadata is always portable YAML)
+- **Delete** your account and all associated data by contacting support
+- **Access** your stored metadata through the API or CLI
+
+## Data Retention
+
+- Account data is retained while your account is active
+- Published semantic planes are retained while your account is active
+- After account deletion, all data is removed within 30 days
+
+## Third-Party Services
+
+- **Stripe**: Payment processing ([Stripe Privacy Policy](https://stripe.com/privacy))
+- **Clerk**: Authentication ([Clerk Privacy Policy](https://clerk.com/privacy))
+- **Cloudflare**: Infrastructure ([Cloudflare Privacy Policy](https://www.cloudflare.com/privacypolicy/))
+- **Neon**: Database hosting ([Neon Privacy Policy](https://neon.tech/privacy-policy))
+
+## Children's Privacy
+
+ContextKit is not directed at children under 13. We do not knowingly collect personal information from children.
+
+## Changes to This Policy
+
+We may update this policy from time to time. Changes will be posted on this page with an updated date.
+
+## Contact
+
+For privacy questions or data requests, contact us at privacy@runcontext.dev.
+
+---
+
+Quiet Victory Labs, LLC

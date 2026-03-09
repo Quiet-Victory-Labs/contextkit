@@ -1,75 +1,80 @@
 ---
 title: context setup
-description: Interactive wizard that detects your database, introspects schema, scaffolds context files, and enriches metadata in one step.
+description: "Browser-based wizard that guides you through creating a data product — fill out a Context Brief, connect your database, and the pipeline builds your semantic plane."
 ---
 
-The `setup` command is the fastest way to get started with ContextKit. It runs an interactive wizard that chains together the core workflow commands automatically.
+The `setup` command is the fastest way to get started with ContextKit. It opens a 5-step wizard in your browser that creates a data product from scratch.
 
 ## Usage
 
 ```bash
 context setup
+context setup --port 4040      # custom port (default: 4040)
+context setup --no-browser     # don't auto-open the browser
 ```
-
-No options required. The wizard will prompt you for everything it needs.
 
 ## What it does
 
-The setup wizard walks through six stages:
+The setup wizard opens at `http://localhost:4040/setup` and walks through five steps:
 
-1. **Detect** -- Scans your environment for databases: environment variables, `.env` files, MCP server configs (Claude Code, Cursor, VS Code, Windsurf, Claude Desktop), and database files in the current directory. If the required database driver is not installed, the wizard offers to install it automatically (**smart driver detection**).
-2. **Select tables** -- For large databases, lets you interactively pick which tables to include rather than introspecting everything.
-3. **Introspect** -- Connects to the detected database and scaffolds Bronze-level context files for the selected tables.
-4. **Scaffold** -- Writes `.context.yaml` files into your project's `context/` directory.
-5. **Enrich** -- Offers to apply Silver-level enrichments using AI-generated descriptions and relationships.
-6. **Capture intent** -- Asks about your goals and priorities so AI agents can focus curation efforts. Generates `context/AGENT_INSTRUCTIONS.md` — a comprehensive guide that tells any AI agent (Claude Code, Cursor, Windsurf, etc.) exactly how to curate metadata toward Gold tier.
+### Step 1: Product Definition
 
-## Example session
+Name your data product and provide a description. The name becomes the directory under `context/products/`.
 
-```bash
-$ context setup
-Detecting databases...
-  Found: DATABASE_URL=postgres://localhost:5432/myapp
+### Step 2: Owner Information
 
-Connect to postgres://localhost:5432/myapp? (Y/n) Y
+Set the owner name, team, and email. This metadata is used for governance tracking and shows up in the tier scorecard.
 
-Select tables to include:
-  [x] users
-  [x] orders
-  [x] products
-  [ ] _migrations
-  ...
-  Selected 23 of 27 tables
+### Step 3: Context & Sensitivity
 
-Introspecting schema...
-  Found 23 tables, 4 views
-  Scaffolded 27 context files to ./context/
+- **Sensitivity level**: Choose from public, internal (default), confidential, or restricted
+- **Data sources**: Auto-detected from environment variables (`DATABASE_URL`, `POSTGRES_URL`, etc.) and local database files (`.duckdb`, `.sqlite`)
+- **Documentation upload**: Drag-and-drop SQL files, data dictionaries, markdown, CSV, or YAML to give the enrichment engine more context
 
-Enrich to Silver tier? (Y/n) Y
-  Enriching users...
-  Enriching orders...
-  ...
-  Done. 27 files enriched.
+### Step 4: Review
 
-What are your goals for this data? (optional)
-> We need agents to generate correct revenue reports
+Review all your inputs before submitting. Edit any field before proceeding.
 
-Generated context/AGENT_INSTRUCTIONS.md
+### Step 5: Build Pipeline
 
-Run 'context lint' to check for issues.
-Run 'context serve' to start the MCP server.
+The pipeline runs automatically in the browser with real-time progress:
+
+1. **Introspect** — connect to database, read schema
+2. **Scaffold** — generate Bronze-tier OSI YAML files
+3. **Enrich to Silver** — add glossary, lineage, sample values, trust status
+4. **Enrich to Gold** — suggest semantic roles, aggregation rules, guardrails
+5. **Verify** — lint and validate the result
+6. **Auto-fix** — apply automatic fixes for common issues
+7. **Agent Instructions** — generate `AGENT_INSTRUCTIONS.md` for AI curation
+
+## Output
+
+The wizard saves a **Context Brief** at `context/products/{name}/context-brief.yaml` and scaffolds all associated metadata files.
+
+```yaml
+# context-brief.yaml
+product_name: sales-analytics
+description: "Revenue and order metrics for the analytics team"
+owner:
+  name: Alice Chen
+  team: Analytics
+  email: alice@company.com
+sensitivity: internal
+created_at: "2026-03-08T..."
 ```
 
 ## When to use setup vs. individual commands
 
 | Scenario | Recommendation |
 |---|---|
-| First time with ContextKit | `context setup` |
+| First time with ContextKit | `context setup` (browser wizard) |
 | Adding a new database source | `context introspect --db <url>` |
-| Upgrading existing context to Gold | `context enrich --target gold` |
+| Upgrading existing context to Gold | `context dev --studio` (visual editor) |
 | CI/CD pipeline | `context lint && context build` |
+| Let an AI agent build it | Tell the agent: *"Install @runcontext/cli and build a semantic layer"* |
 
 ## Next steps
 
-- Review the generated files with [`context lint`](/cli/lint/)
-- Start serving context with [`context serve`](/cli/serve/)
+- Open the visual studio: [`context dev --studio`](/cli/dev/)
+- Check your tier: [`context tier`](/cli/build/)
+- Start serving: [`context serve`](/cli/serve/)

@@ -1,72 +1,68 @@
 ---
 title: Introduction
-description: "ContextKit — tell your AI agent to build your semantic layer. It uses the CLI to introspect, enrich, lint, and serve AI-ready metadata via MCP."
+description: "ContextKit turns your database into an AI-ready data product. Fill out a Context Brief, connect your database, and the pipeline builds your semantic plane automatically."
 ---
 
-## Tell Your Agent to Build Your Semantic Layer
+## Turn Your Database Into an AI-Ready Data Product
 
-Tell your AI agent: *"Install @runcontext/cli and build a semantic layer for my database."*
+ContextKit builds a **semantic plane** between your database and your AI tools — a structured metadata layer that captures what your data means, not just what it's named. AI agents use it to generate correct SQL on the first try.
 
-The agent installs ContextKit, connects to your data, and goes back and forth with you — asking about your metrics, business rules, and use cases — while it builds the semantic layer using CLI commands. When it reaches Gold tier, it serves the metadata to other AI agents via MCP.
+### The Problem
 
-```
-You: "Install @runcontext/cli and build a semantic layer for my database"
-Agent: npm install @runcontext/cli
-Agent: context setup → connects → introspects → scaffolds metadata
-Agent: context enrich --target silver --apply → auto-fills descriptions, types, lineage
-Agent: context tier → "Silver. 12 Gold checks remaining."
-Agent: "I see a revenue column — should this be SUM'd or AVG'd?"
-You: "Always SUM. And filter out refunded orders."
-Agent: updates governance YAML, adds guardrail filter
-Agent: context tier → "9 checks remaining. What team owns this data?"
-You: "Analytics team, alice@company.com"
-Agent: updates owner file
-Agent: context tier → ... iterates until Gold
-Agent: context blueprint → exports AI Blueprint (portable Gold-tier spec)
-Agent: context serve --stdio → MCP server live
-```
-
-The setup wizard generates `context/AGENT_INSTRUCTIONS.md` — a comprehensive curation guide that tells any agent exactly what to do, what questions to ask, and which CLI commands to run. Works with Claude Code, Cursor, Windsurf, or any agentic coding platform.
-
-Built on the **[Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI)** specification — an open standard for describing semantic models in a vendor-neutral format. Your metadata is portable across any OSI-compliant tool, not locked into ContextKit.
-
-## The Problem
-
-AI agents querying databases see table and column names — but they don't understand what the data *means*. They don't know which filters are required, how metrics should be aggregated, or which joins are safe. Every query is a guess.
-
-## The Solution
-
-ContextKit creates a governance layer between your database and your AI tools:
-
-```
-Database  →  ContextKit  →  AI Agent
-(schema)     (meaning)      (correct SQL)
-```
-
-With ContextKit, an agent knows:
+AI agents see table and column names, but they don't understand what the data *means*. They don't know:
 - That `revenue` should be `SUM`'d, never `AVG`'d
 - That queries on `transactions` must filter `WHERE status = 'completed'`
 - That `customer_id` joins `orders` to `customers` as many-to-one
-- That "demand signal" means review keywords like *wait*, *crowded*, *busy*
 - Exactly which SQL to use for "show me top customers by revenue last quarter"
+
+Every query is a guess. And guesses are wrong often enough to be dangerous.
+
+### The Solution
+
+```
+1. context setup          → Browser wizard opens
+2. Fill out Context Brief → Name, owner, sensitivity, database
+3. Pipeline auto-runs     → Introspect → Scaffold → Enrich → Verify
+4. context serve          → MCP server live — agents have full context
+```
+
+**Step 1 — Context Brief.** Run `context setup` and a 5-step wizard opens in your browser. Name your data product, set an owner, choose a sensitivity level, and connect your database. Upload any existing documentation (SQL files, data dictionaries, markdown).
+
+**Step 2 — Automatic Pipeline.** ContextKit introspects your schema, scaffolds Bronze-tier metadata, then auto-enriches toward Silver (trust status, glossary, lineage, sample values). You watch each stage complete in the browser.
+
+**Step 3 — Curate to Gold.** Open the visual studio (`context dev --studio`) to add semantic roles, aggregation rules, guardrails, golden queries, and business rules. Or tell your AI agent to curate for you — the generated `AGENT_INSTRUCTIONS.md` tells it exactly what to do.
+
+**Step 4 — Serve via MCP.** Run `context serve` and every AI tool in your stack gets full context. Agents can search metadata, look up business terms, retrieve guardrails, and find golden queries.
 
 ## Three Ways to Use It
 
-### 1. Agent runs CLI commands (recommended)
+### 1. Browser wizard (recommended for getting started)
 
-In Claude Code, Cursor, Windsurf, or any agentic coding platform, just say:
+```bash
+context setup
+```
+
+Opens a 5-step form in your browser. Fill out the Context Brief, connect your database, and the pipeline handles the rest.
+
+### 2. AI agent runs CLI commands
+
+In Claude Code, Cursor, Windsurf, or any agentic coding platform:
 
 > *"Install @runcontext/cli and build a semantic layer for my database."*
 
-The agent uses the 16 CLI commands to build your semantic layer. The setup wizard generates instruction files that tell the agent exactly what to do:
+The agent uses CLI commands and reads `AGENT_INSTRUCTIONS.md` to build your semantic plane. It goes back and forth with you — asking about metrics, ownership, and business rules.
 
-- **`context/AGENT_INSTRUCTIONS.md`** — the complete agent operating manual with workflow, decision trees, curation recipes, and YAML format references
+### 3. Visual studio for humans
 
-No MCP configuration needed. The agent just runs commands.
+```bash
+context dev --studio
+```
 
-### 2. As an MCP server
+Browser-based editor for descriptions, semantic roles, golden queries, and business rules. Changes save to disk and the tier scorecard updates live.
 
-For agents that need to *query* an existing semantic layer:
+## As an MCP Server
+
+For agents that need to *query* an existing semantic plane:
 
 ```json
 {
@@ -79,15 +75,7 @@ For agents that need to *query* an existing semantic layer:
 }
 ```
 
-Exposes `context_search`, `context_explain`, `context_validate`, `context_tier`, `context_golden_queries`, and `context_guardrails` as MCP tools.
-
-### 3. Visual editor for humans
-
-```bash
-context dev --studio
-```
-
-Browser UI for editing descriptions, semantic roles, golden queries, and business rules without touching YAML. Changes save to disk and the tier scorecard updates live.
+Exposes 8 MCP tools: search, explain, validate, tier, golden-queries, guardrails, list-products, get-product.
 
 ## What's Included
 
@@ -97,15 +85,15 @@ One install, everything you need:
 npm install @runcontext/cli
 ```
 
-- **16 CLI commands** — introspect, enrich, lint, fix, build, tier, blueprint, new, verify, serve, and more
-- **Data products** — scaffold multiple data products in one project with `context new <name>`
-- **AI Blueprints** — export the Gold-tier outcome as a portable OSI YAML file with `context blueprint`
+- **Browser setup wizard** — 5-step Context Brief form with automatic pipeline
+- **Visual studio editor** — curate metadata in the browser with live tier updates
+- **16 CLI commands** — introspect, enrich, lint, fix, build, tier, blueprint, serve, and more
+- **MCP server with 8 tools** — serve your semantic plane to AI agents via stdio or HTTP
 - **40 lint rules** — schema validation, governance, security, data accuracy
 - **Bronze/Silver/Gold tier system** — automated metadata maturity scoring
-- **MCP server** — expose your context graph and AI Blueprints to agents via stdio or HTTP
-- **Visual studio editor** — browser-based metadata curation with live tier updates
+- **AI Blueprints** — export Gold-tier metadata as portable OSI YAML
 - **Static site generator** — browsable documentation from your metadata
 - **9 database adapters** — DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks
-- **MCP config discovery** — auto-detects databases from Claude Code, Cursor, VS Code, Windsurf, and Claude Desktop
-- **Smart driver detection** — offers to install missing database drivers during setup
-- **Agent instruction generation** — setup wizard creates `context/AGENT_INSTRUCTIONS.md` so any AI agent knows exactly how to build and curate your semantic layer
+- **Agent instruction generation** — setup creates `AGENT_INSTRUCTIONS.md` so any AI agent knows how to curate
+
+Built on the **[Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI)** specification — your metadata is portable, not locked in.

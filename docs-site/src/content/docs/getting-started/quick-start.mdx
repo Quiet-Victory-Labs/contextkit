@@ -1,26 +1,19 @@
 ---
 title: Quick Start
-description: "Set up ContextKit in under 5 minutes — install, introspect a database, scaffold metadata, and serve to AI agents via MCP"
+description: "Get started with ContextKit in under 5 minutes — create a data product, connect your database, and serve AI-ready metadata via MCP."
 ---
 
 import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
 
-## The fastest path: tell your AI agent
-
-In Claude Code, Cursor, or any agentic coding platform:
-
-> *"Install @runcontext/cli and build a semantic layer for my database."*
-
-The agent will run `context setup`, introspect your database, and start asking you questions about your data — metrics, ownership, business rules. It reads the generated `context/AGENT_INSTRUCTIONS.md` and knows exactly what to do.
-
-## Or do it yourself
+## Option A: Browser Wizard (Recommended)
 
 <Steps>
 
-1. **Install the CLI**
+1. **Create a new project**
 
    ```bash
-   npm install -g @runcontext/cli
+   npx create-contextkit my-data
+   cd my-data
    ```
 
 2. **Run the setup wizard**
@@ -29,25 +22,29 @@ The agent will run `context setup`, introspect your database, and start asking y
    context setup
    ```
 
-   The wizard auto-detects your database, introspects tables, scaffolds metadata, enriches to Silver, and generates agent instruction files — all in one interactive flow.
+   A 5-step wizard opens in your browser:
+   - **Product name** — name your data product (e.g. `sales-analytics`)
+   - **Owner** — name, team, and email
+   - **Sensitivity** — public, internal, confidential, or restricted
+   - **Database** — auto-detected from environment, or enter a connection URL
+   - **Documentation** — optionally upload SQL files, data dictionaries, or markdown
 
-3. **Check your tier**
+3. **Watch the pipeline run**
 
-   ```bash
-   context tier
-   ```
-
-   You should see your model at **Silver** tier. Gold requires human or agent curation.
+   The wizard runs the build pipeline in real time:
+   - Introspect schema → scaffold Bronze metadata
+   - Auto-enrich toward Silver (glossary, lineage, sample values)
+   - Lint and verify
 
 4. **Curate to Gold**
 
-   Tell your AI agent: *"Read context/AGENT_INSTRUCTIONS.md and get this project to Gold."*
-
-   The agent will go back and forth with you, asking about your data as it builds. Or use the visual editor:
+   Open the visual studio to add semantic roles, aggregation rules, guardrails, and golden queries:
 
    ```bash
    context dev --studio
    ```
+
+   Or tell your AI agent: *"Read context/AGENT_INSTRUCTIONS.md and get this project to Gold."*
 
 5. **Serve to AI agents**
 
@@ -55,42 +52,65 @@ The agent will run `context setup`, introspect your database, and start asking y
    context serve --stdio
    ```
 
-   Your MCP server is live. AI agents now have full semantic context.
+   Your MCP server is live. Add it to your AI tool's config:
+
+   ```json
+   {
+     "mcpServers": {
+       "contextkit": {
+         "command": "npx",
+         "args": ["@runcontext/cli", "serve", "--stdio"]
+       }
+     }
+   }
+   ```
 
 </Steps>
 
-## From a new project
+## Option B: Tell Your AI Agent
+
+In Claude Code, Cursor, or any agentic coding platform:
+
+> *"Install @runcontext/cli and build a semantic layer for my database."*
+
+The agent runs `context setup`, introspects your database, and starts asking you questions about metrics, ownership, and business rules. It reads the generated `context/AGENT_INSTRUCTIONS.md` and knows exactly what to do.
+
+## Option C: Manual Pipeline
 
 ```bash
-npx create-contextkit my-project
-cd my-project
-context lint
-context tier
-```
+# Install
+npm install -g @runcontext/cli
 
-## From an existing project
-
-```bash
-npm install -D @runcontext/cli
-
-# Scaffold metadata from a database
-context introspect --db duckdb://warehouse.duckdb
+# Scaffold from a database
+context introspect --db postgres://user:pass@host/db --select
 
 # Auto-enrich to Silver
-context enrich --target silver --apply --source default
+context enrich --target silver --apply
 
-# Check what Gold requires
+# Check tier progress
 context tier
+
+# Serve via MCP
+context serve --stdio
 ```
 
-## What just happened?
+## What Just Happened?
 
-The setup wizard performed these steps:
+The setup pipeline performed these steps:
 
-1. **Detected** your database (DuckDB, PostgreSQL, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, or Databricks — including databases configured in your MCP server configs)
-2. **Introspected** every table — generated OSI YAML with columns, types, descriptions
+1. **Connected** to your database (PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, or Databricks)
+2. **Introspected** every table — generated OSI YAML with columns, types, primary keys
 3. **Scaffolded** governance files — ownership, security classification, grain statements
-4. **Enriched** to Silver — added lineage, sample values, glossary links, trust status
+4. **Enriched** toward Silver — added lineage, sample values, glossary links, trust status
 5. **Linted** the result — flagged anything that still needs attention
+6. **Generated** `AGENT_INSTRUCTIONS.md` — a complete guide for any AI agent to continue curating
 
-Your metadata now lives in YAML files under `context/`. Edit them directly or let AI agents help curate them toward Gold.
+Your metadata now lives in YAML files under `context/`. Edit them in the visual studio, let AI agents curate them, or modify the YAML directly.
+
+## Next Steps
+
+- **Check your tier**: `context tier` to see Bronze/Silver/Gold scores
+- **Open the studio**: `context dev --studio` to curate in the browser
+- **Export a blueprint**: `context blueprint` for portable OSI YAML
+- **Generate docs**: `context site` for a browsable documentation site
+- **Read the [CLI reference](/cli/overview/)** for all 16 commands
