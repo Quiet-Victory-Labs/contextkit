@@ -11,9 +11,9 @@ export function enforceReadOnly(adapter: AdapterType): string | null {
     case 'mysql':
       return 'SET SESSION TRANSACTION READ ONLY';
     case 'duckdb':
-      return 'PRAGMA enable_object_cache'; // DuckDB doesn't have a read-only session toggle via SQL; return null
+      return null; // DuckDB: no session-level read-only SQL; use access_mode=read_only in connection config
     case 'mssql':
-      return 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED'; // MSSQL doesn't support session read-only via SQL
+      return null; // MSSQL: no session-level read-only SQL; use db_query validation instead
     case 'snowflake':
       return null; // Snowflake uses role-based access; no session-level read-only SQL
     case 'bigquery':
