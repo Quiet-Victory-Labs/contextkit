@@ -1,5 +1,9 @@
 import { Hono } from 'hono';
+import { execFile as execFileCb } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { promisify } from 'node:util';
+
+const execFile = promisify(execFileCb);
 
 export type PipelineStage =
   | 'introspect'
@@ -106,11 +110,47 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
   return app;
 }
 
+function buildCliArgs(
+  stage: PipelineStage,
+  dataSource?: string,
+): string[] {
+  switch (stage) {
+    case 'introspect': {
+      const args = ['@runcontext/cli', 'introspect'];
+      if (dataSource) args.push('--source', dataSource);
+      return args;
+    }
+    case 'scaffold':
+      return ['@runcontext/cli', 'build'];
+    case 'enrich-silver': {
+      const args = ['@runcontext/cli', 'enrich', '--target', 'silver', '--apply'];
+      if (dataSource) args.push('--source', dataSource);
+      return args;
+    }
+    case 'enrich-gold': {
+      const args = ['@runcontext/cli', 'enrich', '--target', 'gold', '--apply'];
+      if (dataSource) args.push('--source', dataSource);
+      return args;
+    }
+    case 'verify':
+      return ['@runcontext/cli', 'verify'];
+    case 'autofix':
+      return ['@runcontext/cli', 'fix'];
+    case 'agent-instructions':
+      return ['@runcontext/cli', 'build'];
+  }
+}
+
+function extractSummary(stdout: string): string {
+  const lines = stdout.trim().split('\n').filter(Boolean);
+  return lines.slice(-3).join('\n') || 'completed';
+}
+
 async function executePipeline(
   run: PipelineRun,
-  _rootDir: string,
-  _contextDir: string,
-  _dataSource?: string,
+  rootDir: string,
+  contextDir: string,
+  dataSource?: string,
 ): Promise<void> {
   for (const stage of run.stages) {
     if (stage.status === 'skipped') continue;
@@ -119,13 +159,14 @@ async function executePipeline(
     stage.startedAt = new Date().toISOString();
 
     try {
-      // TODO: Wire real setup step functions here
-      // For now, each stage is a placeholder that completes immediately
-      // Real implementation will call the corresponding setup step
-      // e.g., for 'introspect': connect to data source and discover schema
-      // e.g., for 'scaffold': generate .osi.yaml files from schema
+      const args = buildCliArgs(stage.stage, dataSource);
+      const { stdout } = await execFile('npx', args, {
+        cwd: rootDir,
+        timeout: 120_000,
+        env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=4096' },
+      });
       stage.status = 'done';
-      stage.summary = `${stage.stage} completed`;
+      stage.summary = extractSummary(stdout);
       stage.completedAt = new Date().toISOString();
     } catch (err) {
       stage.status = 'error';
