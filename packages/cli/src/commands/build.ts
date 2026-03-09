@@ -46,7 +46,7 @@ export const buildCommand = new Command('build')
 
       // Write to output directory
       fs.mkdirSync(outputDir, { recursive: true });
-      const outputPath = path.join(outputDir, 'contextkit-manifest.json');
+      const outputPath = path.join(outputDir, 'runcontext-manifest.json');
       fs.writeFileSync(outputPath, JSON.stringify(manifest, null, 2), 'utf-8');
 
       const productCount = graph.models.size;

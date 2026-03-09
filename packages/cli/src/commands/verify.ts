@@ -169,7 +169,7 @@ export const verifyCommand = new Command('verify')
         if (!sources || Object.keys(sources).length === 0) {
           console.error(
             chalk.red(
-              'No data source configured. Add data_sources to contextkit.config.yaml or use --db.',
+              'No data source configured. Add data_sources to runcontext.config.yaml or use --db.',
             ),
           );
           process.exit(1);

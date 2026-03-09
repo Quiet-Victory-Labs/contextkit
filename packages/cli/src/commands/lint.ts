@@ -82,7 +82,7 @@ export const lintCommand = new Command('lint')
   .option('--rule <ruleId:severity>', 'Override rule severity (repeatable)', collectRule, {})
   .option('--fix', 'Automatically fix problems')
   .option('--fix-dry-run', 'Show what --fix would change without writing')
-  .option('--cache', 'Only lint changed files (uses .contextkit-cache)')
+  .option('--cache', 'Only lint changed files (uses .runcontext-cache)')
   .option('--no-cache', 'Bypass the lint cache')
   .action(async (opts) => {
     try {

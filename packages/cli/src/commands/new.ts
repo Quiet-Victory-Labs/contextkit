@@ -52,7 +52,7 @@ const STARTER_OWNER = () => {
 export const newCommand = new Command('new')
   .description('Scaffold a new data product inside your context directory')
   .argument('<name>', 'Name for the data product (e.g. sales-analytics)')
-  .option('--source <name>', 'Bind to a named data source from contextkit.config.yaml')
+  .option('--source <name>', 'Bind to a named data source from runcontext.config.yaml')
   .option('--context-dir <path>', 'Path to context directory')
   .action(async (name: string, opts) => {
     try {
@@ -67,7 +67,7 @@ export const newCommand = new Command('new')
         if (!sources[opts.source]) {
           const available = Object.keys(sources).join(', ');
           console.error(formatError(
-            `Data source "${opts.source}" not found in contextkit.config.yaml. Available: ${available || '(none)'}`,
+            `Data source "${opts.source}" not found in runcontext.config.yaml. Available: ${available || '(none)'}`,
           ));
           process.exit(1);
         }

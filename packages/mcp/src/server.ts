@@ -2,7 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
-import type { Manifest, ContextGraph, ContextKitConfig } from '@runcontext/core';
+import type { Manifest, ContextGraph, RunContextConfig } from '@runcontext/core';
 import { compile, emitManifest, loadConfig } from '@runcontext/core';
 
 import { registerManifestResource } from './resources/manifest.js';
@@ -21,13 +21,13 @@ import { registerListProductsTool } from './tools/list-products.js';
 import { registerGetProductTool } from './tools/get-product.js';
 
 /**
- * Create and configure an MCP server with all ContextKit resources and tools.
+ * Create and configure an MCP server with all RunContext resources and tools.
  *
  * Use this for testing or embedding — no transport is connected.
  */
 export function createServer(manifest: Manifest, graph: ContextGraph): McpServer {
   const server = new McpServer({
-    name: 'contextkit',
+    name: 'runcontext',
     version: '0.5.0',
   });
 
@@ -144,7 +144,7 @@ export async function startServerHttp(options?: {
 
   const port = options?.port ?? 3000;
   app.listen(port, host, () => {
-    console.error(`ContextKit MCP server listening on http://${host}:${port}/mcp`);
+    console.error(`RunContext MCP server listening on http://${host}:${port}/mcp`);
     console.error(`Health check: http://${host}:${port}/health`);
   });
 }

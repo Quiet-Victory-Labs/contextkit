@@ -1,6 +1,6 @@
-# ContextKit Agent Instructions
+# RunContext Agent Instructions
 
-You have two MCP servers: **duckdb** (query data) and **contextkit** (query metadata).
+You have two MCP servers: **duckdb** (query data) and **runcontext** (query metadata).
 
 ## The Cardinal Rule: Never Fabricate Metadata
 

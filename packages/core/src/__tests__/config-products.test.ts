@@ -6,12 +6,12 @@ import { loadConfig } from '../config/loader.js';
 
 function createTempConfig(content: string): string {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ck-config-test-'));
-  fs.writeFileSync(path.join(tmpDir, 'contextkit.config.yaml'), content, 'utf-8');
+  fs.writeFileSync(path.join(tmpDir, 'runcontext.config.yaml'), content, 'utf-8');
   return tmpDir;
 }
 
 describe('config with products', () => {
-  it('loads products list from contextkit.yaml', () => {
+  it('loads products list from runcontext.config.yaml', () => {
     const dir = createTempConfig(`
 context_dir: context
 products:

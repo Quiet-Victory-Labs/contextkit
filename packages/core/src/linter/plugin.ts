@@ -1,15 +1,18 @@
 import type { LintRule } from './rule.js';
 
-export interface ContextKitPlugin {
+export interface RunContextPlugin {
   name: string;
   rules: LintRule[];
 }
+
+/** @deprecated Use RunContextPlugin instead */
+export type ContextKitPlugin = RunContextPlugin;
 
 /**
  * Load plugins by name and return their rules.
  *
  * Plugin names are resolved as npm packages via dynamic import().
- * Each plugin must export a default ContextKitPlugin object or
+ * Each plugin must export a default RunContextPlugin object or
  * an object with a `rules` array.
  */
 export async function loadPlugins(pluginNames: string[]): Promise<LintRule[]> {
@@ -18,7 +21,7 @@ export async function loadPlugins(pluginNames: string[]): Promise<LintRule[]> {
   for (const name of pluginNames) {
     try {
       const mod = await import(name);
-      const plugin = (mod.default ?? mod) as ContextKitPlugin;
+      const plugin = (mod.default ?? mod) as RunContextPlugin;
 
       if (!plugin.rules || !Array.isArray(plugin.rules)) {
         throw new Error(`Plugin "${name}" does not export a valid rules array.`);

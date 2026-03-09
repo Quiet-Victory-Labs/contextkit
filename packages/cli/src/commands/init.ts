@@ -73,7 +73,7 @@ minimum_tier: bronze
 `;
 
 export const initCommand = new Command('init')
-  .description('Scaffold a v0.2 ContextKit project structure')
+  .description('Scaffold a v0.2 RunContext project structure')
   .option('--dir <path>', 'Root directory for the project', '.')
   .action(async (opts) => {
     try {
@@ -115,7 +115,7 @@ export const initCommand = new Command('init')
           content: EXAMPLE_OWNER,
         },
         {
-          path: path.join(rootDir, 'contextkit.config.yaml'),
+          path: path.join(rootDir, 'runcontext.config.yaml'),
           content: EXAMPLE_CONFIG,
         },
       ];
@@ -137,7 +137,7 @@ export const initCommand = new Command('init')
       console.log('');
       console.log(
         formatSuccess(
-          `Initialized ContextKit project: ${created} file(s) created, ${skipped} skipped.`,
+          `Initialized RunContext project: ${created} file(s) created, ${skipped} skipped.`,
         ),
       );
       console.log('');

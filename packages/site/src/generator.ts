@@ -1,5 +1,5 @@
 /**
- * Site generator for ContextKit.
+ * Site generator for RunContext.
  *
  * `generateSite` accepts a Manifest and returns a Map of relative file path
  * to HTML content. The caller is responsible for writing files to disk.
@@ -12,7 +12,7 @@ import ejs from 'ejs';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Manifest, SiteConfig, ContextKitConfig } from '@runcontext/core';
+import type { Manifest, SiteConfig, RunContextConfig } from '@runcontext/core';
 import {
   indexTemplate,
   modelTemplate,
@@ -40,7 +40,7 @@ export interface GenerateSiteOptions {
 /**
  * Generate all HTML pages for the documentation site.
  *
- * @param manifest - The compiled ContextKit manifest
+ * @param manifest - The compiled RunContext manifest
  * @param config - Optional site configuration (title, base_path)
  * @returns Map of relative file paths to HTML content
  */
@@ -50,7 +50,7 @@ export function generateSite(
   options?: { studioMode?: boolean },
 ): Map<string, string> {
   const files = new Map<string, string>();
-  const siteTitle = config?.title ?? 'ContextKit';
+  const siteTitle = config?.title ?? 'RunContext';
   const basePath = (config?.base_path ?? '').replace(/\/+$/, '');
   const studioMode = options?.studioMode ?? false;
 
@@ -182,13 +182,13 @@ export function generateSite(
  * Called by the CLI `site` command. Accepts a manifest, config, and output
  * directory, then generates and writes all site files.
  *
- * @param manifest - The compiled ContextKit manifest
- * @param config - The full ContextKit configuration
+ * @param manifest - The compiled RunContext manifest
+ * @param config - The full RunContext configuration
  * @param outputDir - Directory to write site files to
  */
 export async function buildSite(
   manifest: Manifest,
-  config: ContextKitConfig,
+  config: RunContextConfig,
   outputDir: string,
 ): Promise<void> {
   const siteConfig = config.site;
@@ -231,7 +231,7 @@ export function getAstroProjectDir(): string {
  */
 export async function buildAstroSite(
   manifest: Manifest,
-  config: ContextKitConfig,
+  config: RunContextConfig,
   outputDir: string,
 ): Promise<void> {
   const astroDir = getAstroProjectDir();
@@ -247,7 +247,7 @@ export async function buildAstroSite(
   fs.writeFileSync(
     path.join(dataDir, 'site-config.json'),
     JSON.stringify({
-      title: config.site?.title ?? 'ContextKit',
+      title: config.site?.title ?? 'RunContext',
       studioMode: false,
     }),
     'utf-8',

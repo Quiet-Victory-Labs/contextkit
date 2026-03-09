@@ -8,16 +8,17 @@ export interface Directive {
   ruleId?: string; // undefined means all rules
 }
 
-const DISABLE_PATTERN = /^\s*#\s*contextkit-disable(?:\s+(.+))?\s*$/;
+// Accept both runcontext-disable and legacy contextkit-disable
+const DISABLE_PATTERN = /^\s*#\s*(?:runcontext|contextkit)-disable(?:\s+(.+))?\s*$/;
 const DISABLE_NEXT_LINE_PATTERN =
-  /^\s*#\s*contextkit-disable-next-line(?:\s+(.+))?\s*$/;
+  /^\s*#\s*(?:runcontext|contextkit)-disable-next-line(?:\s+(.+))?\s*$/;
 
 /**
- * Extract contextkit directives from a YAML file's raw content.
+ * Extract RunContext directives from a YAML file's raw content.
  *
- * Supported directives:
- * - `# contextkit-disable rule-id` — disable rule for the rest of the file from that point
- * - `# contextkit-disable-next-line rule-id` — disable rule for the next line only
+ * Supported directives (both `runcontext-` and legacy `contextkit-` prefixes):
+ * - `# runcontext-disable rule-id` — disable rule for the rest of the file from that point
+ * - `# runcontext-disable-next-line rule-id` — disable rule for the next line only
  * - Without a rule ID, disables all rules
  */
 export function extractDirectives(

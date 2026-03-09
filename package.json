@@ -1,5 +1,5 @@
 {
-  "name": "contextkit",
+  "name": "runcontext",
   "private": true,
   "scripts": {
     "build": "pnpm -r run build",

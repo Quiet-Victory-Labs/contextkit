@@ -38,7 +38,7 @@ export function validateGraph(graph: ContextGraph): ValidateResult {
 export function registerValidateTool(server: McpServer, graph: ContextGraph): void {
   server.tool(
     'context_validate',
-    'Run ContextKit linter against the context graph and return diagnostics',
+    'Run RunContext linter against the context graph and return diagnostics',
     {},
     async () => {
       const result = validateGraph(graph);

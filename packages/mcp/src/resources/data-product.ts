@@ -144,7 +144,7 @@ function modelViewToYaml(name: string, view: Record<string, unknown>, manifest: 
   const lines: string[] = [
     `# ${name}.data-product.osi.yaml`,
     `# AI Blueprint — Open Semantic Interchange (OSI) v1.0`,
-    `# Exported from ContextKit`,
+    `# Exported from RunContext`,
     ``,
     `osi_version: "1.0"`,
     ``,

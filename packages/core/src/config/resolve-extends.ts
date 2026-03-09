@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'yaml';
-import type { ContextKitConfig } from '../types/config.js';
+import type { RunContextConfig } from '../types/config.js';
 
 /**
  * Deep-merge two config objects. Right-side wins on conflicts.
@@ -66,7 +66,7 @@ async function resolveExtend(
 }
 
 /**
- * Resolve the `extends` chain in a ContextKit config.
+ * Resolve the `extends` chain in a RunContext config.
  *
  * Configs are merged left to right: first extends entry is the base,
  * each subsequent entry overrides it, and the user's own config wins last.
@@ -74,11 +74,11 @@ async function resolveExtend(
 export async function resolveExtends(
   config: Record<string, unknown>,
   rootDir: string,
-): Promise<Partial<ContextKitConfig>> {
+): Promise<Partial<RunContextConfig>> {
   const extendsRefs = config.extends as string[] | undefined;
 
   if (!extendsRefs || extendsRefs.length === 0) {
-    return config as Partial<ContextKitConfig>;
+    return config as Partial<RunContextConfig>;
   }
 
   // Resolve all extended configs
@@ -92,5 +92,5 @@ export async function resolveExtends(
   const { extends: _extends, ...userConfig } = config;
   merged = deepMerge(merged, userConfig);
 
-  return merged as Partial<ContextKitConfig>;
+  return merged as Partial<RunContextConfig>;
 }

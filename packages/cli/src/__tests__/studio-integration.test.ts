@@ -12,7 +12,7 @@ describe('studio integration', () => {
     fs.mkdirSync(path.join(tmpDir, 'context', 'governance'), { recursive: true });
     fs.mkdirSync(path.join(tmpDir, 'context', 'owners'), { recursive: true });
     fs.writeFileSync(
-      path.join(tmpDir, 'contextkit.config.yaml'),
+      path.join(tmpDir, 'runcontext.config.yaml'),
       'context_dir: context\noutput_dir: dist\n',
     );
     fs.writeFileSync(

@@ -4,15 +4,15 @@
   "description": "Turn your database into an AI-ready data product. Browser-based Context Brief wizard, automatic schema introspection, Bronze-to-Gold tier enrichment, and MCP server for Claude Code, Cursor, and Copilot.",
   "license": "MIT",
   "author": "Eric Kittelson",
-  "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
+  "homepage": "https://github.com/RunContext/runcontext",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Quiet-Victory-Labs/contextkit.git",
+    "url": "https://github.com/RunContext/runcontext.git",
     "directory": "packages/cli"
   },
-  "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
+  "bugs": "https://github.com/RunContext/runcontext/issues",
   "engines": { "node": ">=18.0.0" },
-  "keywords": ["contextkit", "semantic-plane", "semantic-layer", "data-product", "ai-ready-data", "data-catalog", "data-governance", "mcp", "model-context-protocol", "ai-agent", "database-metadata", "schema-introspection", "claude-code", "cursor", "copilot", "dbt-alternative", "osi", "open-semantic-interchange", "cli"],
+  "keywords": ["runcontext", "semantic-plane", "semantic-layer", "data-product", "ai-ready-data", "data-catalog", "data-governance", "mcp", "model-context-protocol", "ai-agent", "database-metadata", "schema-introspection", "claude-code", "cursor", "copilot", "dbt-alternative", "osi", "open-semantic-interchange", "cli"],
   "type": "module",
   "bin": {
     "context": "./dist/index.js"

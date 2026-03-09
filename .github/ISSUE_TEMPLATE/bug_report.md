@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in ContextKit
+about: Report a bug in RunContext
 title: '[Bug] '
 labels: bug
 assignees: ''
@@ -20,7 +20,7 @@ What you expected to happen.
 **Environment**
 - OS: [e.g., macOS 15, Ubuntu 24.04]
 - Node.js: [e.g., 22.x]
-- ContextKit version: [e.g., 0.3.5]
+- RunContext version: [e.g., 0.3.5]
 - Database: [e.g., DuckDB, Postgres]
 
 **Additional context**

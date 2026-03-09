@@ -105,7 +105,7 @@ export function searchManifest(manifest: Manifest, query: string): SearchResult[
 export function registerSearchTool(server: McpServer, manifest: Manifest): void {
   server.tool(
     'context_search',
-    'Search across all ContextKit nodes (models, datasets, fields, terms, owners) by keyword',
+    'Search across all RunContext nodes (models, datasets, fields, terms, owners) by keyword',
     {
       query: z.string().describe('Keyword to search for'),
       product: z.string().optional().describe('Optional data product name to scope search to'),

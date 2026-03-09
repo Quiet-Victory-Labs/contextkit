@@ -1,5 +1,5 @@
-name: 'ContextKit Lint'
-description: 'Validate your semantic plane with ContextKit'
+name: 'RunContext Lint'
+description: 'Validate your semantic plane with RunContext'
 inputs:
   context-dir:
     description: 'Path to your context directory'
@@ -16,7 +16,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-    - name: Install ContextKit
+    - name: Install RunContext
       run: npm install -g @runcontext/cli
       shell: bash
     - name: Lint semantic plane

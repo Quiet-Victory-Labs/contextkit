@@ -1,13 +1,13 @@
-# Contributing to ContextKit
+# Contributing to RunContext
 
-Thanks for your interest in contributing to ContextKit! This guide will help you get set up and productive quickly.
+Thanks for your interest in contributing to RunContext! This guide will help you get set up and productive quickly.
 
 ## Development Setup
 
 ```bash
 # Clone the repo
-git clone https://github.com/Quiet-Victory-Labs/contextkit.git
-cd ContextKit
+git clone https://github.com/RunContext/runcontext.git
+cd runcontext
 
 # Install dependencies (requires pnpm)
 pnpm install

@@ -15,13 +15,13 @@ describe('loadIgnorePatterns', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it('returns empty array when no .contextkit-ignore exists', () => {
+  it('returns empty array when no .runcontext-ignore exists', () => {
     expect(loadIgnorePatterns(tmpDir)).toEqual([]);
   });
 
-  it('loads patterns from .contextkit-ignore file', () => {
+  it('loads patterns from .runcontext-ignore file', () => {
     fs.writeFileSync(
-      path.join(tmpDir, '.contextkit-ignore'),
+      path.join(tmpDir, '.runcontext-ignore'),
       'drafts/**\narchive/**\n',
     );
     expect(loadIgnorePatterns(tmpDir)).toEqual(['drafts/**', 'archive/**']);
@@ -29,7 +29,7 @@ describe('loadIgnorePatterns', () => {
 
   it('ignores comments and empty lines', () => {
     fs.writeFileSync(
-      path.join(tmpDir, '.contextkit-ignore'),
+      path.join(tmpDir, '.runcontext-ignore'),
       '# This is a comment\n\ndrafts/**\n  \n# Another comment\narchive/**\n',
     );
     expect(loadIgnorePatterns(tmpDir)).toEqual(['drafts/**', 'archive/**']);
@@ -37,7 +37,7 @@ describe('loadIgnorePatterns', () => {
 
   it('merges config ignore patterns', () => {
     fs.writeFileSync(
-      path.join(tmpDir, '.contextkit-ignore'),
+      path.join(tmpDir, '.runcontext-ignore'),
       'drafts/**\n',
     );
     const result = loadIgnorePatterns(tmpDir, ['vendor/**']);
@@ -46,7 +46,7 @@ describe('loadIgnorePatterns', () => {
 
   it('deduplicates patterns', () => {
     fs.writeFileSync(
-      path.join(tmpDir, '.contextkit-ignore'),
+      path.join(tmpDir, '.runcontext-ignore'),
       'drafts/**\n',
     );
     const result = loadIgnorePatterns(tmpDir, ['drafts/**', 'vendor/**']);

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { createEmptyGraph } from '../compiler/graph.js';
 import { emitManifest } from '../compiler/emit.js';
-import type { ContextKitConfig } from '../types/config.js';
+import type { RunContextConfig } from '../types/config.js';
 
-const defaultConfig: ContextKitConfig = {
+const defaultConfig: RunContextConfig = {
   context_dir: 'context',
   output_dir: 'dist',
 };

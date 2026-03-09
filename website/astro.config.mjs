@@ -9,16 +9,16 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [
     starlight({
-      title: 'ContextKit Docs',
+      title: 'RunContext Docs',
       logo: {
         dark: './src/assets/logo-dark.svg',
         light: './src/assets/logo-light.svg',
         replacesTitle: false,
       },
       favicon: '/favicon.svg',
-      description: 'ContextKit documentation — CLI reference, MCP server, semantic plane concepts, and RunContext Cloud.',
+      description: 'RunContext documentation — CLI reference, MCP server, semantic plane concepts, and RunContext Cloud.',
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/Quiet-Victory-Labs/contextkit' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/RunContext/runcontext' },
       ],
       components: {
         Footer: './src/components/Footer.astro',

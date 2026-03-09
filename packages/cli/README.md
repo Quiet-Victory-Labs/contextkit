@@ -2,7 +2,7 @@
 
 **Turn your database into an AI-ready data product.**
 
-Run `context setup` and a guided wizard opens in your browser. Fill out a Context Brief — name your data product, set an owner, choose sensitivity, connect your database. ContextKit introspects the schema, scaffolds metadata, and auto-enriches toward Silver tier. Open the visual studio to curate to Gold. Serve the semantic plane to AI agents via MCP.
+Run `context setup` and a guided wizard opens in your browser. Fill out a Context Brief — name your data product, set an owner, choose sensitivity, connect your database. RunContext introspects the schema, scaffolds metadata, and auto-enriches toward Silver tier. Open the visual studio to curate to Gold. Serve the semantic plane to AI agents via MCP.
 
 Works with Claude Code, Cursor, Copilot, Windsurf, Codex, and any MCP-compatible AI tool. Supports PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, and Databricks.
 
@@ -58,7 +58,7 @@ context explain <name>           # Look up any model, term, or owner
 ```json
 {
   "mcpServers": {
-    "contextkit": {
+    "runcontext": {
       "command": "npx",
       "args": ["@runcontext/cli", "serve", "--stdio"]
     }
@@ -70,7 +70,7 @@ context explain <name>           # Look up any model, term, or owner
 
 ## Documentation
 
-[contextkit.dev](https://contextkit.dev) | [GitHub](https://github.com/Quiet-Victory-Labs/contextkit)
+[runcontext.dev](https://runcontext.dev) | [GitHub](https://github.com/RunContext/runcontext)
 
 ## License
 

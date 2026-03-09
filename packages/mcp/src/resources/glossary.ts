@@ -9,7 +9,7 @@ export function registerGlossaryResource(server: McpServer, manifest: Manifest):
   server.resource(
     'glossary',
     'context://glossary',
-    { description: 'All ContextKit glossary terms with definitions, synonyms, and mappings' },
+    { description: 'All RunContext glossary terms with definitions, synonyms, and mappings' },
     async (uri) => ({
       contents: [
         {

@@ -1,6 +1,6 @@
 # create-contextkit
 
-Scaffold a new [ContextKit](https://github.com/Quiet-Victory-Labs/contextkit) project — one command to start building an AI-ready data product from your database.
+Scaffold a new [RunContext](https://github.com/RunContext/runcontext) project — one command to start building an AI-ready data product from your database.
 
 ## Usage
 
@@ -34,9 +34,9 @@ my-project/
 3. **`context dev --studio`** — Visual editor to curate metadata to Gold tier
 4. **`context serve`** — MCP server live, AI agents get full context
 
-## Part of ContextKit
+## Part of RunContext
 
-See the [ContextKit repository](https://github.com/Quiet-Victory-Labs/contextkit) for full documentation.
+See the [RunContext repository](https://github.com/RunContext/runcontext) for full documentation.
 
 ## License
 

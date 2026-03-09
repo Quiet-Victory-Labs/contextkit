@@ -16,14 +16,14 @@ interface DetectedDb {
 
 /** Try to auto-detect a single database from config, env vars, or MCP config. */
 function autoDetectDb(cwd: string): DetectedDb | undefined {
-  // 1. contextkit.config.yaml
+  // 1. runcontext.config.yaml
   try {
     const config = loadConfig(cwd);
     if (config.data_sources && Object.keys(config.data_sources).length > 0) {
       const name = Object.keys(config.data_sources)[0]!;
       const ds = config.data_sources[name]!;
       const loc = ds.path ?? ds.connection ?? name;
-      return { dsConfig: ds, label: `${ds.adapter} — ${loc} (from contextkit.config.yaml)` };
+      return { dsConfig: ds, label: `${ds.adapter} — ${loc} (from runcontext.config.yaml)` };
     }
   } catch { /* no config */ }
 
@@ -604,7 +604,7 @@ export async function runConnectStep(): Promise<SetupContext | undefined> {
   }
 
   // Ensure config file
-  const configPath = path.join(cwd, 'contextkit.config.yaml');
+  const configPath = path.join(cwd, 'runcontext.config.yaml');
   let config;
   try {
     config = loadConfig(cwd);

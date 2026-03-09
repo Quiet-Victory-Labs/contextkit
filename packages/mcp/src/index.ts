@@ -1,4 +1,4 @@
-// ContextKit MCP Server v0.3
+// RunContext MCP Server v0.3
 export { createServer, startServer, startServerHttp } from './server.js';
 
 // Re-export resource helpers for advanced usage

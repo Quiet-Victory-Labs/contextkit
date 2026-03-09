@@ -5,7 +5,7 @@ import * as os from 'node:os';
 import { createApp } from '../server.js';
 
 function createTestApp() {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'contextkit-test-'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runcontext-test-'));
   const contextDir = path.join(tmpDir, 'context');
   fs.mkdirSync(contextDir, { recursive: true });
   const app = createApp({
@@ -46,11 +46,11 @@ describe('UI Server', () => {
   });
 
   describe('GET /setup', () => {
-    it('returns HTML page with ContextKit branding', async () => {
+    it('returns HTML page with RunContext branding', async () => {
       const res = await app.request('/setup');
       expect(res.status).toBe(200);
       const html = await res.text();
-      expect(html).toContain('ContextKit');
+      expect(html).toContain('RunContext');
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('setup.css');
       expect(html).toContain('setup.js');

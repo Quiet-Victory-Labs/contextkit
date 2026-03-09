@@ -17,7 +17,10 @@ export interface McpConfig {
   port?: number;
 }
 
-export interface ContextKitConfig {
+/** @deprecated Use RunContextConfig instead */
+export type ContextKitConfig = RunContextConfig;
+
+export interface RunContextConfig {
   context_dir: string;
   output_dir: string;
   minimum_tier?: MetadataTier;

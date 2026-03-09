@@ -28,7 +28,7 @@ export function formatJUnit(diagnostics: Diagnostic[]): string {
   const lines: string[] = [];
   lines.push('<?xml version="1.0" encoding="UTF-8"?>');
   lines.push(
-    `<testsuites name="ContextKit" tests="${diagnostics.length}" failures="${diagnostics.length}">`,
+    `<testsuites name="RunContext" tests="${diagnostics.length}" failures="${diagnostics.length}">`,
   );
 
   for (const [file, diags] of byFile) {

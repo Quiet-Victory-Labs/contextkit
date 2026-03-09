@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type {
   ContextGraph,
-  ContextKitConfig,
+  RunContextConfig,
   OsiSemanticModel,
   GovernanceFile,
   RulesFile,
@@ -87,7 +87,7 @@ function buildTestGraph(): ContextGraph {
   return graph;
 }
 
-const defaultConfig: ContextKitConfig = {
+const defaultConfig: RunContextConfig = {
   context_dir: 'context',
   output_dir: 'dist',
 };

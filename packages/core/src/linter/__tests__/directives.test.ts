@@ -12,8 +12,8 @@ const makeDiag = (overrides: Partial<Diagnostic> = {}): Diagnostic => ({
 });
 
 describe('extractDirectives', () => {
-  it('extracts contextkit-disable with rule', () => {
-    const content = '# contextkit-disable test/rule\nsome: value\n';
+  it('extracts runcontext-disable with rule', () => {
+    const content = '# runcontext-disable test/rule\nsome: value\n';
     const directives = extractDirectives('test.yaml', content);
 
     expect(directives).toHaveLength(1);
@@ -25,8 +25,8 @@ describe('extractDirectives', () => {
     });
   });
 
-  it('extracts contextkit-disable without rule (all rules)', () => {
-    const content = '# contextkit-disable\nsome: value\n';
+  it('extracts runcontext-disable without rule (all rules)', () => {
+    const content = '# runcontext-disable\nsome: value\n';
     const directives = extractDirectives('test.yaml', content);
 
     expect(directives).toHaveLength(1);
@@ -34,8 +34,8 @@ describe('extractDirectives', () => {
     expect(directives[0]!.type).toBe('disable');
   });
 
-  it('extracts contextkit-disable-next-line', () => {
-    const content = 'first: a\n# contextkit-disable-next-line test/rule\nsecond: b\n';
+  it('extracts runcontext-disable-next-line', () => {
+    const content = 'first: a\n# runcontext-disable-next-line test/rule\nsecond: b\n';
     const directives = extractDirectives('test.yaml', content);
 
     expect(directives).toHaveLength(1);
@@ -47,11 +47,19 @@ describe('extractDirectives', () => {
     });
   });
 
+  it('supports legacy contextkit-disable prefix', () => {
+    const content = '# contextkit-disable test/rule\nsome: value\n';
+    const directives = extractDirectives('test.yaml', content);
+    expect(directives).toHaveLength(1);
+    expect(directives[0]!.type).toBe('disable');
+    expect(directives[0]!.ruleId).toBe('test/rule');
+  });
+
   it('handles multiple directives', () => {
     const content = [
-      '# contextkit-disable rule/a',
+      '# runcontext-disable rule/a',
       'some: value',
-      '# contextkit-disable-next-line rule/b',
+      '# runcontext-disable-next-line rule/b',
       'other: value',
     ].join('\n');
     const directives = extractDirectives('test.yaml', content);

@@ -1,5 +1,5 @@
 /**
- * Shared layout for the ContextKit metadata catalog site.
+ * Shared layout for the RunContext metadata catalog site.
  *
  * Redesigned with sidebar navigation, top bar with docs link,
  * and a clean dark theme matching the Starlight docs site.
@@ -742,7 +742,7 @@ export const TOPBAR = `<div class="topbar">
   </div>
   <div class="topbar-right">
     <a href="<%= basePath %>/search.html" class="topbar-link">Search</a>
-    <a href="https://github.com/Quiet-Victory-Labs/contextkit#readme" class="topbar-docs" target="_blank" rel="noopener">Docs &nearr;</a>
+    <a href="https://github.com/RunContext/runcontext#readme" class="topbar-docs" target="_blank" rel="noopener">Docs &nearr;</a>
   </div>
 </div>`;
 
@@ -784,7 +784,7 @@ export const SIDEBAR = `<div class="overlay" id="sidebar-overlay" onclick="toggl
 // ---------------------------------------------------------------------------
 
 export const FOOTER = `<footer class="site-footer">
-  Powered by <a href="https://github.com/Quiet-Victory-Labs/contextkit">ContextKit</a>
+  Powered by <a href="https://github.com/RunContext/runcontext">RunContext</a>
   &nbsp;&middot;&nbsp;
   Open Semantic Interchange
 </footer>`;

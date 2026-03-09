@@ -1,4 +1,4 @@
-// ContextKit CLI v0.2
+// RunContext CLI v0.2
 
 import { Command } from 'commander';
 import { lintCommand } from './commands/lint.js';
@@ -24,7 +24,7 @@ const program = new Command();
 
 program
   .name('context')
-  .description('ContextKit — AI-ready metadata governance over OSI')
+  .description('RunContext — AI-ready metadata governance over OSI')
   .version('0.5.0');
 
 // Register all commands

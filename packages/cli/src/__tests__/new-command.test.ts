@@ -9,7 +9,7 @@ import * as yaml from 'yaml';
  * The caller is responsible for cleanup (or rely on OS temp cleanup).
  */
 function makeTmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'contextkit-new-test-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'runcontext-new-test-'));
 }
 
 /**

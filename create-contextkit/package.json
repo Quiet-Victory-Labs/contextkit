@@ -1,16 +1,16 @@
 {
   "name": "create-contextkit",
   "version": "0.5.2",
-  "description": "Scaffold a new ContextKit data product. Run npx create-contextkit, fill out a Context Brief in your browser, and the pipeline builds your semantic plane automatically.",
+  "description": "Scaffold a new RunContext data product. Run npx create-contextkit, fill out a Context Brief in your browser, and the pipeline builds your semantic plane automatically.",
   "license": "MIT",
   "author": "Eric Kittelson",
-  "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
+  "homepage": "https://github.com/RunContext/runcontext",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Quiet-Victory-Labs/contextkit.git",
+    "url": "https://github.com/RunContext/runcontext.git",
     "directory": "create-contextkit"
   },
-  "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
+  "bugs": "https://github.com/RunContext/runcontext/issues",
   "engines": { "node": ">=18.0.0" },
   "keywords": ["create", "scaffold", "semantic-plane", "semantic-layer", "contextkit", "data-product", "ai-ready-data", "npx", "project-generator", "mcp", "data-catalog"],
   "type": "module",

@@ -45,7 +45,7 @@ Use these goals to prioritize which datasets, fields, and metrics to curate firs
 `
     : '';
 
-  return `# ContextKit Agent Instructions
+  return `# RunContext Agent Instructions
 
 Model: **${modelName}** | Current Tier: **${tier}**
 Database: ${ctx.dsConfig.adapter} (${dbInfo})
@@ -357,12 +357,12 @@ context serve --stdio
 context serve --http --port 3000
 \`\`\`
 
-To add ContextKit as an MCP server in another agent's config:
+To add RunContext as an MCP server in another agent's config:
 
 \`\`\`json
 {
   "mcpServers": {
-    "contextkit": {
+    "runcontext": {
       "command": "npx",
       "args": ["@runcontext/cli", "serve", "--stdio"]
     }
@@ -381,7 +381,7 @@ context blueprint ${modelName}
 
 This AI Blueprint contains the complete semantic specification — share it, serve it via MCP, or import it into any OSI-compliant tool.
 
-## MCP Tools (if using ContextKit as an MCP server)
+## MCP Tools (if using RunContext as an MCP server)
 
 | Tool | Parameters | What it does |
 |------|-----------|-------------|

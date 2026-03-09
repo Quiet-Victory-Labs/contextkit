@@ -18,7 +18,7 @@ describe('formatSarif', () => {
     expect(result.version).toBe('2.1.0');
     expect(result.$schema).toContain('sarif-schema-2.1.0');
     expect(result.runs).toHaveLength(1);
-    expect(result.runs[0].tool.driver.name).toBe('ContextKit');
+    expect(result.runs[0].tool.driver.name).toBe('RunContext');
   });
 
   it('maps diagnostics to results', () => {

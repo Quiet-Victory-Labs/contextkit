@@ -48,7 +48,7 @@ export async function startStudioServer(opts: StudioServerOptions): Promise<{
     await fs.promises.writeFile(
       path.join(astroDataDir, 'site-config.json'),
       JSON.stringify({
-        title: config.site?.title ?? 'ContextKit',
+        title: config.site?.title ?? 'RunContext',
         studioMode: true,
       }),
       'utf-8',

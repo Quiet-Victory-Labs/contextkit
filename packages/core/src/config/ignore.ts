@@ -1,13 +1,14 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-const IGNORE_FILENAME = '.contextkit-ignore';
+const IGNORE_FILENAME = '.runcontext-ignore';
+const LEGACY_IGNORE_FILENAME = '.contextkit-ignore';
 
 /**
- * Load ignore patterns from .contextkit-ignore file and config.
+ * Load ignore patterns from .runcontext-ignore (or legacy .contextkit-ignore) file and config.
  * Returns a merged, deduplicated array of glob patterns.
  *
- * .contextkit-ignore format:
+ * .runcontext-ignore format:
  * - One glob per line
  * - Lines starting with # are comments
  * - Empty lines are skipped
@@ -18,8 +19,11 @@ export function loadIgnorePatterns(
 ): string[] {
   const patterns: string[] = [];
 
-  // Load from .contextkit-ignore file
-  const ignorePath = path.join(rootDir, IGNORE_FILENAME);
+  // Load from .runcontext-ignore file (fall back to .contextkit-ignore)
+  let ignorePath = path.join(rootDir, IGNORE_FILENAME);
+  if (!fs.existsSync(ignorePath)) {
+    ignorePath = path.join(rootDir, LEGACY_IGNORE_FILENAME);
+  }
   if (fs.existsSync(ignorePath)) {
     const content = fs.readFileSync(ignorePath, 'utf-8');
     for (const line of content.split('\n')) {

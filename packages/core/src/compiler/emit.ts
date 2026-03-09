@@ -1,5 +1,5 @@
 import type { ContextGraph } from '../types/graph.js';
-import type { ContextKitConfig } from '../types/config.js';
+import type { RunContextConfig } from '../types/config.js';
 import type { TierScore } from '../types/tier.js';
 import type { OsiSemanticModel } from '../types/osi.js';
 import type { GovernanceFile } from '../types/governance.js';
@@ -44,7 +44,7 @@ function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
  *
  * Converts all internal Maps to plain Records suitable for `JSON.stringify`.
  */
-export function emitManifest(graph: ContextGraph, _config: ContextKitConfig): Manifest {
+export function emitManifest(graph: ContextGraph, _config: RunContextConfig): Manifest {
   const manifest: Manifest = {
     version: '0.5.0',
     generatedAt: new Date().toISOString(),

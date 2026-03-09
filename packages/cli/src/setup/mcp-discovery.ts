@@ -580,7 +580,7 @@ export function discoverDatabases(cwd: string): DiscoveredDatabase[] {
 
 /**
  * Converts a DiscoveredDatabase into a DataSourceConfig that can be written
- * into contextkit.config.yaml.  Returns null if the connection details are
+ * into runcontext.config.yaml.  Returns null if the connection details are
  * insufficient to create a usable config.
  */
 export function toDataSourceConfig(discovered: DiscoveredDatabase): DataSourceConfig | null {

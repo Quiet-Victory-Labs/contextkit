@@ -1,15 +1,15 @@
-<h1 align="center">ContextKit</h1>
+<h1 align="center">RunContext</h1>
 
 <p align="center">
   <strong>Turn your database into an AI-ready data product.</strong>
 </p>
 
 <p align="center">
-  Fill out a Context Brief about your data. ContextKit connects to your database, introspects the schema, and builds a <b>semantic plane</b> — a structured metadata layer that tells AI agents what your data means, how to query it safely, and which business rules apply. Serve it to Claude Code, Cursor, Copilot, or any MCP-compatible tool.
+  Fill out a Context Brief about your data. RunContext connects to your database, introspects the schema, and builds a <b>semantic plane</b> — a structured metadata layer that tells AI agents what your data means, how to query it safely, and which business rules apply. Serve it to Claude Code, Cursor, Copilot, or any MCP-compatible tool.
 </p>
 
 <p align="center">
-  <a href="https://github.com/Quiet-Victory-Labs/contextkit/actions/workflows/ci.yml"><img src="https://github.com/Quiet-Victory-Labs/contextkit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/RunContext/runcontext/actions/workflows/ci.yml"><img src="https://github.com/RunContext/runcontext/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://www.npmjs.com/package/@runcontext/cli"><img src="https://img.shields.io/npm/v/@runcontext/cli" alt="npm" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
   <a href="https://github.com/open-semantic-interchange/OSI"><img src="https://img.shields.io/badge/OSI-Open_Semantic_Interchange-c9a55a" alt="OSI" /></a>
@@ -34,7 +34,7 @@
 
 **Step 1 — Context Brief.** Run `context setup` and a 5-step wizard opens in your browser. Name your data product, set an owner, choose a sensitivity level, and connect your database. Upload any existing documentation (SQL files, data dictionaries, markdown) to give the enrichment engine more to work with.
 
-**Step 2 — Automatic Pipeline.** ContextKit introspects your schema, scaffolds Bronze-tier metadata (descriptions, types, ownership), then auto-enriches toward Silver (trust status, glossary, lineage, sample values). The pipeline runs in real time — you watch each stage complete.
+**Step 2 — Automatic Pipeline.** RunContext introspects your schema, scaffolds Bronze-tier metadata (descriptions, types, ownership), then auto-enriches toward Silver (trust status, glossary, lineage, sample values). The pipeline runs in real time — you watch each stage complete.
 
 **Step 3 — Curate to Gold.** Open the visual studio (`context dev --studio`) to add semantic roles, aggregation rules, guardrail filters, golden queries, and business rules. This is what makes AI agents generate correct SQL instead of guessing. Gold tier requires your business knowledge — and that's where the real value is.
 
@@ -104,12 +104,12 @@ PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, 
 
 ## MCP Server
 
-Add ContextKit as an MCP server so AI agents discover your semantic plane automatically:
+Add RunContext as an MCP server so AI agents discover your semantic plane automatically:
 
 ```json
 {
   "mcpServers": {
-    "contextkit": {
+    "runcontext": {
       "command": "npx",
       "args": ["@runcontext/cli", "serve", "--stdio"]
     }
@@ -123,7 +123,7 @@ Add ContextKit as an MCP server so AI agents discover your semantic plane automa
 
 ## Local-first, Cloud-ready
 
-ContextKit runs entirely on your machine. Connect any database, curate metadata locally, serve via MCP — free and open source.
+RunContext runs entirely on your machine. Connect any database, curate metadata locally, serve via MCP — free and open source.
 
 Need collaboration, hosted MCP, or team workflows? **[RunContext Cloud](https://runcontext.dev)** adds multi-user curation, hosted serving, and managed infrastructure on top of the same open core.
 
@@ -131,7 +131,7 @@ Need collaboration, hosted MCP, or team workflows? **[RunContext Cloud](https://
 
 ## Open Semantic Interchange
 
-ContextKit metadata follows the [Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI) specification — a vendor-neutral format for describing data products. Export your semantic plane as portable YAML. Import it into any OSI-compliant tool. No lock-in.
+RunContext metadata follows the [Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI) specification — a vendor-neutral format for describing data products. Export your semantic plane as portable YAML. Import it into any OSI-compliant tool. No lock-in.
 
 ---
 
@@ -150,7 +150,7 @@ ContextKit metadata follows the [Open Semantic Interchange (OSI)](https://github
 
 ## Links
 
-- [Documentation](https://contextkit.dev)
+- [Documentation](https://runcontext.dev)
 - [npm](https://www.npmjs.com/package/@runcontext/cli)
 - [RunContext Cloud](https://runcontext.dev)
 

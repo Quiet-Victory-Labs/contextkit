@@ -1,6 +1,6 @@
-# ContextKit Lint Action
+# RunContext Lint Action
 
-Validate your semantic plane with ContextKit on every pull request.
+Validate your semantic plane with RunContext on every pull request.
 
 ## Usage
 

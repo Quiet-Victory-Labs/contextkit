@@ -1,26 +1,41 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'yaml';
-import { contextKitConfigSchema } from '../schema/config.js';
-import type { ContextKitConfig } from '../types/config.js';
+import { runContextConfigSchema } from '../schema/config.js';
+import type { RunContextConfig } from '../types/config.js';
 import { DEFAULT_CONFIG } from './defaults.js';
 import { resolveExtends } from './resolve-extends.js';
 
-const CONFIG_FILENAME = 'contextkit.config.yaml';
+const CONFIG_FILENAME = 'runcontext.config.yaml';
+const LEGACY_CONFIG_FILENAME = 'contextkit.config.yaml';
 
 /**
- * Load the ContextKit configuration from a root directory (sync).
+ * Resolve the config file path, preferring `runcontext.config.yaml` but
+ * falling back to legacy `contextkit.config.yaml` for backward compatibility.
+ */
+function resolveConfigPath(rootDir: string): string | null {
+  const preferred = path.join(rootDir, CONFIG_FILENAME);
+  if (fs.existsSync(preferred)) return preferred;
+
+  const legacy = path.join(rootDir, LEGACY_CONFIG_FILENAME);
+  if (fs.existsSync(legacy)) return legacy;
+
+  return null;
+}
+
+/**
+ * Load the RunContext configuration from a root directory (sync).
  *
- * Reads `contextkit.config.yaml` from `rootDir`, parses YAML, validates via
- * the Zod config schema, and merges with defaults. Returns `DEFAULT_CONFIG`
- * when no config file is found.
+ * Reads `runcontext.config.yaml` (or legacy `contextkit.config.yaml`) from
+ * `rootDir`, parses YAML, validates via the Zod config schema, and merges
+ * with defaults. Returns `DEFAULT_CONFIG` when no config file is found.
  *
  * Note: Does NOT resolve `extends`. Use `loadConfigAsync` for full resolution.
  */
-export function loadConfig(rootDir: string): ContextKitConfig {
-  const configPath = path.join(rootDir, CONFIG_FILENAME);
+export function loadConfig(rootDir: string): RunContextConfig {
+  const configPath = resolveConfigPath(rootDir);
 
-  if (!fs.existsSync(configPath)) {
+  if (!configPath) {
     return { ...DEFAULT_CONFIG };
   }
 
@@ -35,21 +50,21 @@ export function loadConfig(rootDir: string): ContextKitConfig {
   // Validate with Zod — .parse() will throw on invalid data.
   // The schema has .default() on context_dir and output_dir, so
   // partial configs get those filled in automatically.
-  const validated = contextKitConfigSchema.parse(parsed);
+  const validated = runContextConfigSchema.parse(parsed);
 
-  return validated as ContextKitConfig;
+  return validated as RunContextConfig;
 }
 
 /**
- * Load the ContextKit configuration with full `extends` resolution.
+ * Load the RunContext configuration with full `extends` resolution.
  *
  * Same as `loadConfig` but resolves the `extends` chain (local files and
  * npm packages) before validation.
  */
-export async function loadConfigAsync(rootDir: string): Promise<ContextKitConfig> {
-  const configPath = path.join(rootDir, CONFIG_FILENAME);
+export async function loadConfigAsync(rootDir: string): Promise<RunContextConfig> {
+  const configPath = resolveConfigPath(rootDir);
 
-  if (!fs.existsSync(configPath)) {
+  if (!configPath) {
     return { ...DEFAULT_CONFIG };
   }
 
@@ -63,6 +78,6 @@ export async function loadConfigAsync(rootDir: string): Promise<ContextKitConfig
   // Resolve extends chain before validation
   const resolved = await resolveExtends(parsed as Record<string, unknown>, rootDir);
 
-  const validated = contextKitConfigSchema.parse(resolved);
-  return validated as ContextKitConfig;
+  const validated = runContextConfigSchema.parse(resolved);
+  return validated as RunContextConfig;
 }

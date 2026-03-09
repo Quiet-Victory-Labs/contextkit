@@ -87,9 +87,9 @@ export function formatSarif(diagnostics: Diagnostic[]): string {
       {
         tool: {
           driver: {
-            name: 'ContextKit',
+            name: 'RunContext',
             version: '0.5.0',
-            informationUri: 'https://github.com/Quiet-Victory-Labs/contextkit',
+            informationUri: 'https://github.com/RunContext/runcontext',
             rules: Array.from(ruleMap.values()),
           },
         },

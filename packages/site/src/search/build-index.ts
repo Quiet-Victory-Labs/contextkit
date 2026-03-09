@@ -38,7 +38,7 @@ const MINISEARCH_OPTIONS = {
 /**
  * Build a search index from a manifest.
  *
- * @param manifest - The compiled ContextKit manifest
+ * @param manifest - The compiled RunContext manifest
  * @param basePath - The base URL path for links (e.g. '' or '/docs')
  * @returns A SearchIndex object ready for JSON serialization
  */

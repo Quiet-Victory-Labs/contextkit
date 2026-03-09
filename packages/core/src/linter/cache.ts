@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import * as crypto from 'node:crypto';
 import type { Diagnostic } from '../types/diagnostics.js';
 
-const CACHE_FILENAME = '.contextkit-cache';
+const CACHE_FILENAME = '.runcontext-cache';
 
 interface CacheEntry {
   hash: string;

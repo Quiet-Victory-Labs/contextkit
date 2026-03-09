@@ -25,7 +25,7 @@ export const dataSourceConfigSchema = z.object({
   connection: z.string().optional(),
 });
 
-export const contextKitConfigSchema = z.object({
+export const runContextConfigSchema = z.object({
   context_dir: z.string().default('context'),
   output_dir: z.string().default('dist'),
   minimum_tier: metadataTierEnum.optional(),
@@ -39,3 +39,6 @@ export const contextKitConfigSchema = z.object({
   glossary_dir: z.string().optional(),
   owners_dir: z.string().optional(),
 });
+
+/** @deprecated Use runContextConfigSchema instead */
+export const contextKitConfigSchema = runContextConfigSchema;

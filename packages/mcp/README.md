@@ -7,4 +7,4 @@ npm install @runcontext/cli
 context serve --stdio
 ```
 
-See the [ContextKit repository](https://github.com/Quiet-Victory-Labs/contextkit) for full documentation.
+See the [RunContext repository](https://github.com/RunContext/runcontext) for full documentation.

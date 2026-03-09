@@ -66,13 +66,13 @@ function setupPageHTML(): string {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ContextKit — Build Your Data Product</title>
+  <title>RunContext — Build Your Data Product</title>
   <link rel="stylesheet" href="/static/setup.css" />
 </head>
 <body>
   <div class="wizard">
     <header class="wizard-header">
-      <h1>ContextKit</h1>
+      <h1>RunContext</h1>
       <p class="tagline">Build your data product. AI handles the rest.</p>
     </header>
 
@@ -190,12 +190,12 @@ function setupPageHTML(): string {
       <div id="pipeline-timeline" class="pipeline-timeline"></div>
       <div id="pipeline-done" class="pipeline-done" style="display:none">
         <p>Your semantic plane is live. AI agents can now query your data with context.</p>
-        <p class="muted">Powered by ContextKit \u00B7 Open Semantic Interchange</p>
+        <p class="muted">Powered by RunContext \u00B7 Open Semantic Interchange</p>
       </div>
     </div>
 
     <footer class="wizard-footer">
-      <p>Powered by ContextKit \u00B7 Open Semantic Interchange</p>
+      <p>Powered by RunContext \u00B7 Open Semantic Interchange</p>
     </footer>
   </div>
   <script src="/static/setup.js"></script>
@@ -212,7 +212,7 @@ export function startUIServer(opts: UIServerOptions): Promise<void> {
       port: opts.port,
       hostname: opts.host,
     }, (info) => {
-      console.log(`ContextKit UI running at http://${opts.host === '0.0.0.0' ? 'localhost' : opts.host}:${info.port}/setup`);
+      console.log(`RunContext UI running at http://${opts.host === '0.0.0.0' ? 'localhost' : opts.host}:${info.port}/setup`);
       resolve();
     });
 

@@ -73,7 +73,7 @@ export const introspectCommand = new Command('introspect')
   )
   .option(
     '--source <name>',
-    'Use a named data_source from contextkit.config.yaml',
+    'Use a named data_source from runcontext.config.yaml',
   )
   .option('--tables <glob>', 'Filter tables by glob pattern (e.g., "vw_*")')
   .option('--select', 'Interactively select which tables to include')

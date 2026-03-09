@@ -9,7 +9,7 @@ export function registerManifestResource(server: McpServer, manifest: Manifest):
   server.resource(
     'manifest',
     'context://manifest',
-    { description: 'Full ContextKit manifest JSON (models, governance, rules, lineage, terms, owners, tiers)' },
+    { description: 'Full RunContext manifest JSON (models, governance, rules, lineage, terms, owners, tiers)' },
     async (uri) => ({
       contents: [
         {

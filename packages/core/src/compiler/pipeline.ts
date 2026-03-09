@@ -1,4 +1,4 @@
-import type { ContextGraph, ContextKitConfig, Diagnostic } from '../types/index.js';
+import type { ContextGraph, RunContextConfig, Diagnostic } from '../types/index.js';
 import { discoverFiles, discoverFilesMultiProduct } from '../parser/discover.js';
 import { parseFile } from '../parser/parse.js';
 import { validate } from './validate.js';
@@ -16,7 +16,7 @@ export interface CompileResult {
 
 export async function compile(options: {
   contextDir: string;
-  config?: Partial<ContextKitConfig>;
+  config?: Partial<RunContextConfig>;
   rootDir?: string;
 }): Promise<CompileResult> {
   const allDiagnostics: Diagnostic[] = [];

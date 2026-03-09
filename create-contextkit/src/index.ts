@@ -65,7 +65,7 @@ function main(): void {
     process.exit(1);
   }
 
-  console.log(`Creating ContextKit project: ${projectName}`);
+  console.log(`Creating RunContext project: ${projectName}`);
   console.log('');
 
   // Create project directory

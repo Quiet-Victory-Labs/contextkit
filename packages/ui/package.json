@@ -1,21 +1,21 @@
 {
   "name": "@runcontext/ui",
   "version": "0.5.2",
-  "description": "5-step browser wizard for creating data products and visual studio for curating metadata to Gold tier. Part of ContextKit.",
+  "description": "5-step browser wizard for creating data products and visual studio for curating metadata to Gold tier. Part of RunContext.",
   "license": "MIT",
   "author": "Eric Kittelson",
-  "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
+  "homepage": "https://github.com/RunContext/runcontext",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Quiet-Victory-Labs/contextkit.git",
+    "url": "https://github.com/RunContext/runcontext.git",
     "directory": "packages/ui"
   },
-  "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
+  "bugs": "https://github.com/RunContext/runcontext/issues",
   "engines": {
     "node": ">=18.0.0"
   },
   "keywords": [
-    "contextkit",
+    "runcontext",
     "onboarding",
     "data-product-builder",
     "wizard",

@@ -23,9 +23,35 @@ describe('loadConfig', () => {
     expect(config).toEqual(DEFAULT_CONFIG);
   });
 
-  it('reads contextkit.config.yaml from rootDir', () => {
+  it('falls back to legacy contextkit.config.yaml', () => {
     fs.writeFileSync(
       path.join(tmpDir, 'contextkit.config.yaml'),
+      'context_dir: legacy/context\noutput_dir: legacy-build\n',
+    );
+
+    const config = loadConfig(tmpDir);
+    expect(config.context_dir).toBe('legacy/context');
+    expect(config.output_dir).toBe('legacy-build');
+  });
+
+  it('prefers runcontext.config.yaml over contextkit.config.yaml', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'contextkit.config.yaml'),
+      'context_dir: old\noutput_dir: old-build\n',
+    );
+    fs.writeFileSync(
+      path.join(tmpDir, 'runcontext.config.yaml'),
+      'context_dir: new\noutput_dir: new-build\n',
+    );
+
+    const config = loadConfig(tmpDir);
+    expect(config.context_dir).toBe('new');
+    expect(config.output_dir).toBe('new-build');
+  });
+
+  it('reads runcontext.config.yaml from rootDir', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, 'runcontext.config.yaml'),
       'context_dir: src/context\noutput_dir: build\n',
     );
 
@@ -36,7 +62,7 @@ describe('loadConfig', () => {
 
   it('merges file values with defaults (partial config)', () => {
     fs.writeFileSync(
-      path.join(tmpDir, 'contextkit.config.yaml'),
+      path.join(tmpDir, 'runcontext.config.yaml'),
       'output_dir: out\n',
     );
 
@@ -48,7 +74,7 @@ describe('loadConfig', () => {
 
   it('parses optional fields like minimum_tier', () => {
     fs.writeFileSync(
-      path.join(tmpDir, 'contextkit.config.yaml'),
+      path.join(tmpDir, 'runcontext.config.yaml'),
       'context_dir: ctx\noutput_dir: dist\nminimum_tier: silver\n',
     );
 
@@ -72,7 +98,7 @@ describe('loadConfig', () => {
       '  port: 3000',
     ].join('\n');
 
-    fs.writeFileSync(path.join(tmpDir, 'contextkit.config.yaml'), yaml);
+    fs.writeFileSync(path.join(tmpDir, 'runcontext.config.yaml'), yaml);
 
     const config = loadConfig(tmpDir);
     expect(config.lint?.severity_overrides?.['rule1']).toBe('error');
@@ -85,7 +111,7 @@ describe('loadConfig', () => {
 
   it('validates config via Zod schema and throws on invalid data', () => {
     fs.writeFileSync(
-      path.join(tmpDir, 'contextkit.config.yaml'),
+      path.join(tmpDir, 'runcontext.config.yaml'),
       'minimum_tier: platinum\n',
     );
 
@@ -93,7 +119,7 @@ describe('loadConfig', () => {
   });
 
   it('handles an empty config file (returns defaults)', () => {
-    fs.writeFileSync(path.join(tmpDir, 'contextkit.config.yaml'), '');
+    fs.writeFileSync(path.join(tmpDir, 'runcontext.config.yaml'), '');
 
     const config = loadConfig(tmpDir);
     expect(config.context_dir).toBe('context');

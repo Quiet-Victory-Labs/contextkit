@@ -4,17 +4,17 @@
   "description": "Generate browsable documentation sites from your semantic plane. Auto-built data catalog with search, tier badges, and lineage diagrams.",
   "license": "MIT",
   "author": "Eric Kittelson",
-  "homepage": "https://github.com/Quiet-Victory-Labs/contextkit",
+  "homepage": "https://github.com/RunContext/runcontext",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Quiet-Victory-Labs/contextkit.git",
+    "url": "https://github.com/RunContext/runcontext.git",
     "directory": "packages/site"
   },
-  "bugs": "https://github.com/Quiet-Victory-Labs/contextkit/issues",
+  "bugs": "https://github.com/RunContext/runcontext/issues",
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["contextkit", "docs-generator", "data-catalog", "semantic-layer", "documentation-site", "data-product", "metadata-documentation"],
+  "keywords": ["runcontext", "docs-generator", "data-catalog", "semantic-layer", "documentation-site", "data-product", "metadata-documentation"],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
