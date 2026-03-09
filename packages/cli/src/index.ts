@@ -19,6 +19,7 @@ import { setupCommand } from './commands/setup.js';
 import { blueprintCommand } from './commands/blueprint.js';
 import { newCommand } from './commands/new.js';
 import { publishCommand } from './commands/publish.js';
+import { cloudInitCommand } from './commands/cloud-init.js';
 
 const program = new Command();
 
@@ -46,5 +47,6 @@ program.addCommand(setupCommand);
 program.addCommand(blueprintCommand);
 program.addCommand(newCommand);
 program.addCommand(publishCommand);
+program.addCommand(cloudInitCommand);
 
 program.parse();

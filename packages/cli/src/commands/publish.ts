@@ -118,6 +118,10 @@ export const publishCommand = new Command('publish')
   .option('--api-url <url>', 'RunContext Cloud API URL', DEFAULT_API_URL)
   .option('--context-dir <path>', 'Path to context directory')
   .action(async (opts: PublishOptions) => {
+    console.warn(chalk.yellow('Warning: context publish is deprecated. Use git push with RunContext Cloud instead.'));
+    console.warn(chalk.yellow('  Run: context cloud'));
+    console.warn('');
+
     try {
       // Load config first (before credential validation)
       const config = loadConfig(process.cwd());
