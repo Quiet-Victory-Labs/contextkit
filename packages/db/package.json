@@ -1,0 +1,38 @@
+{
+  "name": "@runcontext/db",
+  "version": "0.5.2",
+  "description": "Read-only, guardrailed database connector MCP server. Connect any database to AI agents with automatic safety constraints.",
+  "license": "MIT",
+  "author": "Eric Kittelson",
+  "homepage": "https://github.com/RunContext/runcontext",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RunContext/runcontext.git",
+    "directory": "packages/db"
+  },
+  "bugs": "https://github.com/RunContext/runcontext/issues",
+  "engines": { "node": ">=18.0.0" },
+  "keywords": ["mcp", "model-context-protocol", "database", "read-only", "guardrails", "ai-agent", "runcontext", "claude-code", "cursor", "copilot", "data-connector"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "runcontext-db": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@runcontext/core": "workspace:^",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0"
+  }
+}
