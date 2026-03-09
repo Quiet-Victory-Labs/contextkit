@@ -30,7 +30,7 @@
     "@runcontext/mcp": "workspace:^",
     "@runcontext/site": "workspace:^",
     "chalk": "^5.4.0",
-    "chokidar": "^4.0.0",
+    "chokidar": "^5.0.0",
     "commander": "^14.0.0",
     "@clack/prompts": "^1.1.0",
     "yaml": "^2.7.0"
