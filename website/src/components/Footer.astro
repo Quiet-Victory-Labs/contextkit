@@ -8,49 +8,50 @@ import Pagination from 'virtual:starlight/components/Pagination';
   <div class="site-footer">
     <div class="footer-grid">
       <div class="footer-col">
-        <h4>Product</h4>
+        <h4>Documentation</h4>
         <ul>
           <li><a href="/getting-started/quick-start/">Quick Start</a></li>
           <li><a href="/getting-started/introduction/">How It Works</a></li>
-          <li><a href="/pricing/">Pricing</a></li>
-          <li><a href="/integrations/">Integrations</a></li>
-          <li><a href="/cloud/overview/">RunContext Cloud</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Developers</h4>
-        <ul>
           <li><a href="/cli/overview/">CLI Reference</a></li>
           <li><a href="/mcp/overview/">MCP Server</a></li>
-          <li><a href="/cloud/api/">Cloud API</a></li>
           <li><a href="/concepts/tiers/">Tier System</a></li>
-          <li><a href="https://github.com/Quiet-Victory-Labs/contextkit" target="_blank" rel="noopener">GitHub</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Resources</h4>
+        <h4>Reference</h4>
         <ul>
-          <li><a href="/blog/why-ai-agents-write-wrong-sql/">Blog</a></li>
           <li><a href="/reference/databases/">Database Support</a></li>
           <li><a href="/reference/lint-rules/">Lint Rules</a></li>
+          <li><a href="/reference/config/">Config File</a></li>
           <li><a href="/concepts/osi/">OSI Specification</a></li>
-          <li><a href="/contact/">Contact Us</a></li>
+          <li><a href="/cloud/api/">Cloud API</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Company</h4>
+        <h4>Platform</h4>
         <ul>
-          <li><a href="/legal/privacy/">Privacy Policy</a></li>
-          <li><a href="/legal/terms/">Terms of Service</a></li>
-          <li><a href="/contact/">Contact</a></li>
-          <li><a href="https://github.com/Quiet-Victory-Labs/contextkit" target="_blank" rel="noopener">Open Source (MIT)</a></li>
+          <li><a href="https://runcontext.dev" target="_blank" rel="noopener">Marketing Site</a></li>
+          <li><a href="https://runcontext.dev/pricing/" target="_blank" rel="noopener">Pricing</a></li>
+          <li><a href="https://app.runcontext.dev" target="_blank" rel="noopener">Cloud Dashboard</a></li>
+          <li><a href="https://runcontext.dev/blog/why-ai-agents-write-wrong-sql/" target="_blank" rel="noopener">Blog</a></li>
+          <li><a href="https://runcontext.dev/contact/" target="_blank" rel="noopener">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <ul>
+          <li><a href="https://github.com/Quiet-Victory-Labs/contextkit" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://github.com/Quiet-Victory-Labs/contextkit/issues" target="_blank" rel="noopener">Issues</a></li>
+          <li><a href="https://github.com/Quiet-Victory-Labs/contextkit/discussions" target="_blank" rel="noopener">Discussions</a></li>
+          <li><a href="https://www.npmjs.com/org/runcontext" target="_blank" rel="noopener">npm</a></li>
+          <li><a href="https://runcontext.dev/legal/privacy/" target="_blank" rel="noopener">Privacy</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer-bottom">
       <div class="footer-brand">
-        <span class="footer-logo">ContextKit</span>
+        <span class="footer-logo">Context<span class="footer-logo-kit">Kit</span></span>
         <span class="footer-tagline">Turn your database into an AI-ready data product.</span>
       </div>
       <div class="footer-social">
@@ -152,6 +153,10 @@ import Pagination from 'virtual:starlight/components/Pagination';
     font-size: 1rem;
     color: var(--sl-color-white);
     letter-spacing: -0.02em;
+  }
+
+  .footer-logo-kit {
+    color: var(--sl-color-accent);
   }
 
   .footer-tagline {
