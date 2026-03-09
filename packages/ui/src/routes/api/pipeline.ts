@@ -1,7 +1,10 @@
 import { Hono } from 'hono';
 import { execFile as execFileCb } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { promisify } from 'node:util';
+import { parse as parseYaml } from 'yaml';
 
 const execFile = promisify(execFileCb);
 
@@ -105,6 +108,41 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
     const run = runs.get(c.req.param('id'));
     if (!run) return c.json({ error: 'Not found' }, 404);
     return c.json(run);
+  });
+
+  app.get('/api/mcp-config', (c) => {
+    // Read runcontext.config.yaml to find a data source connection string
+    let connection: string | undefined;
+    try {
+      const configPath = join(rootDir, 'runcontext.config.yaml');
+      const configRaw = readFileSync(configPath, 'utf-8');
+      const config = parseYaml(configRaw) as Record<string, unknown>;
+      const dataSources = config?.dataSources as
+        | Array<{ connectionString?: string }>
+        | undefined;
+      if (dataSources && dataSources.length > 0) {
+        connection = dataSources[0].connectionString;
+      }
+    } catch {
+      // Config file missing or unparseable – proceed without db entry
+    }
+
+    const mcpServers: Record<string, unknown> = {
+      runcontext: {
+        command: 'npx',
+        args: ['--yes', '@runcontext/cli', 'serve'],
+        cwd: rootDir,
+      },
+    };
+
+    if (connection) {
+      mcpServers['runcontext-db'] = {
+        command: 'npx',
+        args: ['--yes', '@runcontext/db', '--url', connection],
+      };
+    }
+
+    return c.json({ mcpServers });
   });
 
   return app;
