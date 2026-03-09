@@ -5,7 +5,7 @@ import type { DataAdapter, AdapterType } from '@runcontext/core';
 import { createAdapter } from '@runcontext/core';
 
 import { enforceReadOnly, applyTimeout, DEFAULT_TIMEOUT_MS } from './guardrails.js';
-import { listSchemas, listTables, describeTable, sampleValues, listRelationships } from './tools.js';
+import { listSchemas, listTables, describeTable, sampleValues, listRelationships, executeQuery } from './tools.js';
 
 /**
  * Detect the adapter type from a connection URL.
@@ -121,6 +121,30 @@ export function createDbServer(adapter: DataAdapter, adapterType: AdapterType): 
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
       };
+    },
+  );
+
+  // --- db_query ---
+  server.tool(
+    'db_query',
+    'Execute a read-only SQL query. Only SELECT statements are allowed. Automatically enforces row limits and timeouts.',
+    {
+      sql: z.string().describe('SQL query to execute (SELECT only)'),
+      limit: z.number().int().min(1).max(1000).optional().describe('Maximum rows to return (default 100, max 1000)'),
+    },
+    async ({ sql, limit }) => {
+      try {
+        const result = await executeQuery(adapter, sql, limit);
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify({ error: message }) }],
+          isError: true,
+        };
+      }
     },
   );
 

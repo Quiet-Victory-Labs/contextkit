@@ -1,5 +1,5 @@
 import type { DataAdapter, AdapterType, TableInfo, ColumnInfo, QueryResult } from '@runcontext/core';
-import { applyRowLimit, DEFAULT_ROW_LIMIT } from './guardrails.js';
+import { applyRowLimit, DEFAULT_ROW_LIMIT, validateReadOnlySQL, MAX_QUERY_ROW_LIMIT } from './guardrails.js';
 
 // ---------------------------------------------------------------------------
 // db_list_schemas
@@ -257,6 +257,45 @@ export async function listRelationships(
   } catch {
     return { relationships: [] };
   }
+}
+
+// ---------------------------------------------------------------------------
+// db_query
+// ---------------------------------------------------------------------------
+
+export interface ExecuteQueryResult {
+  query: string;
+  columns: string[];
+  rows: Record<string, unknown>[];
+  row_count: number;
+  truncated: boolean;
+}
+
+/**
+ * Execute a read-only SQL query with guardrails.
+ * Validates the query, applies row limits, and returns the results.
+ */
+export async function executeQuery(
+  adapter: DataAdapter,
+  sql: string,
+  limit?: number,
+): Promise<ExecuteQueryResult> {
+  const validation = validateReadOnlySQL(sql);
+  if (!validation.valid) {
+    throw new Error(validation.reason);
+  }
+
+  const effectiveLimit = Math.min(limit ?? DEFAULT_ROW_LIMIT, MAX_QUERY_ROW_LIMIT);
+  const limitedSql = applyRowLimit(sql, effectiveLimit);
+  const result = await adapter.query(limitedSql);
+
+  return {
+    query: limitedSql,
+    columns: result.columns,
+    rows: result.rows,
+    row_count: result.row_count,
+    truncated: result.row_count >= effectiveLimit,
+  };
 }
 
 // ---------------------------------------------------------------------------
