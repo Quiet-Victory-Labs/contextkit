@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { title, activeModel } = Astro.props;
-const siteTitle = siteConfig.title || 'ContextKit';
+const siteTitle = siteConfig.title || 'RunContext';
 const studioMode = (siteConfig as any).studioMode ?? false;
 const models = manifest.models;
 const tiers = manifest.tiers;
@@ -36,7 +36,7 @@ const products = (manifest as any).products;
   </div>
 
   <footer class="site-footer">
-    Powered by <a href="https://github.com/Quiet-Victory-Labs/contextkit">ContextKit</a>
+    Powered by <a href="https://github.com/RunContext/runcontext">RunContext</a>
     &nbsp;&middot;&nbsp;
     Open Semantic Interchange
   </footer>
