@@ -77,6 +77,14 @@ export async function discoverFilesMultiProduct(
     }
   }
 
+  // If no product-scoped model files found, fall back to flat discovery.
+  // This handles the case where products/ exists but only has non-model files
+  // (e.g., context-brief.yaml from the setup wizard).
+  const hasProductModels = files.some((f) => f.kind === 'model');
+  if (!hasProductModels) {
+    return discoverFiles(contextDir, ignore);
+  }
+
   // Scan shared directories for terms and owners
   const glossaryDir = config?.glossary_dir
     ? path.join(contextDir, config.glossary_dir)
