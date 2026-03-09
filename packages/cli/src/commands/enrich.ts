@@ -142,6 +142,8 @@ export const enrichCommand = new Command('enrich')
             if (dsConfig) {
               adapter = await createAdapter(dsConfig);
               await adapter.connect();
+            } else {
+              console.log(chalk.yellow('  ! No data source available for semantic role inference. Using name-based heuristics only.'));
             }
 
             for (const ds of model.datasets) {
@@ -206,6 +208,8 @@ export const enrichCommand = new Command('enrich')
                 }
               }
               await adapter2.disconnect();
+            } else {
+              console.log(chalk.yellow('  ! No data source available for sample_values. Add data_sources to runcontext.config.yaml or use --db <url>.'));
             }
           }
 
