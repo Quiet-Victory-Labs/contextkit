@@ -1,0 +1,112 @@
+---
+title: Dashboard
+description: "The RunContext Cloud dashboard — browse data products, manage your team, configure connectors, and monitor MCP usage from a single web interface."
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+The RunContext Cloud dashboard at [app.runcontext.dev](https://app.runcontext.dev) is where you manage everything about your hosted semantic planes. It's a read-and-manage interface — you still build and curate metadata locally with the CLI, then publish to the cloud.
+
+---
+
+## Home
+
+The home page shows a snapshot of your organization:
+
+- **Published semantic planes** — how many data products are live
+- **Overall tier distribution** — how many products are Bronze, Silver, Gold
+- **Recent activity** — latest publishes, team joins, connector runs
+- **Connected tools** — how many MCP clients are actively querying
+
+This is your at-a-glance health check for your team's semantic layer.
+
+---
+
+## Data Products
+
+Browse every data product published to your organization.
+
+**Product list** — sorted by name, with tier badges (Bronze/Silver/Gold) and last-published dates.
+
+**Product detail** — click into a product to see:
+- **Models** — every table/view with descriptions, grain, and ownership
+- **Fields** — column-level metadata: types, descriptions, semantic roles, sample values
+- **Governance** — trust status, sensitivity classification, refresh cadence
+- **Rules** — golden queries, business rules, guardrail filters
+- **Lineage** — upstream and downstream dependencies
+- **Tier scorecard** — what's passing, what's missing for the next tier
+
+This is the same information available via the MCP server, but presented visually for humans.
+
+---
+
+## Team
+
+Manage who has access to your organization.
+
+**Members** — list of all team members with their roles and last-active dates.
+
+**Invite** — send invitations by email. Choose a role:
+- **Admin** — manage billing, team, and settings
+- **Editor** — publish and update semantic planes
+- **Viewer** — read-only access to dashboard and MCP endpoint
+
+**API Keys** — each team member has their own key for MCP connections. Admins can view and revoke any key.
+
+---
+
+## Connectors
+
+Managed database connections for automatic introspection.
+
+**Active connectors** — list of configured databases with their status (connected, error, syncing) and last introspection date.
+
+**Add connector** — choose a database type, enter connection details, select tables, and set a refresh schedule.
+
+**Introspection history** — see when each connector last ran, what it found (new tables, changed columns), and any errors.
+
+<Aside type="note">
+Connectors run introspection only — they read your schema metadata but never query your actual data rows. The connection uses read-only access over encrypted channels.
+</Aside>
+
+---
+
+## Usage
+
+Monitor how your semantic planes are being used.
+
+- **MCP queries/day** — how many times AI tools are hitting your endpoint
+- **Top data products** — which products are queried most often
+- **Top tools** — which MCP tools are used most (search, explain, guardrails, etc.)
+- **Connected clients** — how many unique AI tools are connecting
+
+This helps you understand which data products are most valuable and where to focus curation effort.
+
+---
+
+## Settings
+
+Organization-level configuration.
+
+- **Organization name** — update your display name
+- **Default sensitivity** — set a default sensitivity level for new data products
+- **Billing** — view your current plan, usage, and invoices
+- **Payment method** — add or update credit card (processed by Stripe)
+- **Plan management** — upgrade, downgrade, or cancel
+- **Danger zone** — transfer or delete your organization
+
+---
+
+## Billing
+
+**Current plan** — shows your plan (Team or Enterprise), billing cycle, and next invoice date.
+
+**Usage this period** — seats used, connectors active, MCP queries made.
+
+**Invoices** — downloadable PDF invoices for each billing period.
+
+**Payment method** — Stripe-managed credit card. Update anytime.
+
+**Plan changes** — upgrades take effect immediately (prorated). Downgrades take effect at the end of the billing cycle. Cancellations retain access through the paid period.

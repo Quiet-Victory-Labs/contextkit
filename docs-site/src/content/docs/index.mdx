@@ -1,14 +1,14 @@
 ---
 title: ContextKit
-description: "Turn your database into an AI-ready data product. ContextKit — the open-source CLI that guides you through a Context Brief, introspects your schema, builds a semantic plane, and serves it to AI agents via MCP."
+description: "Your AI agents write wrong SQL because they don't understand your data. ContextKit fixes that. Build a semantic plane — the metadata layer that makes every AI query correct by default."
 template: splash
 hero:
-  tagline: "Run context setup. Fill out a Context Brief in your browser. ContextKit connects your database, builds a semantic plane, and serves it to every AI tool via MCP — so every query is correct by default."
+  tagline: "Your AI agents write wrong SQL because they don't understand your data. ContextKit builds a semantic plane — the metadata layer that makes every query correct by default."
   image:
     dark: ../../assets/logo-dark.svg
     light: ../../assets/logo-light.svg
   actions:
-    - text: Get Started
+    - text: Get Started Free
       link: /getting-started/quick-start/
       icon: right-arrow
       variant: primary
@@ -27,18 +27,17 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
   </div>
 </div>
 
-## From Database to AI-Ready in Four Steps
+## The Problem
 
-AI agents see table and column names, but they don't understand what the data **means**. They don't know which filters are required, how metrics should be aggregated, or which joins are safe. Every query is a guess.
+You asked your AI agent: *"What was total revenue last quarter?"*
 
-ContextKit fixes this by building a **semantic plane** — a structured metadata layer between your database and your AI tools.
+It connected to your database. It wrote SQL. It ran. It returned a number.
 
-```
-1. context setup          → Browser wizard opens
-2. Fill out Context Brief → Name, owner, sensitivity, database
-3. Pipeline auto-runs     → Introspect → Scaffold → Enrich → Verify
-4. context serve          → MCP server live — agents have full context
-```
+**That number was wrong.**
+
+The agent used `AVG` instead of `SUM`. It forgot to filter out cancelled orders. It joined to the wrong table. And it did all of this confidently, without telling you anything was off.
+
+This happens because AI agents can see your schema — table names, column names, types — but they can't see what the data *means*. They don't know which aggregation to use, which filters are required, which joins are safe, or what "revenue" actually measures in your business.
 
 <div class="comparison">
   <div class="without">
@@ -59,127 +58,141 @@ WHERE status='completed' ← required (guardrail)</code></pre>
 
 ---
 
-## How It Works
+## The Fix: A Semantic Plane
 
-**Step 1 — Context Brief.** Run `context setup` and a 5-step wizard opens in your browser. Name your data product, set an owner, choose a sensitivity level (public, internal, confidential, restricted), and connect your database. Upload any existing documentation — SQL files, data dictionaries, markdown — to give the enrichment engine more to work with.
+A **semantic plane** is a structured metadata layer that sits between your database and your AI tools. It captures what your data means — field descriptions, business rules, metric definitions, safe joins, guardrail filters — so agents generate correct queries instead of guessing.
 
-**Step 2 — Automatic Pipeline.** ContextKit introspects your schema, scaffolds Bronze-tier metadata (descriptions, types, ownership), then auto-enriches toward Silver (trust status, glossary, lineage, sample values). The pipeline runs in real time — you watch each stage complete in the browser.
+```
+Your Database  →  Semantic Plane  →  AI Agent
+(raw schema)      (meaning)          (correct SQL)
+```
 
-**Step 3 — Curate to Gold.** Open the visual studio (`context dev --studio`) to add semantic roles, aggregation rules, guardrail filters, golden queries, and business rules. Gold tier requires your business knowledge — and that's where the real value is.
-
-**Step 4 — Serve via MCP.** Run `context serve` and every AI tool in your stack gets access to your semantic plane. Agents can search metadata, look up business terms, retrieve guardrails, and find golden queries — all through the Model Context Protocol.
-
-Or skip the wizard and tell your AI agent:
-
-> *"Install @runcontext/cli and build a semantic layer for my database."*
-
-The agent runs the same pipeline programmatically, asking you about metrics, ownership, and business rules as it goes.
+ContextKit builds this layer for you. You describe your data once, and every AI tool in your stack gets the same understanding.
 
 ---
 
-## Three Tiers to AI-Ready
+## How It Works
+
+### 1. Fill Out a Context Brief
+
+Run `context setup` and a wizard opens in your browser. You'll answer five simple questions:
+
+- **What is this data product?** — Give it a name and description
+- **Who owns it?** — Name, team, email
+- **How sensitive is it?** — Public, internal, confidential, or restricted
+- **Where does the data live?** — Connect your database (auto-detected from your environment)
+- **Any existing docs?** — Upload SQL files, data dictionaries, markdown — anything that helps
+
+This takes about two minutes. You're describing what you already know about your data.
+
+### 2. The Pipeline Builds Your Semantic Plane
+
+Once you submit the Context Brief, ContextKit runs an automatic pipeline:
+
+- **Introspect** — connects to your database, reads every table, column, and type
+- **Scaffold** — generates Bronze-tier metadata (descriptions, ownership, security classification)
+- **Enrich** — auto-fills Silver-tier context (glossary terms, lineage, sample values, trust status)
+- **Verify** — lints everything and flags issues
+
+You watch each stage complete in the browser. When it's done, you have a Silver-tier semantic plane — already useful, already serving context to AI agents.
+
+### 3. Curate to Gold
+
+Silver gets you most of the way. Gold is what makes agents *truly* reliable.
+
+Open the visual studio (`context dev --studio`) and add the business knowledge that only you have:
+
+- **Semantic roles** — "this column is a metric, always SUM it"
+- **Guardrail filters** — "always filter WHERE status = 'completed'"
+- **Golden queries** — "the correct SQL for 'total revenue' is..."
+- **Business rules** — "revenue = price * quantity, excluding refunds"
+
+This is the work that prevents wrong answers. It takes time, but it's the most valuable thing you can do for your data.
+
+### 4. Serve to Every AI Tool
+
+```bash
+context serve --stdio
+```
+
+Your semantic plane is now available to every MCP-compatible AI tool — Claude Code, Cursor, Copilot, Windsurf, Codex. Agents can search your metadata, look up business terms, check guardrails, and find golden queries.
+
+One source of truth. Every tool gets it.
+
+---
+
+## Start Local, Scale to Cloud
 
 <CardGrid>
-  <Card title="Bronze — Discoverable" icon="document">
-    Descriptions, ownership, security classification, grain. Achieved automatically when the pipeline introspects your database. Your data is findable, but AI doesn't yet know how to use it.
+  <Card title="Free — Local" icon="open-book">
+    Everything runs on your machine. No account needed, no data leaves your environment. Install the CLI, build your semantic plane, serve it locally via MCP. **Free forever.**
+
+    ```bash
+    npx create-contextkit
+    ```
   </Card>
-  <Card title="Silver — Trusted" icon="approve-check">
-    Trust status, business glossary, lineage, sample values, refresh cadence. Achieved automatically via the enrichment pipeline. AI can interpret the data but still lacks guardrails.
-  </Card>
-  <Card title="Gold — AI-Ready" icon="star">
-    Semantic roles, aggregation rules, guardrails, golden queries, business rules. Curated by you in the visual studio. AI generates correct SQL on the first try.
-  </Card>
-  <Card title="40 Lint Rules" icon="list-format">
-    Schema validation, governance checks, security classification, data accuracy — all tier-aware with auto-fix via `context fix`.
+  <Card title="Cloud — Teams" icon="rocket">
+    When your team needs shared access, publish your semantic plane to **RunContext Cloud**. Get a hosted MCP endpoint, team collaboration, managed database connectors, and a web dashboard — without running any infrastructure.
+
+    [Learn about Cloud plans →](/cloud/overview/)
   </Card>
 </CardGrid>
 
 ---
 
-## Architecture
-
-ContextKit runs **local-first** — your metadata lives in your repo as YAML files. No cloud account needed, no vendor lock-in.
-
-```
-┌─────────────────────────────────────────────────┐
-│  Your Repository                                │
-│  context/                                       │
-│    products/                                    │
-│      my_product/                                │
-│        context-brief.yaml  ← your data product  │
-│        osi.yaml            ← OSI spec (portable) │
-│        governance.yaml     ← rules & guardrails  │
-│    contextkit.config.yaml                       │
-└───────────────┬─────────────────────────────────┘
-                │
-    ┌───────────┼───────────────┐
-    ▼           ▼               ▼
-  Setup      MCP Server      Visual Studio
-  Wizard     (serve to        (curate to
-  (build)     agents)          Gold tier)
-```
-
-**Local-first.** Everything runs on your machine. No API keys, no cloud dependency.
-
-**Cloud-ready.** When your team needs shared access, **[RunContext Cloud](https://runcontext.dev)** adds multi-user curation, hosted MCP serving, and managed infrastructure on top of the same open core.
-
----
-
-## Works With
+## Works With Everything
 
 <CardGrid>
   <Card title="Claude Code" icon="rocket">
-    Add ContextKit as an MCP server in `.claude/mcp.json` — the agent discovers your semantic plane automatically.
+    Add to `.claude/mcp.json` — agents discover your semantic plane automatically and use it for every query.
   </Card>
   <Card title="Cursor" icon="rocket">
-    Configure in `.cursor/mcp.json`. Cursor's agent uses `context_search` and `context_explain` to write correct queries.
+    Configure in `.cursor/mcp.json`. Cursor uses `context_search` and `context_explain` to write correct SQL.
   </Card>
-  <Card title="VS Code" icon="rocket">
-    Works with Copilot Chat via `.vscode/mcp.json`. Your semantic metadata is available to any VS Code agent.
+  <Card title="VS Code + Copilot" icon="rocket">
+    Works via `.vscode/mcp.json`. Your semantic metadata is available to Copilot Chat and any VS Code agent.
   </Card>
   <Card title="Windsurf" icon="rocket">
-    Add to `~/.codeium/windsurf/mcp_config.json`. Windsurf's AI uses guardrails and golden queries from your context.
+    Add to `~/.codeium/windsurf/mcp_config.json`. Windsurf uses guardrails and golden queries from your plane.
   </Card>
 </CardGrid>
 
 Also works with OpenAI Codex, any MCP-compatible client, and any agent that can run CLI commands.
 
-See the full [Integrations guide](/integrations/) for setup instructions.
-
 ---
 
-## Everything in One Install
+## 9 Databases, 40 Lint Rules, 8 MCP Tools
 
 <CardGrid stagger>
-  <Card title="Browser-Based Setup Wizard" icon="pen">
-    `context setup` — 5-step guided form to create your data product. Name it, connect your database, and the pipeline builds your semantic plane automatically.
-  </Card>
-  <Card title="Visual Studio Editor" icon="setting">
-    `context dev --studio` — edit metadata in the browser, see tier updates live, save back to YAML. Curate from Silver to Gold with real-time feedback.
-  </Card>
-  <Card title="MCP Server with 8 Tools" icon="rocket">
-    Serve your semantic plane to AI agents via stdio or HTTP. Search, explain, validate, tier, golden queries, guardrails, list products, get product.
-  </Card>
   <Card title="9 Database Adapters" icon="laptop">
-    PostgreSQL, DuckDB, MySQL, SQL Server, Snowflake, BigQuery, ClickHouse, Databricks, SQLite.
+    PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks. Connect any of them during setup — ContextKit auto-detects from your environment.
+  </Card>
+  <Card title="40 Lint Rules" icon="list-format">
+    Schema validation, governance checks, security classification, data accuracy — all tier-aware. Run `context lint` in CI to catch regressions. `context fix --write` auto-fixes common issues.
+  </Card>
+  <Card title="8 MCP Tools" icon="rocket">
+    Search, explain, validate, tier, golden-queries, guardrails, list-products, get-product. Every tool an agent needs to understand your data.
+  </Card>
+  <Card title="Bronze → Silver → Gold" icon="star">
+    Automated maturity scoring. Bronze is auto-generated. Silver is auto-enriched. Gold requires your expertise — and that's what makes it valuable.
   </Card>
 </CardGrid>
 
 ---
 
-## Quick Start
+## Get Started
 
 ```bash
 npx create-contextkit my-data
 cd my-data
-context setup           # browser wizard — database to data product
-context tier            # check your Bronze/Silver/Gold score
-context serve --stdio   # serve to AI agents via MCP
+context setup
 ```
 
+The wizard opens in your browser. Two minutes to describe your data. The pipeline handles the rest.
+
 <CardGrid>
-  <LinkCard title="Introduction" description="How agents use ContextKit" href="/getting-started/introduction/" />
-  <LinkCard title="Quick Start" description="Up and running in 5 minutes" href="/getting-started/quick-start/" />
-  <LinkCard title="Pricing" description="Free, Team, and Enterprise plans" href="/pricing/" />
-  <LinkCard title="Integrations" description="Connect your AI tools" href="/integrations/" />
+  <LinkCard title="Quick Start" description="Database to semantic plane in 5 minutes" href="/getting-started/quick-start/" />
+  <LinkCard title="How It Works" description="The full product walkthrough" href="/getting-started/introduction/" />
+  <LinkCard title="RunContext Cloud" description="Hosted semantic planes for teams" href="/cloud/overview/" />
+  <LinkCard title="Pricing" description="Free, Team, and Enterprise" href="/pricing/" />
 </CardGrid>

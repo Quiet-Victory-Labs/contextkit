@@ -27,13 +27,6 @@ export default defineConfig({
         { label: 'Pricing', slug: 'pricing' },
         { label: 'Integrations', slug: 'integrations' },
         {
-          label: 'Legal',
-          items: [
-            { label: 'Privacy Policy', slug: 'legal/privacy' },
-            { label: 'Terms of Service', slug: 'legal/terms' },
-          ],
-        },
-        {
           label: 'Getting Started',
           items: [
             { label: 'Introduction', slug: 'getting-started/introduction' },
@@ -86,6 +79,22 @@ export default defineConfig({
             { label: 'Lint Rules', slug: 'reference/lint-rules' },
             { label: 'Database Support', slug: 'reference/databases' },
             { label: 'Config File', slug: 'reference/config' },
+          ],
+        },
+        {
+          label: 'RunContext Cloud',
+          items: [
+            { label: 'Overview', slug: 'cloud/overview' },
+            { label: 'Sign Up & Onboarding', slug: 'cloud/signup' },
+            { label: 'Dashboard', slug: 'cloud/dashboard' },
+            { label: 'Cloud API', slug: 'cloud/api' },
+          ],
+        },
+        {
+          label: 'Legal',
+          items: [
+            { label: 'Privacy Policy', slug: 'legal/privacy' },
+            { label: 'Terms of Service', slug: 'legal/terms' },
           ],
         },
         {
