@@ -5,7 +5,7 @@ description: How to configure the ContextKit MCP server for Claude Code, Cursor,
 
 import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
-The ContextKit MCP server can be configured for any MCP-compatible client. You can run it **locally** (stdio or self-hosted HTTP) or connect to the **hosted endpoint** at `mcp.runcontext.dev`.
+The ContextKit MCP server can be configured for any MCP-compatible client. You can run it **locally** (stdio or self-hosted HTTP) or connect to the **hosted endpoint** at `api.runcontext.dev/mcp`.
 
 ## Connection modes
 
@@ -28,7 +28,7 @@ For the hosted endpoint, replace `{org}` with your organization slug and set `CO
   "mcpServers": {
     "contextkit": {
       "command": "npx",
-      "args": ["contextkit", "mcp"],
+      "args": ["@runcontext/cli", "serve", "--stdio"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -51,7 +51,7 @@ For the hosted endpoint, replace `{org}` with your organization slug and set `CO
 {
   "mcpServers": {
     "contextkit": {
-      "url": "https://mcp.runcontext.dev/{org}",
+      "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
         "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
       }
@@ -77,7 +77,7 @@ Set `cwd` to the directory containing your `contextkit.config.yaml` file. If the
   "mcpServers": {
     "contextkit": {
       "command": "npx",
-      "args": ["contextkit", "mcp"],
+      "args": ["@runcontext/cli", "serve", "--stdio"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -100,7 +100,7 @@ Set `cwd` to the directory containing your `contextkit.config.yaml` file. If the
 {
   "mcpServers": {
     "contextkit": {
-      "url": "https://mcp.runcontext.dev/{org}",
+      "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
         "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
       }
@@ -124,7 +124,7 @@ VS Code supports MCP servers via its built-in chat/copilot agent framework. Conf
   "mcpServers": {
     "contextkit": {
       "command": "npx",
-      "args": ["contextkit", "mcp"],
+      "args": ["@runcontext/cli", "serve", "--stdio"],
       "cwd": "${workspaceFolder}"
     }
   }
@@ -147,7 +147,7 @@ VS Code supports MCP servers via its built-in chat/copilot agent framework. Conf
 {
   "mcpServers": {
     "contextkit": {
-      "url": "https://mcp.runcontext.dev/{org}",
+      "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
         "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
       }
@@ -171,7 +171,7 @@ Windsurf reads MCP configuration from `~/.codeium/windsurf/mcp_config.json`.
   "mcpServers": {
     "contextkit": {
       "command": "npx",
-      "args": ["contextkit", "mcp"],
+      "args": ["@runcontext/cli", "serve", "--stdio"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -183,7 +183,7 @@ Windsurf reads MCP configuration from `~/.codeium/windsurf/mcp_config.json`.
 {
   "mcpServers": {
     "contextkit": {
-      "serverUrl": "https://mcp.runcontext.dev/{org}",
+      "serverUrl": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
         "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
       }
@@ -207,7 +207,7 @@ OpenAI Codex CLI reads MCP configuration from a `mcp.json` file or inline config
   "mcpServers": {
     "contextkit": {
       "command": "npx",
-      "args": ["contextkit", "mcp"],
+      "args": ["@runcontext/cli", "serve", "--stdio"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -219,7 +219,7 @@ OpenAI Codex CLI reads MCP configuration from a `mcp.json` file or inline config
 {
   "mcpServers": {
     "contextkit": {
-      "url": "https://mcp.runcontext.dev/{org}",
+      "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
         "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
       }
@@ -241,7 +241,7 @@ Any MCP-compatible client can connect using either transport.
 Run the MCP server as a subprocess:
 
 ```bash
-npx contextkit mcp
+npx @runcontext/cli serve --stdio
 ```
 
 The server communicates over stdin/stdout using the MCP JSON-RPC protocol.
@@ -265,7 +265,7 @@ http://localhost:3000/mcp
 Send MCP JSON-RPC requests to the hosted endpoint:
 
 ```
-POST https://mcp.runcontext.dev/{org}
+POST https://api.runcontext.dev/mcp/{org}
 Authorization: Bearer <your-api-key>
 Content-Type: application/json
 ```
