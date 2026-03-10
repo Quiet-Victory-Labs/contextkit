@@ -16,19 +16,34 @@ function getArg(name: string): string | undefined {
 }
 
 const url = getArg('--url');
+const authKey = getArg('--auth');
 
-if (!url) {
+if (!url && !authKey) {
   console.error('Usage: runcontext-db --url <connection-string>');
+  console.error('       runcontext-db --auth <provider:key>');
   console.error('');
   console.error('Examples:');
   console.error('  runcontext-db --url postgres://user:pass@localhost:5432/mydb');
   console.error('  runcontext-db --url mysql://user:pass@localhost:3306/mydb');
   console.error('  runcontext-db --url /path/to/database.duckdb');
   console.error('  runcontext-db --url /path/to/database.sqlite');
+  console.error('  runcontext-db --auth neon:my-project');
   process.exit(1);
 }
 
-startServer(url).catch((err) => {
-  console.error('Failed to start runcontext-db server:', err);
-  process.exit(1);
-});
+if (authKey) {
+  import('@runcontext/core').then(async ({ createDefaultRegistry, CredentialStore, resolveAuthConnection }) => {
+    const registry = createDefaultRegistry();
+    const store = new CredentialStore();
+    const resolvedUrl = await resolveAuthConnection(authKey, registry, store);
+    return startServer(resolvedUrl);
+  }).catch((err) => {
+    console.error('Failed to resolve auth credentials:', err);
+    process.exit(1);
+  });
+} else {
+  startServer(url!).catch((err) => {
+    console.error('Failed to start runcontext-db server:', err);
+    process.exit(1);
+  });
+}
