@@ -1,0 +1,72 @@
+---
+import config from 'virtual:starlight/user-config';
+import { logos } from 'virtual:starlight/user-images';
+const { siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="site-title sl-flex">
+  {config.logo && logos.dark && (
+    <>
+      <img
+        class:list={{ 'light:sl-hidden print:hidden': !('src' in config.logo) }}
+        alt={config.logo.alt}
+        src={logos.dark.src}
+        width={logos.dark.width}
+        height={logos.dark.height}
+      />
+      {!('src' in config.logo) && (
+        <img
+          class="dark:sl-hidden print:block"
+          alt={config.logo.alt}
+          src={logos.light?.src}
+          width={logos.light?.width}
+          height={logos.light?.height}
+        />
+      )}
+    </>
+  )}
+  <span class="brand-text" translate="no">
+    <span class="brand-run">Run</span><span class="brand-context">Context</span>
+  </span>
+  <span class="brand-badge">Docs</span>
+</a>
+
+<style>
+  .site-title {
+    align-items: center;
+    gap: var(--sl-nav-gap);
+    font-size: var(--sl-text-h4);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .brand-text {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .brand-run {
+    color: var(--sl-color-white);
+  }
+  .brand-context {
+    color: var(--rc-color-brand-gold, #c9a55a);
+  }
+  .brand-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--rc-color-brand-gold, #c9a55a);
+    background: color-mix(in srgb, var(--rc-color-brand-gold, #c9a55a) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rc-color-brand-gold, #c9a55a) 30%, transparent);
+  }
+  img {
+    height: calc(var(--sl-nav-height) - 2 * var(--sl-nav-pad-y));
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: 0 50%;
+  }
+</style>

@@ -21,6 +21,7 @@ export default defineConfig({
         { icon: 'github', label: 'GitHub', href: 'https://github.com/RunContext/runcontext' },
       ],
       components: {
+        SiteTitle: './src/components/SiteTitle.astro',
         Footer: './src/components/Footer.astro',
       },
       customCss: ['@runcontext/uxd/css/tokens', './src/styles/custom.css'],
