@@ -8,7 +8,6 @@ export const siteCommand = new Command('site')
   .description('Build a static documentation site from compiled context')
   .option('--context-dir <path>', 'Path to context directory')
   .option('--output-dir <path>', 'Path to site output directory')
-  .option('--astro', 'Use Astro-based site builder (default: EJS legacy)')
   .action(async (opts) => {
     try {
       const config = loadConfig(process.cwd());
@@ -25,9 +24,9 @@ export const siteCommand = new Command('site')
       let builder: ((...args: any[]) => Promise<void>) | undefined;
       try {
         const siteModule = await import('@runcontext/site');
-        builder = opts.astro ? siteModule.buildAstroSite : siteModule.buildSite;
+        builder = siteModule.buildSite;
       } catch {
-        // @runcontext/site not yet implemented
+        // @runcontext/site not available
       }
 
       if (!builder) {
@@ -44,7 +43,7 @@ export const siteCommand = new Command('site')
         : path.resolve(config.site?.base_path ?? 'site');
 
       await builder(manifest, config, outputDir);
-      console.log(chalk.green(`Site built to ${outputDir}${opts.astro ? ' (Astro)' : ''}`));
+      console.log(chalk.green(`Site built to ${outputDir}`));
     } catch (err) {
       console.error(formatError((err as Error).message));
       process.exit(1);
