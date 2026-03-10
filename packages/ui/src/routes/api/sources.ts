@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import * as yaml from 'yaml';
 
@@ -9,6 +10,206 @@ export interface DetectedSource {
   origin: string;
   status: 'detected' | 'connected' | 'error';
 }
+
+// ---------------------------------------------------------------------------
+// Lightweight MCP discovery (reads IDE config files for database servers)
+// ---------------------------------------------------------------------------
+
+interface McpServerEntry {
+  command?: string;
+  args?: string[];
+  env?: Record<string, string>;
+  type?: string;
+  url?: string;
+  headers?: Record<string, string>;
+}
+
+/** Known MCP server name patterns → adapter type */
+const NAME_PATTERNS: Record<string, string> = {
+  duckdb: 'duckdb', motherduck: 'duckdb',
+  postgres: 'postgres', postgresql: 'postgres', neon: 'postgres', supabase: 'postgres',
+  mysql: 'mysql', sqlite: 'sqlite', snowflake: 'snowflake',
+  bigquery: 'bigquery', clickhouse: 'clickhouse', databricks: 'databricks',
+  mssql: 'mssql', 'sql-server': 'mssql', redshift: 'postgres',
+};
+
+/** Known MCP package names → adapter type */
+const PACKAGE_PATTERNS: Record<string, string> = {
+  '@motherduck/mcp': 'duckdb', 'mcp-server-duckdb': 'duckdb',
+  'mcp-server-postgres': 'postgres', 'mcp-server-postgresql': 'postgres',
+  '@neon/mcp': 'postgres', '@supabase/mcp': 'postgres',
+  'mcp-server-mysql': 'mysql', 'mcp-server-sqlite': 'sqlite',
+  'mcp-server-snowflake': 'snowflake', 'mcp-server-bigquery': 'bigquery',
+  'mcp-server-clickhouse': 'clickhouse', 'mcp-server-databricks': 'databricks',
+  'mcp-server-mssql': 'mssql', 'mcp-server-redshift': 'postgres',
+};
+
+function readJsonSafe(filePath: string): unknown | null {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    let raw = fs.readFileSync(filePath, 'utf-8');
+    // Strip control characters that break JSON.parse (but keep \n, \r, \t)
+    raw = raw.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '');
+    // Try parsing as-is first (most configs are valid JSON)
+    try {
+      return JSON.parse(raw);
+    } catch {
+      // Strip JSONC comments: only // at line start or after whitespace (not inside strings like URLs)
+      const cleaned = raw
+        .replace(/^\s*\/\/.*$/gm, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/,(\s*[}\]])/g, '$1');
+      return JSON.parse(cleaned);
+    }
+  } catch {
+    return null;
+  }
+}
+
+function getConfigLocations(cwd: string): Array<{ ide: string; path: string }> {
+  const home = os.homedir();
+  const locations: Array<{ ide: string; path: string }> = [];
+
+  // Claude Code
+  locations.push({ ide: 'claude-code', path: path.join(cwd, '.mcp.json') });
+  locations.push({ ide: 'claude-code', path: path.join(home, '.claude.json') });
+  locations.push({ ide: 'claude-code', path: path.join(home, '.claude', 'mcp_servers.json') });
+
+  // Claude Desktop
+  if (process.platform === 'darwin') {
+    locations.push({ ide: 'claude-desktop', path: path.join(home, 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json') });
+  } else if (process.platform === 'win32') {
+    const appData = process.env.APPDATA ?? path.join(home, 'AppData', 'Roaming');
+    locations.push({ ide: 'claude-desktop', path: path.join(appData, 'Claude', 'claude_desktop_config.json') });
+  } else {
+    locations.push({ ide: 'claude-desktop', path: path.join(home, '.config', 'claude', 'claude_desktop_config.json') });
+  }
+
+  // Cursor
+  locations.push({ ide: 'cursor', path: path.join(cwd, '.cursor', 'mcp.json') });
+  locations.push({ ide: 'cursor', path: path.join(home, '.cursor', 'mcp.json') });
+  if (process.platform === 'darwin') {
+    locations.push({ ide: 'cursor', path: path.join(home, 'Library', 'Application Support', 'Cursor', 'User', 'globalStorage', 'cursor.mcp', 'mcp.json') });
+  }
+
+  // VS Code
+  locations.push({ ide: 'vscode', path: path.join(cwd, '.vscode', 'mcp.json') });
+
+  // Windsurf
+  locations.push({ ide: 'windsurf', path: path.join(cwd, '.windsurf', 'mcp.json') });
+  if (process.platform === 'darwin') {
+    locations.push({ ide: 'windsurf', path: path.join(home, 'Library', 'Application Support', 'Windsurf', 'User', 'globalStorage', 'windsurf.mcp', 'mcp.json') });
+  }
+
+  return locations;
+}
+
+function detectAdapterType(serverName: string, entry: McpServerEntry): string | null {
+  const nameLower = serverName.toLowerCase();
+
+  // Check server name patterns
+  for (const [pattern, adapter] of Object.entries(NAME_PATTERNS)) {
+    if (nameLower.includes(pattern)) return adapter;
+  }
+
+  // Check package name in args (command-based servers)
+  const args = entry.args ?? [];
+  const allArgs = [entry.command ?? '', ...args].join(' ').toLowerCase();
+  for (const [pkg, adapter] of Object.entries(PACKAGE_PATTERNS)) {
+    if (allArgs.includes(pkg.toLowerCase())) return adapter;
+  }
+
+  // Check URL for HTTP-type servers (e.g. mcp.neon.tech → neon → postgres)
+  if (entry.url) {
+    const urlLower = entry.url.toLowerCase();
+    for (const [pattern, adapter] of Object.entries(NAME_PATTERNS)) {
+      if (urlLower.includes(pattern)) return adapter;
+    }
+  }
+
+  return null;
+}
+
+function discoverMcpDatabases(cwd: string): DetectedSource[] {
+  const results: DetectedSource[] = [];
+  const seen = new Set<string>();
+
+  try {
+    const locations = getConfigLocations(cwd);
+
+    for (const loc of locations) {
+      const json = readJsonSafe(loc.path) as Record<string, unknown> | null;
+      if (!json) continue;
+
+      // Extract mcpServers from various config formats
+      const servers = (json.mcpServers ?? json.mcp_servers ?? json.servers ?? json) as Record<string, McpServerEntry>;
+      if (!servers || typeof servers !== 'object') continue;
+
+      for (const [serverName, entry] of Object.entries(servers)) {
+        if (!entry || typeof entry !== 'object') continue;
+
+        const adapterType = detectAdapterType(serverName, entry);
+        if (!adapterType) continue;
+
+        const key = `${adapterType}:${serverName}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+
+        // Build a friendly label
+        const dbInfo = extractDbName(entry);
+        const label = dbInfo
+          ? `${serverName} (${adapterType}${dbInfo ? ' — ' + dbInfo : ''})`
+          : `${serverName} (${adapterType})`;
+
+        results.push({
+          name: label,
+          adapter: adapterType,
+          origin: `mcp:${loc.ide}/${serverName}`,
+          status: 'detected',
+        });
+      }
+    }
+  } catch {
+    // Discovery is best-effort
+  }
+
+  return results;
+}
+
+function extractDbName(entry: McpServerEntry): string {
+  const args = entry.args ?? [];
+  // Look for database name in common arg patterns
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    // --database, --db, --dbname flags
+    if ((arg === '--database' || arg === '--db' || arg === '--dbname') && args[i + 1]) {
+      return args[i + 1];
+    }
+    // Connection URL
+    if (arg && /^(postgres|mysql|mssql|clickhouse):\/\//.test(arg)) {
+      try {
+        const u = new URL(arg);
+        return u.pathname.replace(/^\//, '') || u.hostname;
+      } catch { /* ignore */ }
+    }
+  }
+  // Check env vars for connection info
+  if (entry.env) {
+    for (const [key, val] of Object.entries(entry.env)) {
+      if (/^(DATABASE_URL|POSTGRES_URL|PG_CONNECTION)/.test(key) && val) {
+        try {
+          const u = new URL(val);
+          return u.pathname.replace(/^\//, '') || u.hostname;
+        } catch { /* ignore */ }
+      }
+    }
+  }
+  return '';
+}
+
+// ---------------------------------------------------------------------------
+// Routes
+// ---------------------------------------------------------------------------
 
 export function sourcesRoutes(rootDir: string, contextDir: string): Hono {
   const app = new Hono();
@@ -92,6 +293,18 @@ export function sourcesRoutes(rootDir: string, contextDir: string): Hono {
       }
     } catch {
       // ignore
+    }
+
+    // MCP discovery: scan IDE configs for database MCP servers
+    const mcpSources = discoverMcpDatabases(rootDir);
+    for (const mcp of mcpSources) {
+      // Skip duplicates already found via config/env/files
+      const alreadyFound = sources.some((s) =>
+        s.origin === mcp.origin || (s.adapter === mcp.adapter && s.name === mcp.name)
+      );
+      if (!alreadyFound) {
+        sources.push(mcp);
+      }
     }
 
     return c.json(sources);

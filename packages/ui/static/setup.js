@@ -338,7 +338,7 @@
       connBtn.textContent = 'Connecting\u2026';
       connBtn.disabled = true;
       try {
-        var result = await api('POST', '/api/sources', { connection_url: url });
+        var result = await api('POST', '/api/sources', { connection: url });
         var src = result.source || result;
         state.sources = state.sources || [];
         state.sources.push(src);
@@ -370,17 +370,12 @@
           createElement('span', { className: 'source-card-meta', textContent: (src.adapter || '') + (src.origin ? ' \u2022 ' + src.origin : '') }),
           createElement('button', { className: 'btn btn-primary', textContent: 'Use This' }),
         ]);
-        card.querySelector('.btn').addEventListener('click', async function () {
-          try {
-            await api('POST', '/api/sources', src);
-            state.sources = state.sources || [];
-            state.sources.push(src);
-            saveState();
-            updateDbStatus(src);
-            goToStep(2);
-          } catch (e) {
-            container.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'Failed to select source' }));
-          }
+        card.querySelector('.btn').addEventListener('click', function () {
+          state.sources = state.sources || [];
+          state.sources.push(src);
+          saveState();
+          updateDbStatus(src);
+          goToStep(2);
         });
         container.appendChild(card);
       });
