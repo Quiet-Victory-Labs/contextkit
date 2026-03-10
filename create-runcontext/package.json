@@ -1,6 +1,6 @@
 {
   "name": "create-runcontext",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Scaffold a new RunContext data product. Run npx create-runcontext, fill out a Context Brief in your browser, and the pipeline builds your semantic plane automatically.",
   "license": "MIT",
   "author": "Eric Kittelson",
