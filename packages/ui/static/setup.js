@@ -147,6 +147,9 @@
   function goToStep(n) {
     if (n < 1 || n > 5) return;
 
+    // Clear any running pipeline poll timer when navigating away
+    if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+
     var content = document.getElementById('wizard-content');
     if (content) content.textContent = '';
 
@@ -810,6 +813,19 @@
     return frag;
   }
 
+  function getStageDescription(item) {
+    var name = (item.stage || '').toLowerCase();
+    var source = state.brief.data_source || 'database';
+    if (name === 'introspect') return 'Connecting to ' + source + ' and scanning table schemas, columns, and row counts.';
+    if (name === 'scaffold') return 'Generating OSI-compliant YAML files for each table and column discovered.';
+    if (name === 'enrich-silver') return 'Using AI to generate human-readable descriptions for every column and table.';
+    if (name === 'enrich-gold') return 'Adding semantic roles, aggregation hints, and golden query patterns.';
+    if (name === 'verify') return 'Validating all generated metadata against the OSI schema for completeness.';
+    if (name === 'autofix') return 'Automatically fixing any validation warnings found in the verify step.';
+    if (name === 'agent-instructions') return 'Generating agent instruction files so AI tools know how to query your data.';
+    return null;
+  }
+
   function buildStageElement(item, stageIndex) {
     var statusClass = 'stage-pending';
     var dotText = '';
@@ -831,14 +847,22 @@
     ]);
 
     var bodyInner = createElement('div', { className: 'pipeline-stage-body-inner' });
+
+    // Show summary/error detail from the API
     if (item.detail) {
       bodyInner.appendChild(createElement('p', { className: 'muted', textContent: item.detail }));
     }
 
-    // Render rich detail content
+    // Render rich detail content from API details object
     var detailContent = buildStageDetailContent(item);
     if (detailContent.childNodes.length > 0) {
       bodyInner.appendChild(detailContent);
+    }
+
+    // Always show a contextual description for each stage
+    var stageDesc = getStageDescription(item);
+    if (stageDesc && !item.detail) {
+      bodyInner.appendChild(createElement('p', { className: 'muted', textContent: stageDesc }));
     }
 
     var body = createElement('div', { className: 'pipeline-stage-body' }, [bodyInner]);
@@ -894,7 +918,7 @@
       return {
         stage: s.name || s.stage || s.label || '',
         status: s.status || 'pending',
-        detail: s.detail || s.message || '',
+        detail: s.summary || s.detail || s.error || s.message || '',
         details: s.details || s.data || null,
       };
     });

@@ -682,7 +682,7 @@ body {
    Locked Tooltip
    ================================================================ */
 .locked-tooltip {
-  position: absolute;
+  position: fixed;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -692,7 +692,6 @@ body {
   font-size: 0.8125rem;
   color: var(--text);
   white-space: nowrap;
-  pointer-events: none;
 }
 
 .locked-tooltip::before {
