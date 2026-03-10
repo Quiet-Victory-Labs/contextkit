@@ -23,7 +23,7 @@ export default defineConfig({
       components: {
         Footer: './src/components/Footer.astro',
       },
-      customCss: ['../packages/uxd/dist/css/tokens.css', './src/styles/custom.css'],
+      customCss: ['@runcontext/uxd/css/tokens', './src/styles/custom.css'],
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true } },
