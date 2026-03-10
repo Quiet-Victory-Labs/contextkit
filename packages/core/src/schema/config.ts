@@ -20,9 +20,13 @@ export const mcpConfigSchema = z.object({
 });
 
 export const dataSourceConfigSchema = z.object({
-  adapter: z.enum(['duckdb', 'postgres']),
+  adapter: z.enum([
+    'duckdb', 'postgres', 'mysql', 'mssql', 'snowflake',
+    'bigquery', 'clickhouse', 'databricks', 'sqlite',
+  ]),
   path: z.string().optional(),
   connection: z.string().optional(),
+  auth: z.string().optional(), // provider:key reference, e.g. "neon:ep-red-rain"
 });
 
 export const runContextConfigSchema = z.object({

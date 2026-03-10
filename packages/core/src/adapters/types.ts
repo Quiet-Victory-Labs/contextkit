@@ -60,4 +60,5 @@ export interface DataSourceConfig {
   serverHostname?: string;
   httpPath?: string;
   token?: string;
+  auth?: string; // provider:key reference for OAuth credentials
 }
