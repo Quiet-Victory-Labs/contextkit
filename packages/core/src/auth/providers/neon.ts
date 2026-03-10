@@ -85,13 +85,36 @@ export class NeonProvider implements AuthProvider {
     try {
       const headers = { Authorization: `Bearer ${token}` };
 
-      // List all projects
+      // Collect projects from personal account + all organizations
+      const allProjects: Array<{ id: string; name: string }> = [];
+
+      // Personal projects
       const projRes = await fetch(`${NEON_API}/projects`, { headers });
-      if (!projRes.ok) return [];
-      const projData = await projRes.json() as { projects: Array<{ id: string; name: string }> };
+      if (projRes.ok) {
+        const projData = await projRes.json() as { projects: Array<{ id: string; name: string }> };
+        allProjects.push(...projData.projects);
+      }
+
+      // Organization projects
+      try {
+        const orgRes = await fetch(`${NEON_API}/users/me/organizations`, { headers });
+        if (orgRes.ok) {
+          const orgData = await orgRes.json() as { organizations: Array<{ id: string }> };
+          for (const org of orgData.organizations) {
+            const orgProjRes = await fetch(`${NEON_API}/projects?org_id=${org.id}`, { headers });
+            if (orgProjRes.ok) {
+              const orgProjData = await orgProjRes.json() as { projects: Array<{ id: string; name: string }> };
+              // Deduplicate (personal projects may overlap with org projects)
+              for (const p of orgProjData.projects) {
+                if (!allProjects.some((e) => e.id === p.id)) allProjects.push(p);
+              }
+            }
+          }
+        }
+      } catch { /* org listing is best-effort */ }
 
       const entries: DatabaseEntry[] = [];
-      for (const proj of projData.projects) {
+      for (const proj of allProjects) {
         try {
           // Get branches (databases are per-branch in Neon API)
           const brRes = await fetch(`${NEON_API}/projects/${proj.id}/branches`, { headers });
