@@ -47,12 +47,6 @@
   function $(sel) { return document.querySelector(sel); }
   function $$(sel) { return document.querySelectorAll(sel); }
 
-  function esc(s) {
-    var d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
-  }
-
   function showError(fieldId, msg) {
     var field = document.getElementById(fieldId);
     if (!field) return;
