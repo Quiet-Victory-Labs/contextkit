@@ -10,6 +10,8 @@ import { uploadRoutes } from './routes/api/upload.js';
 import { pipelineRoutes } from './routes/api/pipeline.js';
 import { productsRoutes } from './routes/api/products.js';
 import { authRoutes } from './routes/api/auth.js';
+import { attachWebSocket } from './routes/ws.js';
+import { setupBus } from './events.js';
 
 export interface UIServerOptions {
   rootDir: string;
@@ -44,6 +46,11 @@ export function createApp(opts: UIServerOptions): Hono {
   app.route('', authRoutes(opts.rootDir));
 
   app.get('/api/health', (c) => c.json({ ok: true }));
+
+  app.post('/api/session', (c) => {
+    const id = setupBus.createSession();
+    return c.json({ sessionId: id });
+  });
 
   // Static file serving (CSS, JS)
   app.get('/static/:filename', (c) => {
@@ -184,6 +191,8 @@ export function startUIServer(opts: UIServerOptions): Promise<void> {
       console.log(`RunContext UI running at http://${opts.host === '0.0.0.0' ? 'localhost' : opts.host}:${info.port}/setup`);
       resolve();
     });
+
+    attachWebSocket(server as unknown as import('node:http').Server);
 
     server.on('error', reject);
   });
