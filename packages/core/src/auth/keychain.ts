@@ -20,7 +20,7 @@ export class Keychain {
   async isAvailable(): Promise<boolean> {
     try {
       if (this.platform === 'darwin') {
-        await execFileAsync('security', ['help']);
+        await execFileAsync('security', ['list-keychains']);
         return true;
       }
       if (this.platform === 'linux') {
@@ -78,52 +78,56 @@ export class Keychain {
 
   /** Store a credential in the keychain. */
   async set(account: string, password: string): Promise<void> {
-    if (this.platform === 'darwin') {
-      // Delete existing entry first (ignore errors)
-      try {
+    try {
+      if (this.platform === 'darwin') {
+        // Delete existing entry first (ignore errors)
+        try {
+          await execFileAsync('security', [
+            'delete-generic-password',
+            '-s', SERVICE_NAME,
+            '-a', account,
+          ]);
+        } catch {
+          /* not found — ok */
+        }
+
         await execFileAsync('security', [
-          'delete-generic-password',
+          'add-generic-password',
           '-s', SERVICE_NAME,
           '-a', account,
+          '-w', password,
         ]);
-      } catch {
-        /* not found — ok */
+        return;
       }
 
-      await execFileAsync('security', [
-        'add-generic-password',
-        '-s', SERVICE_NAME,
-        '-a', account,
-        '-w', password,
-      ]);
-      return;
-    }
+      if (this.platform === 'linux') {
+        const proc = execFileCb('secret-tool', [
+          'store',
+          '--label', `RunContext: ${account}`,
+          'service', SERVICE_NAME,
+          'account', account,
+        ]);
+        proc.stdin?.write(password);
+        proc.stdin?.end();
+        await new Promise<void>((resolve, reject) => {
+          proc.on('close', (code) =>
+            code === 0
+              ? resolve()
+              : reject(new Error(`secret-tool exited ${code}`)),
+          );
+        });
+        return;
+      }
 
-    if (this.platform === 'linux') {
-      const proc = execFileCb('secret-tool', [
-        'store',
-        '--label', `RunContext: ${account}`,
-        'service', SERVICE_NAME,
-        'account', account,
-      ]);
-      proc.stdin?.write(password);
-      proc.stdin?.end();
-      await new Promise<void>((resolve, reject) => {
-        proc.on('close', (code) =>
-          code === 0
-            ? resolve()
-            : reject(new Error(`secret-tool exited ${code}`)),
-        );
-      });
-      return;
-    }
-
-    if (this.platform === 'win32') {
-      await execFileAsync('powershell', [
-        '-Command',
-        `New-StoredCredential -Target '${SERVICE_NAME}:${account}' -UserName '${account}' -Password '${password}' -Type Generic -Persist LocalMachine`,
-      ]);
-      return;
+      if (this.platform === 'win32') {
+        await execFileAsync('powershell', [
+          '-Command',
+          `New-StoredCredential -Target '${SERVICE_NAME}:${account}' -UserName '${account}' -Password '${password}' -Type Generic -Persist LocalMachine`,
+        ]);
+        return;
+      }
+    } catch {
+      // Swallow errors — keychain write failures should not crash the caller
     }
   }
 
