@@ -288,15 +288,11 @@
     var card = createElement('div', { className: 'card' });
 
     card.appendChild(createElement('h2', { className: 'connect-heading', textContent: 'Connect Your Database' }));
-    card.appendChild(createElement('p', { className: 'connect-subheading', textContent: 'RunContext discovers databases from your IDE configs and environment. You can also connect via OAuth \u2014 your credentials never pass through the AI agent.' }));
+    card.appendChild(createElement('p', { className: 'connect-subheading', textContent: 'RunContext connects directly to your database via OAuth \u2014 your credentials never pass through the AI agent.' }));
 
-    // Container for detected source cards
-    var sourcesGrid = createElement('div', { className: 'source-cards', id: 'connect-sources' });
-    sourcesGrid.appendChild(createElement('p', { className: 'muted', textContent: 'Detecting databases\u2026' }));
-    card.appendChild(sourcesGrid);
-
-    // Divider
-    card.appendChild(createElement('div', { className: 'section-divider' }, ['Or connect a new database']));
+    // Detected databases hint (from MCP/IDE configs)
+    var detectedHint = createElement('div', { id: 'connect-detected-hint' });
+    card.appendChild(detectedHint);
 
     // Platform picker grid (populated after fetching providers)
     var platformGrid = createElement('div', { className: 'platform-grid', id: 'connect-platforms' });
@@ -325,11 +321,10 @@
 
     content.appendChild(card);
 
-    // --- Fetch detected sources ---
-    fetchDetectedSources(sourcesGrid);
-
-    // --- Fetch auth providers ---
-    fetchAuthProviders(platformGrid, oauthResult);
+    // --- Detect sources first, then render providers (detected ones get highlighted) ---
+    fetchDetectedSources(detectedHint, platformGrid, oauthResult).then(function () {
+      fetchAuthProviders(platformGrid, oauthResult);
+    });
 
     // --- Manual connect handler ---
     connBtn.addEventListener('click', async function () {
@@ -355,19 +350,81 @@
     });
   }
 
-  function fetchDetectedSources(container) {
-    api('GET', '/api/sources').then(function (data) {
+  /** Map adapter type to the provider ID for OAuth */
+  var ADAPTER_TO_PROVIDER = {
+    postgres: 'neon', // default; detected sources refine below
+    mysql: 'planetscale',
+    duckdb: null, // local file, no OAuth needed
+    sqlite: null,
+    snowflake: 'snowflake',
+    bigquery: 'gcp',
+    clickhouse: 'clickhouse',
+    databricks: 'databricks',
+    mssql: 'azure-sql',
+    mongodb: 'mongodb',
+  };
+
+  /** Refine provider from origin hint (e.g. "mcp:claude-code/neon" → neon) */
+  function providerFromOrigin(origin, adapter) {
+    if (!origin) return ADAPTER_TO_PROVIDER[adapter] || null;
+    var o = origin.toLowerCase();
+    if (o.includes('neon')) return 'neon';
+    if (o.includes('supabase')) return 'supabase';
+    if (o.includes('aws') || o.includes('rds')) return 'aws-rds';
+    if (o.includes('azure')) return 'azure-sql';
+    if (o.includes('gcp') || o.includes('bigquery')) return 'gcp';
+    if (o.includes('planetscale')) return 'planetscale';
+    if (o.includes('cockroach')) return 'cockroachdb';
+    if (o.includes('snowflake')) return 'snowflake';
+    if (o.includes('clickhouse')) return 'clickhouse';
+    if (o.includes('databricks')) return 'databricks';
+    if (o.includes('mongodb') || o.includes('atlas')) return 'mongodb';
+    if (o.includes('motherduck') || o.includes('duckdb')) return null;
+    return ADAPTER_TO_PROVIDER[adapter] || null;
+  }
+
+  function fetchDetectedSources(container, platformGrid, oauthResult) {
+    return api('GET', '/api/sources').then(function (data) {
       var sources = data.sources || data || [];
       container.textContent = '';
       if (sources.length === 0) {
-        container.appendChild(createElement('p', { className: 'muted', textContent: 'No databases auto-detected.' }));
         updateDbStatus(null);
         return;
       }
+
+      // Group detected sources by provider
+      var byProvider = {};
+      var localFiles = [];
       sources.forEach(function (src) {
-        var card = createElement('div', { className: 'source-card' }, [
+        var prov = providerFromOrigin(src.origin, src.adapter);
+        if (!prov) {
+          localFiles.push(src);
+        } else {
+          byProvider[prov] = byProvider[prov] || [];
+          byProvider[prov].push(src);
+        }
+      });
+
+      // Show detected hint banner
+      var hint = createElement('div', { className: 'detected-hint' });
+      var hintIcon = createElement('span', { className: 'detected-hint-icon', textContent: '\u{1F50D}' });
+      var provNames = Object.keys(byProvider);
+      var hintText;
+      if (provNames.length > 0) {
+        var names = provNames.map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1); });
+        hintText = 'We detected ' + names.join(', ') + ' in your IDE configs. Click a provider below to connect securely via OAuth.';
+      } else {
+        hintText = 'We detected local database files. Use manual connection or select a provider below.';
+      }
+      hint.appendChild(hintIcon);
+      hint.appendChild(createElement('span', { textContent: hintText }));
+      container.appendChild(hint);
+
+      // For local files (duckdb, sqlite), show direct-use cards
+      localFiles.forEach(function (src) {
+        var card = createElement('div', { className: 'source-card source-card-local' }, [
           createElement('span', { className: 'source-card-name', textContent: src.name || src.adapter }),
-          createElement('span', { className: 'source-card-meta', textContent: (src.adapter || '') + (src.origin ? ' \u2022 ' + src.origin : '') }),
+          createElement('span', { className: 'source-card-meta', textContent: 'Local file' }),
           createElement('button', { className: 'btn btn-primary', textContent: 'Use This' }),
         ]);
         card.querySelector('.btn').addEventListener('click', function () {
@@ -379,9 +436,12 @@
         });
         container.appendChild(card);
       });
+
+      // Highlight matching providers in the platform grid
+      state._detectedProviders = provNames;
+
     }).catch(function () {
       container.textContent = '';
-      container.appendChild(createElement('p', { className: 'muted', textContent: 'Could not detect databases.' }));
       updateDbStatus(null);
     });
   }
@@ -394,13 +454,49 @@
         container.appendChild(createElement('p', { className: 'muted', textContent: 'No OAuth providers available.' }));
         return;
       }
+
+      var detected = state._detectedProviders || [];
+
+      // Show detected providers first (highlighted)
+      var detectedProvs = [];
+      var otherProvs = [];
       providers.forEach(function (prov) {
-        var btn = createElement('button', { className: 'platform-btn', textContent: prov.display_name || prov.name || prov.id });
+        if (detected.indexOf(prov.id) !== -1) {
+          detectedProvs.push(prov);
+        } else {
+          otherProvs.push(prov);
+        }
+      });
+
+      // Detected providers get prominent cards
+      if (detectedProvs.length > 0) {
+        var detectedGrid = createElement('div', { className: 'source-cards' });
+        detectedProvs.forEach(function (prov) {
+          var card = createElement('div', { className: 'source-card source-card-detected' }, [
+            createElement('span', { className: 'source-card-badge', textContent: 'Detected' }),
+            createElement('span', { className: 'source-card-name', textContent: prov.displayName || prov.display_name || prov.id }),
+            createElement('span', { className: 'source-card-meta', textContent: (prov.cliAuthenticated ? 'CLI authenticated' : prov.cliInstalled ? 'CLI installed' : 'OAuth available') }),
+            createElement('button', { className: 'btn btn-primary', textContent: 'Connect via OAuth' }),
+          ]);
+          card.querySelector('.btn').addEventListener('click', function () {
+            startOAuthFlow(prov, container, oauthResult);
+          });
+          detectedGrid.appendChild(card);
+        });
+        container.appendChild(detectedGrid);
+        container.appendChild(createElement('div', { className: 'section-divider' }, ['Other providers']));
+      }
+
+      // Other providers as button grid
+      var grid = createElement('div', { className: 'platform-grid' });
+      otherProvs.forEach(function (prov) {
+        var btn = createElement('button', { className: 'platform-btn', textContent: prov.displayName || prov.display_name || prov.name || prov.id });
         btn.addEventListener('click', function () {
           startOAuthFlow(prov, container, oauthResult);
         });
-        container.appendChild(btn);
+        grid.appendChild(btn);
       });
+      container.appendChild(grid);
     }).catch(function () {
       container.textContent = '';
       container.appendChild(createElement('p', { className: 'muted', textContent: 'Could not load providers.' }));
