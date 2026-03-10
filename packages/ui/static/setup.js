@@ -528,27 +528,246 @@
     if (state.brief.sensitivity) document.getElementById('sensitivity').value = state.brief.sensitivity;
   }
 
-  // ---- Step 3: Scaffold (placeholder) ----
+  // ---- Step 3: Scaffold ----
+
+  var SCAFFOLD_STAGES = [
+    { key: 'introspect', label: 'Extracting schema from database...' },
+    { key: 'scaffold', label: 'Building semantic plane files...' },
+    { key: 'verify', label: 'Validating semantic plane...' },
+    { key: 'autofix', label: 'Fixing any issues...' },
+    { key: 'agent-instructions', label: 'Generating agent instructions...' },
+  ];
 
   function renderScaffoldStep() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
+
     var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Scaffold' }));
-    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
-    card.appendChild(createStepActions(true, true));
-    content.appendChild(card);
+
+    card.appendChild(createElement('h2', { textContent: 'Building Your Semantic Plane' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'Connecting to your database and extracting schema metadata. This creates a Bronze-tier semantic plane.' }));
+
+    // Stage rows container
+    var stagesContainer = createElement('div', { className: 'scaffold-stages', id: 'scaffold-stages' });
+    SCAFFOLD_STAGES.forEach(function (stage) {
+      var row = createElement('div', { className: 'stage-row', id: 'stage-' + stage.key }, [
+        createElement('span', { className: 'stage-dot' }),
+        createElement('span', { className: 'stage-name', textContent: stage.label }),
+      ]);
+      stagesContainer.appendChild(row);
+    });
+    card.appendChild(stagesContainer);
+
+    // Error area
+    var errorArea = createElement('div', { id: 'scaffold-error' });
+    card.appendChild(errorArea);
+
+    // Action area (Start / Retry button)
+    var actionArea = createElement('div', { className: 'step-actions', id: 'scaffold-actions' });
+
+    var backBtn = createElement('button', { className: 'btn btn-secondary', textContent: 'Back' });
+    backBtn.addEventListener('click', function () { goToStep(2); });
+    actionArea.appendChild(backBtn);
+
+    // If we already have a pipelineId, resume polling; otherwise show Start button
+    if (state.pipelineId) {
+      actionArea.appendChild(createElement('span', { className: 'muted', textContent: 'Build in progress...' }));
+      card.appendChild(actionArea);
+      content.appendChild(card);
+      startScaffoldPolling();
+    } else {
+      var startBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Start Build', id: 'scaffold-start-btn' });
+      startBtn.addEventListener('click', function () { startScaffoldBuild(startBtn); });
+      actionArea.appendChild(startBtn);
+      card.appendChild(actionArea);
+      content.appendChild(card);
+    }
   }
 
-  // ---- Step 4: Checkpoint (placeholder) ----
+  async function startScaffoldBuild(btn) {
+    btn.textContent = 'Starting...';
+    btn.disabled = true;
+
+    var errorArea = document.getElementById('scaffold-error');
+    if (errorArea) errorArea.textContent = '';
+
+    var body = {
+      productName: state.brief.product_name,
+      targetTier: 'bronze',
+    };
+    if (state.sources && state.sources[0]) {
+      body.dataSource = state.sources[0];
+    }
+
+    try {
+      var result = await api('POST', '/api/pipeline/start', body);
+      state.pipelineId = result.id;
+      saveState();
+      btn.textContent = 'Building...';
+      startScaffoldPolling();
+    } catch (e) {
+      btn.textContent = 'Start Build';
+      btn.disabled = false;
+      var errorArea = document.getElementById('scaffold-error');
+      if (errorArea) {
+        errorArea.textContent = '';
+        errorArea.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'Failed to start build.' }));
+      }
+    }
+  }
+
+  function startScaffoldPolling() {
+    if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+
+    async function poll() {
+      if (!state.pipelineId) return;
+      try {
+        var status = await api('GET', '/api/pipeline/status/' + state.pipelineId);
+        var stages = status.stages || [];
+        var hasError = false;
+        var allDone = true;
+
+        SCAFFOLD_STAGES.forEach(function (def) {
+          var row = document.getElementById('stage-' + def.key);
+          if (!row) return;
+
+          var match = null;
+          for (var i = 0; i < stages.length; i++) {
+            if (stages[i].name === def.key) { match = stages[i]; break; }
+          }
+
+          var dot = row.querySelector('.stage-dot');
+          // Reset classes
+          dot.className = 'stage-dot';
+
+          // Remove any previous summary/error elements
+          var oldSummary = row.querySelector('.stage-summary');
+          if (oldSummary) oldSummary.remove();
+          var oldError = row.querySelector('.stage-error');
+          if (oldError) oldError.remove();
+
+          if (!match || match.status === 'pending') {
+            allDone = false;
+          } else if (match.status === 'running') {
+            dot.classList.add('running');
+            allDone = false;
+          } else if (match.status === 'done') {
+            dot.classList.add('done');
+            if (match.summary) {
+              row.appendChild(createElement('span', { className: 'stage-summary', textContent: match.summary }));
+            }
+          } else if (match.status === 'error') {
+            dot.classList.add('error');
+            hasError = true;
+            allDone = false;
+            if (match.error) {
+              row.appendChild(createElement('span', { className: 'stage-error', textContent: match.error }));
+            }
+          }
+        });
+
+        if (hasError) {
+          if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+          showScaffoldError(status.error || 'A pipeline stage failed.');
+        } else if (allDone && stages.length > 0) {
+          if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+          goToStep(4);
+        }
+      } catch (e) {
+        // Network error — keep polling, it may recover
+      }
+    }
+
+    poll();
+    state.pollTimer = setInterval(poll, 2000);
+  }
+
+  function showScaffoldError(msg) {
+    var errorArea = document.getElementById('scaffold-error');
+    if (!errorArea) return;
+    errorArea.textContent = '';
+    errorArea.appendChild(createElement('p', { className: 'field-error', textContent: msg }));
+
+    var actions = document.getElementById('scaffold-actions');
+    if (!actions) return;
+    // Remove old start/building button if any
+    var oldBtn = actions.querySelector('.btn-primary');
+    if (oldBtn) oldBtn.remove();
+    var oldMuted = actions.querySelector('.muted');
+    if (oldMuted) oldMuted.remove();
+
+    var retryBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Retry' });
+    retryBtn.addEventListener('click', function () {
+      state.pipelineId = null;
+      saveState();
+      // Reset stage dots
+      SCAFFOLD_STAGES.forEach(function (def) {
+        var row = document.getElementById('stage-' + def.key);
+        if (!row) return;
+        var dot = row.querySelector('.stage-dot');
+        if (dot) dot.className = 'stage-dot';
+        var s = row.querySelector('.stage-summary');
+        if (s) s.remove();
+        var e = row.querySelector('.stage-error');
+        if (e) e.remove();
+      });
+      errorArea.textContent = '';
+      startScaffoldBuild(retryBtn);
+    });
+    actions.appendChild(retryBtn);
+  }
+
+  // ---- Step 4: Checkpoint ----
 
   function renderCheckpointStep() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
-    var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Checkpoint' }));
-    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
-    card.appendChild(createStepActions(true, true));
+
+    var card = createElement('div', { className: 'card checkpoint-card' });
+
+    card.appendChild(createElement('h2', { textContent: 'Bronze Tier Achieved' }));
+
+    // Tier scorecard
+    var scorecard = createElement('div', { className: 'tier-scorecard' });
+
+    // Bronze (achieved)
+    var bronzeRow = createElement('div', { className: 'tier-row achieved' }, [
+      createElement('span', { className: 'tier-label', textContent: 'Bronze' }),
+      createElement('span', { className: 'tier-desc', textContent: 'Schema metadata, table/column names, types, row counts' }),
+    ]);
+    scorecard.appendChild(bronzeRow);
+
+    // Silver
+    var silverRow = createElement('div', { className: 'tier-row' }, [
+      createElement('span', { className: 'tier-label', textContent: 'Silver' }),
+      createElement('span', { className: 'tier-desc', textContent: 'Column descriptions, sample values, trust tags' }),
+    ]);
+    scorecard.appendChild(silverRow);
+
+    // Gold
+    var goldRow = createElement('div', { className: 'tier-row' }, [
+      createElement('span', { className: 'tier-label', textContent: 'Gold' }),
+      createElement('span', { className: 'tier-desc', textContent: 'Join rules, grain statements, semantic roles, golden queries, guardrail filters' }),
+    ]);
+    scorecard.appendChild(goldRow);
+
+    card.appendChild(scorecard);
+
+    // Explanatory text
+    card.appendChild(createElement('p', { className: 'checkpoint-explain', textContent: 'Your semantic plane has basic schema metadata. AI tools can use this now, but with Gold tier they\'ll understand join relationships, business descriptions, and query patterns.' }));
+
+    // CTA buttons
+    var ctas = createElement('div', { className: 'checkpoint-ctas' });
+
+    var serveBtn = createElement('button', { className: 'btn btn-secondary', textContent: 'Start MCP Server' });
+    serveBtn.addEventListener('click', function () { goToStep(6); });
+    ctas.appendChild(serveBtn);
+
+    var goldBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Continue to Gold' });
+    goldBtn.addEventListener('click', function () { goToStep(5); });
+    ctas.appendChild(goldBtn);
+
+    card.appendChild(ctas);
     content.appendChild(card);
   }
 
