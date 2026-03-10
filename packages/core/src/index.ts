@@ -11,3 +11,4 @@ export * from './adapters/index.js';
 export * from './introspect/index.js';
 export * from './migration/index.js';
 export { applyYamlEdit, previewYamlEdit } from './yaml-edit.js';
+export * from './auth/index.js';
