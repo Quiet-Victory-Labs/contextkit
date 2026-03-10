@@ -2,7 +2,7 @@
   'use strict';
 
   var STORAGE_KEY = 'runcontext_wizard_state';
-  var STEP_LABELS = ['Product', 'Owner', 'Context', 'Review', 'Build'];
+  var STEP_LABELS = ['Connect', 'Define', 'Scaffold', 'Checkpoint', 'Enrich', 'Serve'];
 
   // ---- State persistence ----
 
@@ -145,7 +145,7 @@
   // ---- Navigation ----
 
   function goToStep(n) {
-    if (n < 1 || n > 5) return;
+    if (n < 1 || n > 6) return;
 
     // Clear any running pipeline poll timer when navigating away
     if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
@@ -159,32 +159,18 @@
     renderStepper();
 
     switch (n) {
-      case 1: renderStep1(); break;
-      case 2: renderStep2(); break;
-      case 3: renderStep3(); break;
-      case 4: renderStep4(); break;
-      case 5: renderStep5(); break;
+      case 1: renderConnectStep(); break;
+      case 2: renderDefineStep(); break;
+      case 3: renderScaffoldStep(); break;
+      case 4: renderCheckpointStep(); break;
+      case 5: renderEnrichStep(); break;
+      case 6: renderServeStep(); break;
     }
   }
 
   function validateStep(n) {
     clearErrors();
-    if (n === 1) {
-      var name = $('#product-name').value.trim();
-      if (!name) { showError('product-name', 'Product name is required'); return false; }
-      if (!/^[a-zA-Z0-9_-]+$/.test(name)) { showError('product-name', 'Only letters, numbers, dashes, underscores'); return false; }
-      state.brief.product_name = name;
-      state.brief.description = $('#description').value.trim();
-      saveState();
-      return true;
-    }
-    if (n === 2) {
-      state.brief.owner.name = $('#owner-name').value.trim();
-      state.brief.owner.team = $('#owner-team').value.trim();
-      state.brief.owner.email = $('#owner-email').value.trim();
-      saveState();
-      return true;
-    }
+    // Step-specific validation will be added as each step is implemented
     return true;
   }
 
@@ -211,808 +197,253 @@
     return actions;
   }
 
-  // ---- Step 1: Product ----
+  // ---- Step 1: Connect ----
 
-  function renderStep1() {
+  function renderConnectStep() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
 
-    // Check existing products banner first
-    checkExistingProducts();
-
     var card = createElement('div', { className: 'card' });
 
-    var heading = createElement('h2', { textContent: 'Define Your Data Product' });
-    card.appendChild(heading);
+    card.appendChild(createElement('h2', { className: 'connect-heading', textContent: 'Connect Your Database' }));
+    card.appendChild(createElement('p', { className: 'connect-subheading', textContent: 'RunContext discovers databases from your IDE configs and environment. You can also connect via OAuth \u2014 your credentials never pass through the AI agent.' }));
 
-    // Product name field
-    var nameField = createElement('div', { className: 'field' });
-    nameField.appendChild(createElement('label', { htmlFor: 'product-name', textContent: 'Product Name' }));
-    var nameInput = createElement('input', {
+    // Container for detected source cards
+    var sourcesGrid = createElement('div', { className: 'source-cards', id: 'connect-sources' });
+    sourcesGrid.appendChild(createElement('p', { className: 'muted', textContent: 'Detecting databases\u2026' }));
+    card.appendChild(sourcesGrid);
+
+    // Divider
+    card.appendChild(createElement('div', { className: 'section-divider' }, ['Or connect a new database']));
+
+    // Platform picker grid (populated after fetching providers)
+    var platformGrid = createElement('div', { className: 'platform-grid', id: 'connect-platforms' });
+    platformGrid.appendChild(createElement('p', { className: 'muted', textContent: 'Loading providers\u2026' }));
+    card.appendChild(platformGrid);
+
+    // OAuth result area (hidden until needed)
+    var oauthResult = createElement('div', { id: 'connect-oauth-result' });
+    card.appendChild(oauthResult);
+
+    // Manual connection string
+    var manual = createElement('div', { className: 'manual-connect' });
+    manual.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Manual Connection' }));
+    var manualRow = createElement('div', { className: 'manual-connect-row' });
+    var connInput = createElement('input', {
       className: 'input',
-      id: 'product-name',
+      id: 'connect-url',
       type: 'text',
-      placeholder: 'e.g. customer-analytics',
+      placeholder: 'postgres://user:pass@host:5432/dbname',
     });
-    nameField.appendChild(nameInput);
-    nameField.appendChild(createElement('p', { className: 'hint', textContent: 'Letters, numbers, dashes, and underscores only.' }));
-    card.appendChild(nameField);
+    manualRow.appendChild(connInput);
+    var connBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Connect' });
+    manualRow.appendChild(connBtn);
+    manual.appendChild(manualRow);
+    card.appendChild(manual);
 
-    // Description field with voice button
-    var descField = createElement('div', { className: 'field' });
-    descField.appendChild(createElement('label', { htmlFor: 'description', textContent: 'Description' }));
-    var textareaWrapper = createElement('div', { className: 'textarea-wrapper' });
-    var textarea = createElement('textarea', {
-      className: 'textarea',
-      id: 'description',
-      placeholder: 'Describe what this data product does...',
-      rows: '4',
-    });
-    textareaWrapper.appendChild(textarea);
-    var voiceBtn = createElement('button', { className: 'btn-icon', id: 'voice-btn', type: 'button', title: 'Voice input' });
-    voiceBtn.textContent = '\uD83C\uDF99';
-    textareaWrapper.appendChild(voiceBtn);
-    descField.appendChild(textareaWrapper);
-    card.appendChild(descField);
-
-    card.appendChild(createStepActions(false, true));
     content.appendChild(card);
 
-    // Restore values from state
-    if (state.brief.product_name) {
-      nameInput.value = state.brief.product_name;
-    }
-    if (state.brief.description) {
-      textarea.value = state.brief.description;
-    }
+    // --- Fetch detected sources ---
+    fetchDetectedSources(sourcesGrid);
 
-    setupVoice();
-  }
+    // --- Fetch auth providers ---
+    fetchAuthProviders(platformGrid, oauthResult);
 
-  // ---- Step 2: Owner ----
-
-  function renderStep2() {
-    var content = document.getElementById('wizard-content');
-    if (!content) return;
-
-    var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Owner Details' }));
-
-    // Owner name
-    var nameField = createElement('div', { className: 'field' });
-    nameField.appendChild(createElement('label', { htmlFor: 'owner-name', textContent: 'Owner Name' }));
-    var nameInput = createElement('input', {
-      className: 'input',
-      id: 'owner-name',
-      type: 'text',
-      placeholder: 'Jane Doe',
-    });
-    nameField.appendChild(nameInput);
-    card.appendChild(nameField);
-
-    // Team
-    var teamField = createElement('div', { className: 'field' });
-    teamField.appendChild(createElement('label', { htmlFor: 'owner-team', textContent: 'Team' }));
-    var teamInput = createElement('input', {
-      className: 'input',
-      id: 'owner-team',
-      type: 'text',
-      placeholder: 'Data Engineering',
-    });
-    teamField.appendChild(teamInput);
-    card.appendChild(teamField);
-
-    // Email
-    var emailField = createElement('div', { className: 'field' });
-    emailField.appendChild(createElement('label', { htmlFor: 'owner-email', textContent: 'Email' }));
-    var emailInput = createElement('input', {
-      className: 'input',
-      id: 'owner-email',
-      type: 'email',
-      placeholder: 'jane@company.com',
-    });
-    emailField.appendChild(emailInput);
-    card.appendChild(emailField);
-
-    card.appendChild(createStepActions(true, true));
-    content.appendChild(card);
-
-    // Restore values
-    if (state.brief.owner.name) nameInput.value = state.brief.owner.name;
-    if (state.brief.owner.team) teamInput.value = state.brief.owner.team;
-    if (state.brief.owner.email) emailInput.value = state.brief.owner.email;
-  }
-
-  // ---- Step 3: Context (Sensitivity, Sources, Upload) ----
-
-  function renderStep3() {
-    var content = document.getElementById('wizard-content');
-    if (!content) return;
-
-    var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Context & Sources' }));
-
-    // Sensitivity section
-    card.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Data Sensitivity' }));
-    var sensCards = createElement('div', { className: 'sensitivity-cards' });
-
-    var sensitivities = [
-      { key: 'public', label: 'Public', desc: 'Openly available data with no access restrictions.' },
-      { key: 'internal', label: 'Internal', desc: 'Company-internal data, not shared externally.' },
-      { key: 'confidential', label: 'Confidential', desc: 'Restricted access, requires authorization.' },
-      { key: 'restricted', label: 'Restricted', desc: 'Highly sensitive, regulatory or PII constraints.' },
-    ];
-
-    sensitivities.forEach(function (s) {
-      var sensCard = createElement('div', { className: 'card', 'data-sensitivity': s.key }, [
-        createElement('strong', { textContent: s.label }),
-        createElement('p', { textContent: s.desc }),
-      ]);
-      if (state.brief.sensitivity === s.key) {
-        sensCard.classList.add('selected');
-      }
-      sensCard.addEventListener('click', function () {
-        sensCards.querySelectorAll('.card').forEach(function (c) { c.classList.remove('selected'); });
-        sensCard.classList.add('selected');
-        state.brief.sensitivity = s.key;
+    // --- Manual connect handler ---
+    connBtn.addEventListener('click', async function () {
+      var url = connInput.value.trim();
+      if (!url) return;
+      connBtn.textContent = 'Connecting\u2026';
+      connBtn.disabled = true;
+      try {
+        var result = await api('POST', '/api/sources', { connection_url: url });
+        var src = result.source || result;
+        state.sources = state.sources || [];
+        state.sources.push(src);
         saveState();
-      });
-      sensCards.appendChild(sensCard);
+        updateDbStatus(src);
+        goToStep(2);
+      } catch (e) {
+        connBtn.textContent = 'Connect';
+        connBtn.disabled = false;
+        var errP = manual.querySelector('.field-error');
+        if (errP) errP.remove();
+        manual.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'Connection failed' }));
+      }
     });
-    card.appendChild(sensCards);
-
-    // Data sources section
-    card.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Data Sources' }));
-    var sourcesList = createElement('div', { id: 'sources-list', className: 'source-cards' });
-    card.appendChild(sourcesList);
-
-    // Upload section
-    card.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Upload Documentation' }));
-    var uploadArea = createElement('div', { className: 'upload-area', id: 'upload-area' }, [
-      createElement('p', { textContent: 'Drag & drop files here or click to browse' }),
-      createElement('p', { className: 'hint', textContent: 'Supports .md, .txt, .csv, .json, .yaml' }),
-    ]);
-    var fileInput = createElement('input', { type: 'file', id: 'file-input', multiple: 'true' });
-    fileInput.style.display = 'none';
-    card.appendChild(uploadArea);
-    card.appendChild(fileInput);
-    var uploadedFiles = createElement('div', { id: 'uploaded-files' });
-    card.appendChild(uploadedFiles);
-
-    card.appendChild(createStepActions(true, true));
-    content.appendChild(card);
-
-    // Setup upload interactions
-    setupUpload();
-
-    // Load sources
-    loadSources();
   }
 
-  // ---- Step 3: Sources & Upload logic ----
-
-  async function loadSources() {
-    var container = $('#sources-list');
-    if (!container) return;
-    container.textContent = '';
-    container.appendChild(createElement('p', { className: 'muted', textContent: 'Detecting data sources...' }));
-    try {
-      var data = await api('GET', '/api/sources');
-      state.sources = data.sources || data || [];
+  function fetchDetectedSources(container) {
+    api('GET', '/api/sources').then(function (data) {
+      var sources = data.sources || data || [];
       container.textContent = '';
-      if (state.sources.length === 0) {
-        container.appendChild(createElement('p', { className: 'muted', textContent: 'No data sources detected in this directory.' }));
+      if (sources.length === 0) {
+        container.appendChild(createElement('p', { className: 'muted', textContent: 'No databases auto-detected.' }));
         updateDbStatus(null);
         return;
       }
-      state.sources.forEach(function (src) {
+      sources.forEach(function (src) {
         var card = createElement('div', { className: 'source-card' }, [
-          createElement('span', { className: 'source-name', textContent: src.name || src.adapter }),
-          createElement('span', { className: 'source-type', textContent: src.adapter || '' }),
-          createElement('span', { className: 'source-status detected', textContent: 'Detected' }),
+          createElement('span', { className: 'source-card-name', textContent: src.name || src.adapter }),
+          createElement('span', { className: 'source-card-meta', textContent: (src.adapter || '') + (src.origin ? ' \u2022 ' + src.origin : '') }),
+          createElement('button', { className: 'btn btn-primary', textContent: 'Use This' }),
         ]);
-        card.addEventListener('click', function () {
-          container.querySelectorAll('.source-card').forEach(function (c) { c.classList.remove('selected'); });
-          card.classList.add('selected');
-          state.brief.data_source = src.adapter + ':' + (src.name || src.adapter);
-          updateDbStatus(src);
+        card.querySelector('.btn').addEventListener('click', async function () {
+          try {
+            await api('POST', '/api/sources', src);
+            state.sources = state.sources || [];
+            state.sources.push(src);
+            saveState();
+            updateDbStatus(src);
+            goToStep(2);
+          } catch (e) {
+            container.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'Failed to select source' }));
+          }
         });
         container.appendChild(card);
       });
-      // Auto-select if only one source detected
-      if (state.sources.length === 1) {
-        var only = container.querySelector('.source-card');
-        if (only) only.click();
-      }
-    } catch (e) {
+    }).catch(function () {
       container.textContent = '';
-      container.appendChild(createElement('p', { className: 'muted', textContent: 'Could not detect sources.' }));
+      container.appendChild(createElement('p', { className: 'muted', textContent: 'Could not detect databases.' }));
       updateDbStatus(null);
-    }
-  }
-
-  function setupUpload() {
-    var area = $('#upload-area');
-    var input = $('#file-input');
-    if (!area || !input) return;
-
-    area.addEventListener('click', function () { input.click(); });
-
-    area.addEventListener('dragover', function (e) {
-      e.preventDefault();
-      area.classList.add('dragover');
-    });
-    area.addEventListener('dragleave', function () {
-      area.classList.remove('dragover');
-    });
-    area.addEventListener('drop', function (e) {
-      e.preventDefault();
-      area.classList.remove('dragover');
-      if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
-    });
-
-    input.addEventListener('change', function () {
-      if (input.files.length) uploadFiles(input.files);
-      input.value = '';
     });
   }
 
-  async function uploadFiles(files) {
-    var productName = state.brief.product_name || 'unnamed';
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-      var fd = new FormData();
-      fd.append('file', file);
-      addFileRow(file.name, 'uploading...');
-      try {
-        await api('POST', '/api/upload/' + encodeURIComponent(productName), fd);
-        updateFileRow(file.name, 'uploaded');
-        state.brief.docs.push(file.name);
-      } catch (e) {
-        updateFileRow(file.name, 'error');
-      }
-    }
-  }
-
-  function addFileRow(name, status) {
-    var container = $('#uploaded-files');
-    if (!container) return;
-    var row = createElement('div', { className: 'uploaded-file', 'data-file': name }, [
-      createElement('span', { className: 'file-name', textContent: name }),
-      createElement('span', { className: 'file-status', textContent: status }),
-    ]);
-    container.appendChild(row);
-  }
-
-  function updateFileRow(name, status) {
-    var row = $('[data-file="' + CSS.escape(name) + '"]');
-    if (row) {
-      var s = row.querySelector('.file-status');
-      if (s) s.textContent = status;
-    }
-  }
-
-  // ---- Voice Input ----
-
-  function setupVoice() {
-    var btn = $('#voice-btn');
-    if (!btn) return;
-    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      btn.style.display = 'none';
-      return;
-    }
-    var recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-    var recording = false;
-
-    btn.addEventListener('click', function () {
-      if (recording) {
-        recognition.stop();
+  function fetchAuthProviders(container, oauthResult) {
+    api('GET', '/api/auth/providers').then(function (data) {
+      var providers = data.providers || data || [];
+      container.textContent = '';
+      if (providers.length === 0) {
+        container.appendChild(createElement('p', { className: 'muted', textContent: 'No OAuth providers available.' }));
         return;
       }
-      recording = true;
-      btn.classList.add('recording');
-      recognition.start();
-    });
-
-    recognition.addEventListener('result', function (e) {
-      var transcript = e.results[0][0].transcript;
-      var desc = $('#description');
-      if (desc) desc.value = (desc.value ? desc.value + ' ' : '') + transcript;
-    });
-
-    recognition.addEventListener('end', function () {
-      recording = false;
-      btn.classList.remove('recording');
-    });
-
-    recognition.addEventListener('error', function () {
-      recording = false;
-      btn.classList.remove('recording');
+      providers.forEach(function (prov) {
+        var btn = createElement('button', { className: 'platform-btn', textContent: prov.display_name || prov.name || prov.id });
+        btn.addEventListener('click', function () {
+          startOAuthFlow(prov, container, oauthResult);
+        });
+        container.appendChild(btn);
+      });
+    }).catch(function () {
+      container.textContent = '';
+      container.appendChild(createElement('p', { className: 'muted', textContent: 'Could not load providers.' }));
     });
   }
 
-  // ---- Step 4: Review ----
+  async function startOAuthFlow(provider, platformGrid, oauthResult) {
+    // Show loading state on the platform grid
+    platformGrid.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = true; });
+    oauthResult.textContent = '';
+    oauthResult.appendChild(createElement('p', { className: 'muted', textContent: 'Connecting to ' + (provider.display_name || provider.id) + '\u2026' }));
 
-  function renderStep4() {
+    try {
+      var data = await api('POST', '/api/auth/start', { provider: provider.id });
+      var databases = data.databases || data || [];
+      oauthResult.textContent = '';
+
+      if (databases.length === 0) {
+        oauthResult.appendChild(createElement('p', { className: 'muted', textContent: 'No databases found for this provider.' }));
+        platformGrid.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
+        return;
+      }
+
+      oauthResult.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Select a database' }));
+      var dbGrid = createElement('div', { className: 'source-cards' });
+      databases.forEach(function (db) {
+        var dbCard = createElement('div', { className: 'source-card' }, [
+          createElement('span', { className: 'source-card-name', textContent: db.name || db.database }),
+          createElement('span', { className: 'source-card-meta', textContent: db.adapter || db.type || '' }),
+          createElement('button', { className: 'btn btn-primary', textContent: 'Use This' }),
+        ]);
+        dbCard.querySelector('.btn').addEventListener('click', async function () {
+          try {
+            await api('POST', '/api/auth/select-db', { provider: provider.id, database: db });
+            state.sources = state.sources || [];
+            state.sources.push(db);
+            saveState();
+            updateDbStatus(db);
+            goToStep(2);
+          } catch (e) {
+            oauthResult.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'Failed to select database' }));
+          }
+        });
+        dbGrid.appendChild(dbCard);
+      });
+      oauthResult.appendChild(dbGrid);
+    } catch (e) {
+      oauthResult.textContent = '';
+      oauthResult.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'OAuth flow failed' }));
+      platformGrid.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
+    }
+  }
+
+  // ---- Step 2: Define (placeholder) ----
+
+  function renderDefineStep() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
-
     var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Review Your Data Product' }));
-
-    // Product section
-    var prodSection = createElement('div', { className: 'review-section' });
-    var prodHeader = createElement('div', { className: 'review-header' });
-    prodHeader.appendChild(createElement('h3', { textContent: 'Product' }));
-    var prodEdit = createElement('span', { className: 'review-edit-link', textContent: 'Edit' });
-    prodEdit.addEventListener('click', function () { goToStep(1); });
-    prodHeader.appendChild(prodEdit);
-    prodSection.appendChild(prodHeader);
-    var prodBody = createElement('div', { className: 'review-body' });
-    prodBody.appendChild(createReviewRow('Product Name', state.brief.product_name || '(not set)'));
-    prodBody.appendChild(createReviewRow('Description', state.brief.description || '(none)'));
-    prodSection.appendChild(prodBody);
-    card.appendChild(prodSection);
-
-    // Owner section
-    var ownerSection = createElement('div', { className: 'review-section' });
-    var ownerHeader = createElement('div', { className: 'review-header' });
-    ownerHeader.appendChild(createElement('h3', { textContent: 'Owner' }));
-    var ownerEdit = createElement('span', { className: 'review-edit-link', textContent: 'Edit' });
-    ownerEdit.addEventListener('click', function () { goToStep(2); });
-    ownerHeader.appendChild(ownerEdit);
-    ownerSection.appendChild(ownerHeader);
-    var ownerBody = createElement('div', { className: 'review-body' });
-    ownerBody.appendChild(createReviewRow('Owner', state.brief.owner.name || '(not set)'));
-    ownerBody.appendChild(createReviewRow('Team', state.brief.owner.team || '(not set)'));
-    ownerBody.appendChild(createReviewRow('Email', state.brief.owner.email || '(not set)'));
-    ownerSection.appendChild(ownerBody);
-    card.appendChild(ownerSection);
-
-    // Context section
-    var ctxSection = createElement('div', { className: 'review-section' });
-    var ctxHeader = createElement('div', { className: 'review-header' });
-    ctxHeader.appendChild(createElement('h3', { textContent: 'Context' }));
-    var ctxEdit = createElement('span', { className: 'review-edit-link', textContent: 'Edit' });
-    ctxEdit.addEventListener('click', function () { goToStep(3); });
-    ctxHeader.appendChild(ctxEdit);
-    ctxSection.appendChild(ctxHeader);
-    var ctxBody = createElement('div', { className: 'review-body' });
-    ctxBody.appendChild(createReviewRow('Sensitivity', state.brief.sensitivity));
-
-    // Data Source row with status dot
-    var dsRow = createElement('div', { className: 'review-row' });
-    dsRow.appendChild(createElement('span', { className: 'review-label', textContent: 'Data Source' }));
-    var dsValue = createElement('span', { className: 'review-value' });
-    var dsDot = createElement('span', { className: 'status-dot' });
-    if (state.brief.data_source) {
-      dsDot.classList.add('success');
-    } else {
-      dsDot.classList.add('error');
-    }
-    dsValue.appendChild(dsDot);
-    dsValue.appendChild(document.createTextNode(' ' + (state.brief.data_source || '(none selected) \u2014 ' + state.sources.length + ' detected')));
-    dsRow.appendChild(dsValue);
-    ctxBody.appendChild(dsRow);
-
-    ctxBody.appendChild(createReviewRow('Uploaded Docs', state.brief.docs.length > 0 ? state.brief.docs.join(', ') : '(none)'));
-    ctxSection.appendChild(ctxBody);
-    card.appendChild(ctxSection);
-
-    card.appendChild(createStepActions(true, true, 'Build'));
+    card.appendChild(createElement('h2', { textContent: 'Define' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
+    card.appendChild(createStepActions(true, true));
     content.appendChild(card);
   }
+
+  // ---- Step 3: Scaffold (placeholder) ----
+
+  function renderScaffoldStep() {
+    var content = document.getElementById('wizard-content');
+    if (!content) return;
+    var card = createElement('div', { className: 'card' });
+    card.appendChild(createElement('h2', { textContent: 'Scaffold' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
+    card.appendChild(createStepActions(true, true));
+    content.appendChild(card);
+  }
+
+  // ---- Step 4: Checkpoint (placeholder) ----
+
+  function renderCheckpointStep() {
+    var content = document.getElementById('wizard-content');
+    if (!content) return;
+    var card = createElement('div', { className: 'card' });
+    card.appendChild(createElement('h2', { textContent: 'Checkpoint' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
+    card.appendChild(createStepActions(true, true));
+    content.appendChild(card);
+  }
+
+  // ---- Step 5: Enrich (placeholder) ----
+
+  function renderEnrichStep() {
+    var content = document.getElementById('wizard-content');
+    if (!content) return;
+    var card = createElement('div', { className: 'card' });
+    card.appendChild(createElement('h2', { textContent: 'Enrich' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
+    card.appendChild(createStepActions(true, true));
+    content.appendChild(card);
+  }
+
+  // ---- Step 6: Serve (placeholder) ----
+
+  function renderServeStep() {
+    var content = document.getElementById('wizard-content');
+    if (!content) return;
+    var card = createElement('div', { className: 'card' });
+    card.appendChild(createElement('h2', { textContent: 'Serve' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
+    card.appendChild(createStepActions(true, false));
+    content.appendChild(card);
+  }
+
+  // ---- Review / Build helpers (will be re-implemented in later tasks) ----
 
   function createReviewRow(label, value) {
     return createElement('div', { className: 'review-row' }, [
       createElement('span', { className: 'review-label', textContent: label }),
       createElement('span', { className: 'review-value', textContent: value }),
     ]);
-  }
-
-  // ---- Step 5: Build ----
-
-  var STAGES = [
-    'Saving context brief',
-    'Scanning data sources',
-    'Extracting schema metadata',
-    'Generating semantic descriptions',
-    'Writing OSI-ready context',
-  ];
-
-  var userExpandedStages = new Set();
-
-  function renderStep5() {
-    var content = document.getElementById('wizard-content');
-    if (!content) return;
-
-    var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Building Your Data Product' }));
-
-    // Descriptive line above the pipeline
-    var source = state.brief.data_source || '';
-    var descP = createElement('p', { className: 'pipeline-desc' }, [
-      document.createTextNode('Building semantic plane for '),
-      createElement('strong', { textContent: state.brief.product_name || '' }),
-      document.createTextNode(' from '),
-      createElement('strong', { textContent: source }),
-    ]);
-    card.appendChild(descP);
-
-    var timeline = createElement('div', { className: 'pipeline-timeline', id: 'pipeline-timeline' });
-    card.appendChild(timeline);
-
-    // Completion card
-    var doneEl = createElement('div', { className: 'completion-card', id: 'pipeline-done' });
-    doneEl.style.display = 'none';
-
-    doneEl.appendChild(createElement('h2', { textContent: 'Your semantic plane is ready' }));
-    doneEl.appendChild(createElement('span', { className: 'tier-badge', id: 'completion-tier', textContent: '...' }));
-
-    var subtitleText = (state.brief.product_name || 'Your product') + ' is now AI-ready. AI agents can query your data with full semantic context.';
-    doneEl.appendChild(createElement('p', { className: 'completion-subtitle', textContent: subtitleText }));
-
-    var actions = createElement('div', { className: 'completion-actions' });
-    var startBtn = createElement('button', { className: 'btn btn-primary', id: 'start-mcp-btn', textContent: 'Start MCP Server' });
-    actions.appendChild(startBtn);
-    var publishLink = createElement('a', { className: 'btn btn-secondary', textContent: 'Publish to Cloud' });
-    publishLink.href = 'https://app.runcontext.dev';
-    publishLink.target = '_blank';
-    publishLink.rel = 'noopener';
-    actions.appendChild(publishLink);
-    doneEl.appendChild(actions);
-
-    var nextSteps = createElement('div', { className: 'completion-next-steps' });
-    nextSteps.appendChild(createElement('h3', { textContent: 'Next Steps' }));
-    nextSteps.appendChild(createElement('p', { textContent: 'Start the MCP server to make your data available to AI tools:' }));
-    var cli1 = createElement('div', { className: 'completion-cli' });
-    cli1.appendChild(createElement('code', { textContent: 'npx runcontext serve' }));
-    nextSteps.appendChild(cli1);
-    nextSteps.appendChild(createElement('p', { textContent: 'Or configure your AI tool to connect to:' }));
-    var cli2 = createElement('div', { className: 'completion-cli' });
-    cli2.appendChild(createElement('code', { textContent: 'http://localhost:3333/mcp' }));
-    nextSteps.appendChild(cli2);
-    doneEl.appendChild(nextSteps);
-
-    // Start MCP Server button handler
-    startBtn.addEventListener('click', function () {
-      startBtn.textContent = 'Starting...';
-      startBtn.disabled = true;
-      fetch('http://localhost:3333/health', { method: 'GET' })
-        .then(function (res) {
-          if (res.ok) {
-            startBtn.textContent = 'MCP Server Running';
-            var serverDot = document.getElementById('mcp-server-dot');
-            var serverText = document.getElementById('mcp-server-text');
-            if (serverDot) { serverDot.classList.remove('error'); serverDot.classList.add('success'); }
-            if (serverText) serverText.textContent = 'running on :3333';
-          } else {
-            throw new Error('not running');
-          }
-        })
-        .catch(function () {
-          startBtn.textContent = 'Start MCP Server';
-          startBtn.disabled = false;
-          alert('MCP server is not running. Start it from your terminal:\n\nnpx runcontext serve');
-        });
-    });
-
-    card.appendChild(doneEl);
-
-    content.appendChild(card);
-
-    startBuild();
-  }
-
-  function maskConnectionString(str) {
-    if (!str) return '';
-    return str.replace(/:([^@:]+)@/, ':****@');
-  }
-
-  function buildStageDetailContent(item) {
-    var frag = document.createDocumentFragment();
-    if (!item.details) return frag;
-    var name = (item.stage || '').toLowerCase();
-
-    if (name.indexOf('introspect') !== -1 || name.indexOf('scanning') !== -1) {
-      if (item.details.connection_string) {
-        var connP = createElement('p', { className: 'mono', textContent: maskConnectionString(item.details.connection_string) });
-        connP.style.fontSize = '0.8rem';
-        connP.style.marginBottom = '0.5rem';
-        frag.appendChild(connP);
-      }
-      if (item.details.tables && item.details.tables.length) {
-        var tbl = document.createElement('table');
-        tbl.className = 'stage-detail-table';
-        item.details.tables.forEach(function (t) {
-          var tr = document.createElement('tr');
-          var td1 = document.createElement('td');
-          td1.textContent = t.name || t;
-          tr.appendChild(td1);
-          var td2 = document.createElement('td');
-          td2.textContent = t.row_count != null ? t.row_count + ' rows' : '';
-          tr.appendChild(td2);
-          tbl.appendChild(tr);
-        });
-        frag.appendChild(tbl);
-      }
-    } else if (name.indexOf('scaffold') !== -1 || name.indexOf('schema') !== -1) {
-      if (item.details.files && item.details.files.length) {
-        var ul = document.createElement('ul');
-        ul.className = 'stage-detail-list';
-        item.details.files.forEach(function (f) {
-          var li = document.createElement('li');
-          li.textContent = (f.name || f) + (f.size ? ' (' + f.size + ')' : '');
-          ul.appendChild(li);
-        });
-        frag.appendChild(ul);
-      }
-    } else if (name.indexOf('silver') !== -1 || name.indexOf('description') !== -1) {
-      if (item.details.fields_enriched != null) {
-        frag.appendChild(createElement('p', { textContent: item.details.fields_enriched + ' fields enriched' }));
-      }
-      if (item.details.samples && item.details.samples.length) {
-        var ul2 = document.createElement('ul');
-        ul2.className = 'stage-detail-list';
-        var limit = Math.min(item.details.samples.length, 3);
-        for (var i = 0; i < limit; i++) {
-          var li2 = document.createElement('li');
-          li2.textContent = item.details.samples[i];
-          ul2.appendChild(li2);
-        }
-        frag.appendChild(ul2);
-      }
-    } else if (name.indexOf('gold') !== -1 || name.indexOf('semantic') !== -1) {
-      if (item.details.semantic_roles != null) {
-        frag.appendChild(createElement('p', { textContent: item.details.semantic_roles + ' semantic roles added' }));
-      }
-      if (item.details.aggregations != null) {
-        frag.appendChild(createElement('p', { textContent: item.details.aggregations + ' aggregations set' }));
-      }
-    } else if (name.indexOf('verify') !== -1) {
-      var counts = [];
-      if (item.details.pass != null) {
-        var passSpan = createElement('span', { textContent: item.details.pass + ' pass' });
-        passSpan.style.color = 'var(--success)';
-        counts.push(passSpan);
-      }
-      if (item.details.warn != null) {
-        var warnSpan = createElement('span', { textContent: item.details.warn + ' warn' });
-        warnSpan.style.color = 'var(--warning)';
-        counts.push(warnSpan);
-      }
-      if (item.details.fail != null) {
-        var failSpan = createElement('span', { textContent: item.details.fail + ' fail' });
-        failSpan.style.color = 'var(--error)';
-        counts.push(failSpan);
-      }
-      if (counts.length) {
-        var countsP = document.createElement('p');
-        counts.forEach(function (sp, idx) {
-          if (idx > 0) countsP.appendChild(document.createTextNode(' / '));
-          countsP.appendChild(sp);
-        });
-        frag.appendChild(countsP);
-      }
-    } else if (name.indexOf('autofix') !== -1 || name.indexOf('fix') !== -1) {
-      if (item.details.fixes_applied != null) {
-        frag.appendChild(createElement('p', { textContent: item.details.fixes_applied + ' fixes applied' }));
-      }
-    } else if (name.indexOf('agent') !== -1 || name.indexOf('instruction') !== -1) {
-      if (item.details.file_path) {
-        var codePath = createElement('code', { textContent: item.details.file_path });
-        codePath.style.fontSize = '0.8125rem';
-        frag.appendChild(codePath);
-      }
-    }
-
-    return frag;
-  }
-
-  function getStageDescription(item) {
-    var name = (item.stage || '').toLowerCase();
-    var source = state.brief.data_source || 'database';
-    if (name === 'introspect') return 'Connecting to ' + source + ' and scanning table schemas, columns, and row counts.';
-    if (name === 'scaffold') return 'Generating OSI-compliant YAML files for each table and column discovered.';
-    if (name === 'enrich-silver') return 'Using AI to generate human-readable descriptions for every column and table.';
-    if (name === 'enrich-gold') return 'Adding semantic roles, aggregation hints, and golden query patterns.';
-    if (name === 'verify') return 'Validating all generated metadata against the OSI schema for completeness.';
-    if (name === 'autofix') return 'Automatically fixing any validation warnings found in the verify step.';
-    if (name === 'agent-instructions') return 'Generating agent instruction files so AI tools know how to query your data.';
-    return null;
-  }
-
-  function buildStageElement(item, stageIndex) {
-    var statusClass = 'stage-pending';
-    var dotText = '';
-    if (item.status === 'done' || item.status === 'completed' || item.status === 'complete') {
-      statusClass = 'stage-done';
-    } else if (item.status === 'running' || item.status === 'in_progress') {
-      statusClass = 'stage-running';
-    } else if (item.status === 'error') {
-      statusClass = 'stage-error';
-      dotText = '!';
-    }
-
-    var header = createElement('div', { className: 'pipeline-stage-header' }, [
-      createElement('div', { className: 'stage-dot', textContent: dotText }),
-      createElement('span', { className: 'stage-name', textContent: item.stage }),
-      item.detail ? createElement('span', { className: 'stage-summary', textContent: item.detail }) : null,
-    ]);
-
-    var bodyInner = createElement('div', { className: 'pipeline-stage-body-inner' });
-
-    // Show summary/error detail from the API
-    if (item.detail) {
-      bodyInner.appendChild(createElement('p', { className: 'muted', textContent: item.detail }));
-    }
-
-    // Render rich detail content from API details object
-    var detailContent = buildStageDetailContent(item);
-    if (detailContent.childNodes.length > 0) {
-      bodyInner.appendChild(detailContent);
-    }
-
-    // Always show a contextual description for each stage
-    var stageDesc = getStageDescription(item);
-    if (stageDesc && !item.detail) {
-      bodyInner.appendChild(createElement('p', { className: 'muted', textContent: stageDesc }));
-    }
-
-    var body = createElement('div', { className: 'pipeline-stage-body' }, [bodyInner]);
-
-    var stage = createElement('div', { className: 'pipeline-stage ' + statusClass }, [header, body]);
-
-    header.addEventListener('click', function () {
-      stage.classList.toggle('expanded');
-      if (stage.classList.contains('expanded')) {
-        userExpandedStages.add(stageIndex);
-      } else {
-        userExpandedStages.delete(stageIndex);
-      }
-    });
-
-    return stage;
-  }
-
-  function renderTimeline(items) {
-    var el = $('#pipeline-timeline');
-    if (!el) return;
-    if (items.length === 0) {
-      items = STAGES.map(function (name) {
-        return { stage: name, status: 'pending', detail: '', details: null };
-      });
-    }
-    el.textContent = '';
-    items.forEach(function (item, idx) {
-      var stageEl = buildStageElement(item, idx);
-      el.appendChild(stageEl);
-    });
-
-    // Auto-expand/collapse logic
-    var stageEls = el.querySelectorAll('.pipeline-stage');
-    stageEls.forEach(function (stageEl, idx) {
-      var isRunning = stageEl.classList.contains('stage-running');
-      var isDone = stageEl.classList.contains('stage-done');
-      var userOpened = userExpandedStages.has(idx);
-
-      if (isRunning) {
-        stageEl.classList.add('expanded');
-      } else if (userOpened) {
-        stageEl.classList.add('expanded');
-      } else if (isDone) {
-        stageEl.classList.remove('expanded');
-      }
-    });
-  }
-
-  function renderTimelineFromStatus(data) {
-    var stages = data.stages || data.steps || [];
-    var items = stages.map(function (s) {
-      return {
-        stage: s.name || s.stage || s.label || '',
-        status: s.status || 'pending',
-        detail: s.summary || s.detail || s.error || s.message || '',
-        details: s.details || s.data || null,
-      };
-    });
-    if (items.length === 0 && typeof data.currentStep === 'number') {
-      items = STAGES.map(function (name, i) {
-        var status = 'pending';
-        if (i < data.currentStep) status = 'done';
-        else if (i === data.currentStep) status = 'running';
-        return { stage: name, status: status, detail: '' };
-      });
-    }
-    renderTimeline(items);
-  }
-
-  async function startBuild() {
-    renderTimeline([]);
-    try {
-      await api('POST', '/api/brief', state.brief);
-      var result = await api('POST', '/api/pipeline/start', {
-        productName: state.brief.product_name,
-        targetTier: 'gold',
-      });
-      state.pipelineId = result.id || result.pipelineId;
-      saveState();
-      pollPipeline();
-    } catch (e) {
-      renderTimeline([{ stage: 'Error', status: 'error', detail: e.message }]);
-      showRetryButton();
-    }
-  }
-
-  function detectAndShowTier(data) {
-    // Run the tier command via the CLI to get the actual tier
-    var tierBadge = document.getElementById('completion-tier');
-    var sidebarBadge = document.getElementById('tier-badge');
-    // Check if enrich-gold completed successfully
-    var stages = data.stages || [];
-    var goldDone = stages.some(function (s) {
-      return (s.stage === 'enrich-gold') && (s.status === 'done');
-    });
-    var silverDone = stages.some(function (s) {
-      return (s.stage === 'enrich-silver') && (s.status === 'done');
-    });
-    // Check verify for actual tier info from summary
-    var verifyStage = stages.find(function (s) { return s.stage === 'verify'; });
-    var verifySummary = (verifyStage && (verifyStage.summary || '')) || '';
-    var hasErrors = verifySummary.indexOf('error') !== -1;
-
-    // Determine tier: gold only if gold enrichment ran AND no verify errors
-    var tier = 'Bronze';
-    if (goldDone && !hasErrors) tier = 'Gold';
-    else if (silverDone && !hasErrors) tier = 'Silver';
-    else if (goldDone || silverDone) tier = hasErrors ? 'Bronze' : 'Silver';
-
-    if (tierBadge) tierBadge.textContent = tier;
-    if (sidebarBadge) sidebarBadge.textContent = tier;
-  }
-
-  function showRetryButton() {
-    var timeline = $('#pipeline-timeline');
-    if (!timeline) return;
-    // Don't add duplicate retry buttons
-    if (timeline.parentElement.querySelector('.retry-build-btn')) return;
-    var retryBtn = createElement('button', { className: 'btn btn-primary retry-build-btn', textContent: 'Retry Build' });
-    retryBtn.style.marginTop = '16px';
-    retryBtn.addEventListener('click', function () {
-      retryBtn.remove();
-      state.pipelineId = null;
-      saveState();
-      startBuild();
-    });
-    timeline.parentElement.appendChild(retryBtn);
-  }
-
-  function pollPipeline() {
-    if (!state.pipelineId) return;
-    state.pollTimer = setInterval(async function () {
-      try {
-        var data = await api('GET', '/api/pipeline/status/' + encodeURIComponent(state.pipelineId));
-        renderTimelineFromStatus(data);
-        if (data.status === 'done' || data.status === 'complete' || data.status === 'completed' || data.status === 'error') {
-          clearInterval(state.pollTimer);
-          if (data.status !== 'error') {
-            var doneEl = $('#pipeline-done');
-            if (doneEl) doneEl.style.display = '';
-            // Detect actual tier from stage summaries
-            detectAndShowTier(data);
-          } else {
-            showRetryButton();
-          }
-        }
-      } catch (e) {
-        clearInterval(state.pollTimer);
-        renderTimeline([{ stage: 'Error', status: 'error', detail: e.message }]);
-      }
-    }, 1000);
   }
 
   // ---- Existing Products Banner ----
