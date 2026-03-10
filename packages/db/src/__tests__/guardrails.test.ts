@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { enforceReadOnly, applyRowLimit, applyTimeout } from '../guardrails.js';
+import { enforceReadOnly, applyRowLimit, applyTimeout, validateReadOnlySQL } from '../guardrails.js';
 
 describe('enforceReadOnly', () => {
   it('returns SET default_transaction_read_only for postgres', () => {
@@ -85,5 +85,82 @@ describe('applyTimeout', () => {
 
   it('returns null for duckdb', () => {
     expect(applyTimeout('duckdb', 30000)).toBeNull();
+  });
+});
+
+describe('validateReadOnlySQL', () => {
+  it('allows simple SELECT', () => {
+    expect(validateReadOnlySQL('SELECT * FROM users')).toEqual({ valid: true });
+  });
+
+  it('allows SELECT with trailing semicolon', () => {
+    expect(validateReadOnlySQL('SELECT 1;')).toEqual({ valid: true });
+  });
+
+  it('allows WITH (CTE) + SELECT', () => {
+    expect(validateReadOnlySQL('WITH cte AS (SELECT id FROM users) SELECT * FROM cte')).toEqual({ valid: true });
+  });
+
+  it('allows EXPLAIN SELECT', () => {
+    expect(validateReadOnlySQL('EXPLAIN SELECT * FROM users')).toEqual({ valid: true });
+  });
+
+  it('allows SHOW', () => {
+    expect(validateReadOnlySQL('SHOW TABLES')).toEqual({ valid: true });
+  });
+
+  it('allows DESCRIBE', () => {
+    expect(validateReadOnlySQL('DESCRIBE users')).toEqual({ valid: true });
+  });
+
+  it('rejects empty query', () => {
+    const result = validateReadOnlySQL('');
+    expect(result.valid).toBe(false);
+  });
+
+  it('rejects INSERT', () => {
+    const result = validateReadOnlySQL("INSERT INTO users (name) VALUES ('test')");
+    expect(result.valid).toBe(false);
+    expect(result.reason).toContain('INSERT');
+  });
+
+  it('rejects UPDATE', () => {
+    expect(validateReadOnlySQL("UPDATE users SET name = 'test'").valid).toBe(false);
+  });
+
+  it('rejects DELETE', () => {
+    expect(validateReadOnlySQL('DELETE FROM users WHERE id = 1').valid).toBe(false);
+  });
+
+  it('rejects DROP', () => {
+    expect(validateReadOnlySQL('DROP TABLE users').valid).toBe(false);
+  });
+
+  it('rejects CREATE', () => {
+    expect(validateReadOnlySQL('CREATE TABLE test (id INT)').valid).toBe(false);
+  });
+
+  it('rejects ALTER', () => {
+    expect(validateReadOnlySQL('ALTER TABLE users ADD COLUMN age INT').valid).toBe(false);
+  });
+
+  it('rejects TRUNCATE', () => {
+    expect(validateReadOnlySQL('TRUNCATE TABLE users').valid).toBe(false);
+  });
+
+  it('rejects GRANT', () => {
+    expect(validateReadOnlySQL('GRANT ALL ON users TO public').valid).toBe(false);
+  });
+
+  it('rejects multi-statement with semicolon injection', () => {
+    expect(validateReadOnlySQL('SELECT 1; DROP TABLE users').valid).toBe(false);
+  });
+
+  it('rejects SET', () => {
+    expect(validateReadOnlySQL('SET search_path TO public').valid).toBe(false);
+  });
+
+  it('rejects BEGIN', () => {
+    expect(validateReadOnlySQL('BEGIN').valid).toBe(false);
   });
 });

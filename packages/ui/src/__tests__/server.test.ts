@@ -83,7 +83,7 @@ describe('UI Server', () => {
       expect(body.ok).toBe(true);
 
       // Verify file was written
-      const briefPath = path.join(contextDir, 'products', 'test-product', 'context-brief.yaml');
+      const briefPath = path.join(contextDir, 'test-product.context-brief.yaml');
       expect(fs.existsSync(briefPath)).toBe(true);
     });
 

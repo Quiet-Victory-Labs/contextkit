@@ -117,11 +117,14 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
       const configPath = join(rootDir, 'runcontext.config.yaml');
       const configRaw = readFileSync(configPath, 'utf-8');
       const config = parseYaml(configRaw) as Record<string, unknown>;
-      const dataSources = config?.dataSources as
-        | Array<{ connectionString?: string }>
+      const dataSources = config?.data_sources as
+        | Record<string, { connection?: string; path?: string }>
         | undefined;
-      if (dataSources && dataSources.length > 0) {
-        connection = dataSources[0].connectionString;
+      if (dataSources) {
+        const firstKey = Object.keys(dataSources)[0];
+        if (firstKey) {
+          connection = dataSources[firstKey].connection || dataSources[firstKey].path;
+        }
       }
     } catch {
       // Config file missing or unparseable – proceed without db entry
@@ -198,7 +201,7 @@ async function executePipeline(
 
     try {
       const args = buildCliArgs(stage.stage, dataSource);
-      const { stdout } = await execFile('npx', args, {
+      const { stdout } = await execFile('npx', ['--yes', ...args], {
         cwd: rootDir,
         timeout: 120_000,
         env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=4096' },
