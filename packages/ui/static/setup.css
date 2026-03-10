@@ -78,6 +78,9 @@ body {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   overflow-y: auto;
 }
 
@@ -1027,16 +1030,28 @@ code, pre, .mono {
   background: var(--rc-color-bg-secondary, #1e293b);
   border: 1px solid var(--rc-color-border, #334155);
   border-radius: var(--rc-radius-lg, 12px);
-  padding: var(--rc-space-4);
-  cursor: pointer;
+  padding: var(--rc-space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-2, 8px);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .source-card:hover {
   border-color: var(--rc-color-accent, #c9a55a);
   box-shadow: 0 0 0 1px var(--rc-color-accent, #c9a55a);
 }
-.source-card-name { font-weight: 600; margin-bottom: var(--rc-space-1); }
-.source-card-meta { font-size: var(--rc-font-sm); color: var(--rc-color-text-secondary, #94a3b8); }
+.source-card-name { font-weight: 600; }
+.source-card-meta {
+  font-size: var(--rc-font-sm, 0.8125rem);
+  color: var(--rc-color-text-secondary, #94a3b8);
+  word-break: break-all;
+}
+.source-card .btn {
+  align-self: flex-start;
+  margin-top: var(--rc-space-2, 8px);
+  padding: 0.4rem 1rem;
+  font-size: 0.8125rem;
+}
 
 .section-divider {
   display: flex;

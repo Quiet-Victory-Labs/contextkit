@@ -880,9 +880,8 @@
     startArea.appendChild(startBtn);
     card.appendChild(startArea);
 
-    // Dashboard (hidden until enrichment starts)
+    // Dashboard (always visible — shows checklist pre-enrichment)
     var dashboard = createElement('div', { className: 'enrich-dashboard', id: 'enrich-dashboard' });
-    dashboard.style.display = 'none';
 
     // Top panel: Requirements checklist
     var checklist = createElement('div', { className: 'enrich-checklist' });
@@ -948,11 +947,9 @@
       state.pipelineId = result.id;
       saveState();
 
-      // Hide start button area, show dashboard
+      // Hide start button area
       var startArea = document.getElementById('enrich-start-area');
       if (startArea) startArea.style.display = 'none';
-      var dashboard = document.getElementById('enrich-dashboard');
-      if (dashboard) dashboard.style.display = '';
 
       appendEnrichLog({ message: 'Enrichment pipeline started.' });
       startEnrichPolling();
@@ -1312,35 +1309,33 @@
     async function check() {
       var dot = document.getElementById('mcp-status-dot');
       var text = document.getElementById('mcp-status-text');
+      var serverDot = document.getElementById('mcp-server-dot');
+      var serverText = document.getElementById('mcp-server-text');
       if (!dot || !text) return;
       try {
-        var res = await fetch('http://localhost:3333/health', { method: 'GET' });
-        if (res.ok) {
-          dot.classList.remove('error');
-          dot.classList.add('success');
-          text.textContent = 'connected';
-          // Also update the MCP server status in sidebar-status
-          var serverDot = document.getElementById('mcp-server-dot');
-          var serverText = document.getElementById('mcp-server-text');
-          if (serverDot) { serverDot.classList.remove('error'); serverDot.classList.add('success'); }
-          if (serverText) serverText.textContent = 'MCP running';
-        } else {
-          dot.classList.remove('success');
-          dot.classList.add('error');
-          text.textContent = 'error';
-        }
+        var controller = new AbortController();
+        var timer = setTimeout(function () { controller.abort(); }, 2000);
+        var res = await fetch('http://localhost:3333/health', {
+          method: 'GET',
+          mode: 'no-cors',
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        // mode: 'no-cors' returns opaque response (status 0) but means server is reachable
+        dot.classList.remove('error');
+        dot.classList.add('success');
+        text.textContent = 'connected';
+        if (serverDot) { serverDot.classList.remove('error'); serverDot.classList.add('success'); }
+        if (serverText) serverText.textContent = 'MCP running';
       } catch (e) {
         dot.classList.remove('success');
-        dot.classList.add('error');
         text.textContent = 'offline';
-        var serverDot = document.getElementById('mcp-server-dot');
-        var serverText = document.getElementById('mcp-server-text');
-        if (serverDot) { serverDot.classList.remove('success'); serverDot.classList.add('error'); }
+        if (serverDot) { serverDot.classList.remove('success'); }
         if (serverText) serverText.textContent = 'MCP stopped';
       }
     }
     check();
-    state.mcpPollTimer = setInterval(check, 5000);
+    state.mcpPollTimer = setInterval(check, 10000);
   }
 
   function updateDbStatus(source) {
@@ -1363,6 +1358,12 @@
   function init() {
     setupSidebarLocked();
     pollMcpStatus();
+
+    // Restore DB status from saved state
+    if (state.sources && state.sources.length > 0) {
+      updateDbStatus(state.sources[0]);
+    }
+
     goToStep(state.step);
 
     // Create or resume a WebSocket session
