@@ -35,7 +35,8 @@ export type AdapterType =
   | 'bigquery'
   | 'clickhouse'
   | 'databricks'
-  | 'sqlite';
+  | 'sqlite'
+  | 'mongodb';
 
 export interface DataSourceConfig {
   adapter: AdapterType;

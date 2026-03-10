@@ -22,7 +22,7 @@ export const mcpConfigSchema = z.object({
 export const dataSourceConfigSchema = z.object({
   adapter: z.enum([
     'duckdb', 'postgres', 'mysql', 'mssql', 'snowflake',
-    'bigquery', 'clickhouse', 'databricks', 'sqlite',
+    'bigquery', 'clickhouse', 'databricks', 'sqlite', 'mongodb',
   ]),
   path: z.string().optional(),
   connection: z.string().optional(),

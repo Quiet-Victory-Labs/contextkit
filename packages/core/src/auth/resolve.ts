@@ -20,7 +20,7 @@ export async function resolveAuthConnection(
     throw new Error(`No stored credential found for "${authKey}". Run \`context auth\` to authenticate.`);
   }
 
-  const providerId = authKey.split(':')[0];
+  const providerId = authKey.split(':')[0]!;
   const provider = registry.get(providerId);
   if (!provider) {
     throw new Error(`No auth provider registered for "${providerId}".`);
@@ -44,9 +44,9 @@ export async function resolveAuthConnection(
     id: authKey.split(':').slice(1).join(':'),
     name: (cred.metadata?.database as string) ?? '',
     host: (cred.metadata?.host as string) ?? '',
-    adapter: provider.adapters[0],
-    ...cred.metadata,
-  };
+    adapter: provider.adapters[0]!,
+    metadata: cred.metadata,
+  } as import('./types.js').DatabaseEntry;
 
   return provider.getConnectionString(dbEntry);
 }
