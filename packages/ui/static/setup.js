@@ -771,16 +771,223 @@
     content.appendChild(card);
   }
 
-  // ---- Step 5: Enrich (placeholder) ----
+  // ---- Step 5: Enrich ----
+
+  var ENRICH_REQUIREMENTS = [
+    { key: 'column-descriptions', label: 'Column descriptions', initial: '0/45 columns' },
+    { key: 'sample-values', label: 'Sample values', initial: '0/45 columns' },
+    { key: 'join-rules', label: 'Join rules', initial: '0/0' },
+    { key: 'grain-statements', label: 'Grain statements', initial: '0/0' },
+    { key: 'semantic-roles', label: 'Semantic roles', initial: '0/0' },
+    { key: 'golden-queries', label: 'Golden queries', initial: '0/0' },
+    { key: 'guardrail-filters', label: 'Guardrail filters', initial: '0/0' },
+  ];
 
   function renderEnrichStep() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
+
     var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Enrich' }));
-    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
-    card.appendChild(createStepActions(true, true));
+
+    card.appendChild(createElement('h2', { textContent: 'Enriching to Gold' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'RunContext is analyzing your schema to add descriptions, join rules, and query patterns.' }));
+
+    // Start Enrichment button area
+    var startArea = createElement('div', { className: 'step-actions', id: 'enrich-start-area' });
+    var backBtn = createElement('button', { className: 'btn btn-secondary', textContent: 'Back' });
+    backBtn.addEventListener('click', function () { goToStep(4); });
+    startArea.appendChild(backBtn);
+
+    var startBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Start Enrichment', id: 'enrich-start-btn' });
+    startBtn.addEventListener('click', function () { startEnrichment(startBtn); });
+    startArea.appendChild(startBtn);
+    card.appendChild(startArea);
+
+    // Dashboard (hidden until enrichment starts)
+    var dashboard = createElement('div', { className: 'enrich-dashboard', id: 'enrich-dashboard' });
+    dashboard.style.display = 'none';
+
+    // Top panel: Requirements checklist
+    var checklist = createElement('div', { className: 'enrich-checklist' });
+    ENRICH_REQUIREMENTS.forEach(function (req) {
+      var row = createElement('div', { className: 'enrich-row', id: 'enrich-req-' + req.key });
+
+      var header = createElement('div', { className: 'enrich-row-header' });
+      header.appendChild(createElement('span', { className: 'stage-dot' }));
+      header.appendChild(createElement('span', { className: 'enrich-req-name', textContent: req.label }));
+      header.appendChild(createElement('span', { className: 'enrich-progress', textContent: req.initial }));
+      header.appendChild(createElement('span', { className: 'enrich-arrow', textContent: '\u25B6' }));
+
+      header.addEventListener('click', function () {
+        row.classList.toggle('expanded');
+      });
+
+      var detail = createElement('div', { className: 'enrich-row-detail' }, [
+        'Details will appear as enrichment progresses.',
+      ]);
+
+      row.appendChild(header);
+      row.appendChild(detail);
+      checklist.appendChild(row);
+    });
+    dashboard.appendChild(checklist);
+
+    // Bottom panel: Activity log
+    var logSection = createElement('div', { className: 'activity-log' });
+    logSection.appendChild(createElement('div', { className: 'activity-log-title', textContent: 'Activity Log' }));
+    var logContainer = createElement('div', { id: 'activity-log' });
+    logContainer.appendChild(createElement('div', { className: 'log-entry' }, [
+      createElement('span', { className: 'log-time', textContent: new Date().toLocaleTimeString() }),
+      createElement('span', {}, [' Waiting for enrichment to start...']),
+    ]));
+    logSection.appendChild(logContainer);
+    dashboard.appendChild(logSection);
+
+    // Error area
+    var errorArea = createElement('div', { id: 'enrich-error' });
+    dashboard.appendChild(errorArea);
+
+    card.appendChild(dashboard);
     content.appendChild(card);
+  }
+
+  async function startEnrichment(btn) {
+    btn.textContent = 'Starting...';
+    btn.disabled = true;
+
+    var errorArea = document.getElementById('enrich-error');
+    if (errorArea) errorArea.textContent = '';
+
+    var body = {
+      productName: state.brief.product_name,
+      targetTier: 'gold',
+    };
+    if (state.sources && state.sources[0]) {
+      body.dataSource = state.sources[0];
+    }
+
+    try {
+      var result = await api('POST', '/api/pipeline/start', body);
+      state.pipelineId = result.id;
+      saveState();
+
+      // Hide start button area, show dashboard
+      var startArea = document.getElementById('enrich-start-area');
+      if (startArea) startArea.style.display = 'none';
+      var dashboard = document.getElementById('enrich-dashboard');
+      if (dashboard) dashboard.style.display = '';
+
+      appendEnrichLog({ message: 'Enrichment pipeline started.' });
+      startEnrichPolling();
+    } catch (e) {
+      btn.textContent = 'Start Enrichment';
+      btn.disabled = false;
+      if (errorArea) {
+        errorArea.textContent = '';
+        errorArea.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'Failed to start enrichment.' }));
+      }
+    }
+  }
+
+  function startEnrichPolling() {
+    if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+
+    async function poll() {
+      if (!state.pipelineId) return;
+      try {
+        var status = await api('GET', '/api/pipeline/status/' + state.pipelineId);
+        var stages = status.stages || [];
+        var hasError = false;
+        var silverDone = false;
+        var goldDone = false;
+
+        for (var i = 0; i < stages.length; i++) {
+          var s = stages[i];
+          if (s.name === 'enrich-silver' && s.status === 'done') silverDone = true;
+          if (s.name === 'enrich-gold' && s.status === 'done') goldDone = true;
+          if (s.status === 'error') hasError = true;
+        }
+
+        if (hasError) {
+          if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+          showEnrichError(status.error || 'An enrichment stage failed.');
+          return;
+        }
+
+        if (silverDone) {
+          appendEnrichLog({ message: 'Silver enrichment complete.' });
+        }
+        if (silverDone && goldDone) {
+          if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+          appendEnrichLog({ message: 'Gold enrichment complete! Advancing...' });
+          goToStep(6);
+        }
+      } catch (e) {
+        // Network error — keep polling
+      }
+    }
+
+    poll();
+    state.pollTimer = setInterval(poll, 3000);
+  }
+
+  function showEnrichError(msg) {
+    var errorArea = document.getElementById('enrich-error');
+    if (!errorArea) return;
+    errorArea.textContent = '';
+    errorArea.appendChild(createElement('p', { className: 'field-error', textContent: msg }));
+
+    var retryBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Retry' });
+    retryBtn.addEventListener('click', function () {
+      errorArea.textContent = '';
+      state.pipelineId = null;
+      saveState();
+      // Reset requirement rows to pending
+      ENRICH_REQUIREMENTS.forEach(function (req) {
+        var row = document.getElementById('enrich-req-' + req.key);
+        if (!row) return;
+        var dot = row.querySelector('.stage-dot');
+        if (dot) dot.className = 'stage-dot';
+        var prog = row.querySelector('.enrich-progress');
+        if (prog) prog.textContent = req.initial;
+      });
+      // Show start area again, hide dashboard
+      var startArea = document.getElementById('enrich-start-area');
+      if (startArea) startArea.style.display = '';
+      var dashboard = document.getElementById('enrich-dashboard');
+      if (dashboard) dashboard.style.display = 'none';
+      var startBtn = document.getElementById('enrich-start-btn');
+      if (startBtn) {
+        startBtn.textContent = 'Start Enrichment';
+        startBtn.disabled = false;
+      }
+    });
+    errorArea.appendChild(retryBtn);
+  }
+
+  function updateEnrichProgress(payload) {
+    // payload: { requirement: string, status: string, progress: string }
+    var row = document.getElementById('enrich-req-' + payload.requirement);
+    if (!row) return;
+    var dot = row.querySelector('.stage-dot');
+    var prog = row.querySelector('.enrich-progress');
+    if (dot) {
+      dot.className = 'stage-dot' + (payload.status === 'working' ? ' running' : payload.status === 'done' ? ' done' : '');
+    }
+    if (prog) prog.textContent = payload.progress || '';
+  }
+
+  function appendEnrichLog(payload) {
+    // payload: { message: string, timestamp?: string }
+    var log = document.getElementById('activity-log');
+    if (!log) return;
+    var ts = payload.timestamp ? new Date(payload.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+    var entry = createElement('div', { className: 'log-entry' }, [
+      createElement('span', { className: 'log-time' }, [ts]),
+      createElement('span', {}, [' ' + payload.message]),
+    ]);
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
   }
 
   // ---- Step 6: Serve (placeholder) ----

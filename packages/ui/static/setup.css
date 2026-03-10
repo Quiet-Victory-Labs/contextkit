@@ -1203,3 +1203,92 @@ code, pre, .mono {
   margin-top: var(--rc-space-4);
   font-size: var(--rc-font-sm);
 }
+
+/* ================================================================
+   Enrich Step
+   ================================================================ */
+.enrich-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-6);
+  max-width: 700px;
+}
+
+.enrich-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-2);
+}
+
+.enrich-row {
+  background: var(--rc-color-bg-secondary, #1e293b);
+  border: 1px solid var(--rc-color-border, #334155);
+  border-radius: var(--rc-radius-md, 8px);
+  overflow: hidden;
+}
+
+.enrich-row-header {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-space-3);
+  padding: var(--rc-space-3) var(--rc-space-4);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.enrich-row-header:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.enrich-req-name { font-weight: 500; flex: 1; }
+.enrich-progress {
+  font-size: var(--rc-font-sm);
+  color: var(--rc-color-text-secondary, #94a3b8);
+  min-width: 80px;
+  text-align: right;
+}
+.enrich-arrow {
+  color: var(--rc-color-text-secondary, #94a3b8);
+  transition: transform 0.2s;
+  font-size: 12px;
+}
+.enrich-row.expanded .enrich-arrow {
+  transform: rotate(90deg);
+}
+.enrich-row-detail {
+  display: none;
+  padding: var(--rc-space-3) var(--rc-space-4);
+  border-top: 1px solid var(--rc-color-border, #334155);
+  font-size: var(--rc-font-sm);
+  color: var(--rc-color-text-secondary, #94a3b8);
+}
+.enrich-row.expanded .enrich-row-detail {
+  display: block;
+}
+
+.activity-log {
+  background: var(--rc-color-bg-secondary, #1e293b);
+  border: 1px solid var(--rc-color-border, #334155);
+  border-radius: var(--rc-radius-md, 8px);
+  padding: var(--rc-space-4);
+  max-height: 300px;
+  overflow-y: auto;
+}
+.activity-log-title {
+  font-weight: 600;
+  margin-bottom: var(--rc-space-3);
+  font-size: var(--rc-font-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rc-color-text-secondary, #94a3b8);
+}
+.log-entry {
+  font-size: var(--rc-font-sm);
+  padding: var(--rc-space-1) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.log-time {
+  color: var(--rc-color-text-secondary, #64748b);
+  margin-right: var(--rc-space-2);
+  font-family: var(--rc-font-mono, 'Geist Mono', monospace);
+  font-size: 12px;
+}
