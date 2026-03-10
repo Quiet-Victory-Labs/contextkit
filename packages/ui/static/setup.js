@@ -427,14 +427,22 @@
       oauthResult.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Select a database' }));
       var dbGrid = createElement('div', { className: 'source-cards' });
       databases.forEach(function (db) {
-        var meta = db.adapter || db.type || '';
-        if (db.metadata && db.metadata.project) meta = db.metadata.project + (meta ? ' \u2022 ' + meta : '');
-        if (db.host) meta += (meta ? ' \u2022 ' : '') + db.host;
+        var m = db.metadata || {};
+        // Title: "project / branch" if available, else just db name
+        var title = m.project ? m.project + ' / ' + (m.branch || 'main') : (db.name || db.database);
+        // Subtitle line 1: db name + adapter
+        var line1 = (db.name || db.database);
+        if (db.adapter) line1 += ' \u2022 ' + db.adapter;
+        if (m.region) line1 += ' \u2022 ' + m.region;
+        // Subtitle line 2: host (truncated)
+        var line2 = db.host || '';
+
         var dbCard = createElement('div', { className: 'source-card' }, [
-          createElement('span', { className: 'source-card-name', textContent: db.name || db.database }),
-          createElement('span', { className: 'source-card-meta', textContent: meta }),
+          createElement('span', { className: 'source-card-name', textContent: title }),
+          createElement('span', { className: 'source-card-meta', textContent: line1 }),
+          line2 ? createElement('span', { className: 'source-card-host', textContent: line2 }) : null,
           createElement('button', { className: 'btn btn-primary', textContent: 'Use This' }),
-        ]);
+        ].filter(Boolean));
         dbCard.querySelector('.btn').addEventListener('click', async function () {
           try {
             await api('POST', '/api/auth/select-db', { provider: provider.id, database: db });

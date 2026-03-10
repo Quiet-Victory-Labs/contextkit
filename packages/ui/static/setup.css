@@ -1046,6 +1046,12 @@ code, pre, .mono {
   color: var(--rc-color-text-secondary, #94a3b8);
   word-break: break-all;
 }
+.source-card-host {
+  font-size: 0.6875rem;
+  color: var(--rc-color-text-tertiary, #64748b);
+  word-break: break-all;
+  font-family: var(--rc-font-mono, monospace);
+}
 .source-card .btn {
   align-self: flex-start;
   margin-top: var(--rc-space-2, 8px);

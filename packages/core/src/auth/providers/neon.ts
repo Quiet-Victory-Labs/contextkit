@@ -86,12 +86,13 @@ export class NeonProvider implements AuthProvider {
       const headers = { Authorization: `Bearer ${token}` };
 
       // Collect projects from personal account + all organizations
-      const allProjects: Array<{ id: string; name: string }> = [];
+      interface NeonProject { id: string; name: string; region_id?: string; org_id?: string; created_at?: string }
+      const allProjects: NeonProject[] = [];
 
       // Personal projects
       const projRes = await fetch(`${NEON_API}/projects`, { headers });
       if (projRes.ok) {
-        const projData = await projRes.json() as { projects: Array<{ id: string; name: string }> };
+        const projData = await projRes.json() as { projects: NeonProject[] };
         allProjects.push(...projData.projects);
       }
 
@@ -99,14 +100,17 @@ export class NeonProvider implements AuthProvider {
       try {
         const orgRes = await fetch(`${NEON_API}/users/me/organizations`, { headers });
         if (orgRes.ok) {
-          const orgData = await orgRes.json() as { organizations: Array<{ id: string }> };
+          const orgData = await orgRes.json() as { organizations: Array<{ id: string; name: string }> };
           for (const org of orgData.organizations) {
             const orgProjRes = await fetch(`${NEON_API}/projects?org_id=${org.id}`, { headers });
             if (orgProjRes.ok) {
-              const orgProjData = await orgProjRes.json() as { projects: Array<{ id: string; name: string }> };
+              const orgProjData = await orgProjRes.json() as { projects: NeonProject[] };
               // Deduplicate (personal projects may overlap with org projects)
               for (const p of orgProjData.projects) {
-                if (!allProjects.some((e) => e.id === p.id)) allProjects.push(p);
+                if (!allProjects.some((e) => e.id === p.id)) {
+                  p.org_id = org.id;
+                  allProjects.push(p);
+                }
               }
             }
           }
@@ -142,16 +146,22 @@ export class NeonProvider implements AuthProvider {
 
             const endpoint = epData.endpoints.find((e) => e.branch_id === branch.id);
             for (const db of dbData.databases) {
+              // Friendly region label (e.g. "aws-us-east-1" → "US East 1")
+              const region = proj.region_id ?? '';
               entries.push({
-                id: `${proj.id}:${db.name}`,
+                id: `${proj.id}:${branch.id}:${db.name}`,
                 name: db.name,
                 host: endpoint?.host ?? '',
                 adapter: 'postgres',
+                region,
+                project: proj.name,
                 metadata: {
                   project: proj.name,
                   projectId: proj.id,
                   branch: branch.name,
+                  branchId: branch.id,
                   user: db.owner_name,
+                  region,
                   token,
                 },
               });
