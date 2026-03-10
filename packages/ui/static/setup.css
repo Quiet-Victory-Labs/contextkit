@@ -850,6 +850,10 @@ body {
 .btn-secondary:hover:not(:disabled) {
   background: rgba(201, 165, 90, 0.1);
 }
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8125rem;
+}
 
 /* ================================================================
    Steps (wizard step visibility)

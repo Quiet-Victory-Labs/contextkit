@@ -294,14 +294,14 @@
     var detectedHint = createElement('div', { id: 'connect-detected-hint' });
     card.appendChild(detectedHint);
 
+    // OAuth result area — positioned right after detected hint so db cards appear here
+    var oauthResult = createElement('div', { id: 'connect-oauth-result' });
+    card.appendChild(oauthResult);
+
     // Platform picker grid (populated after fetching providers)
     var platformGrid = createElement('div', { className: 'platform-grid', id: 'connect-platforms' });
     platformGrid.appendChild(createElement('p', { className: 'muted', textContent: 'Loading providers\u2026' }));
     card.appendChild(platformGrid);
-
-    // OAuth result area (hidden until needed)
-    var oauthResult = createElement('div', { id: 'connect-oauth-result' });
-    card.appendChild(oauthResult);
 
     // Manual connection string
     var manual = createElement('div', { className: 'manual-connect' });
@@ -511,11 +511,14 @@
     });
   }
 
-  async function startOAuthFlow(provider, platformGrid, oauthResult) {
-    // Show loading state on the platform grid
-    platformGrid.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = true; });
+  async function startOAuthFlow(provider, providerWrapper, oauthResult) {
+    // Disable all buttons
+    providerWrapper.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = true; });
+    providerWrapper.querySelectorAll('.source-card .btn').forEach(function (b) { b.disabled = true; });
+
+    // Show loading in the oauth result area (right after detected cards)
     oauthResult.textContent = '';
-    oauthResult.appendChild(createElement('p', { className: 'muted', textContent: 'Connecting to ' + (provider.display_name || provider.id) + '\u2026 A browser window may open for authentication.' }));
+    oauthResult.appendChild(createElement('p', { className: 'muted', textContent: 'Connecting to ' + (provider.displayName || provider.display_name || provider.id) + '\u2026 A browser window may open for authentication.' }));
 
     try {
       var data = await api('POST', '/api/auth/start', { provider: provider.id });
@@ -524,11 +527,26 @@
 
       if (databases.length === 0) {
         oauthResult.appendChild(createElement('p', { className: 'muted', textContent: 'No databases found for this provider.' }));
-        platformGrid.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
+        providerWrapper.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
+        providerWrapper.querySelectorAll('.source-card .btn').forEach(function (b) { b.disabled = false; });
         return;
       }
 
-      oauthResult.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Select a database' }));
+      // Hide the other providers / platform grid — show only database results
+      providerWrapper.style.display = 'none';
+
+      oauthResult.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Select a database from ' + (provider.displayName || provider.display_name || provider.id) }));
+
+      // Back button to return to provider selection
+      var backLink = createElement('button', { className: 'btn btn-secondary btn-sm', textContent: '\u2190 Back to providers' });
+      backLink.addEventListener('click', function () {
+        oauthResult.textContent = '';
+        providerWrapper.style.display = '';
+        providerWrapper.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
+        providerWrapper.querySelectorAll('.source-card .btn').forEach(function (b) { b.disabled = false; });
+      });
+      oauthResult.appendChild(backLink);
+
       var dbGrid = createElement('div', { className: 'source-cards' });
       databases.forEach(function (db) {
         var m = db.metadata || {};
@@ -568,7 +586,8 @@
     } catch (e) {
       oauthResult.textContent = '';
       oauthResult.appendChild(createElement('p', { className: 'field-error', textContent: e.message || 'OAuth flow failed' }));
-      platformGrid.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
+      providerWrapper.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
+      providerWrapper.querySelectorAll('.source-card .btn').forEach(function (b) { b.disabled = false; });
     }
   }
 
