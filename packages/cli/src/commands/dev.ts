@@ -115,9 +115,6 @@ export const devCommand = new Command('dev')
   .description('Watch mode — re-run lint on file changes')
   .option('--context-dir <path>', 'Path to context directory')
   .option('--fix', 'Auto-fix problems on each re-lint')
-  .option('--studio', 'Open interactive metadata editor in the browser')
-  .option('--port <number>', 'Studio server port (default: 4040)', '4040')
-  .option('--host <address>', 'Studio server host (default: localhost)', 'localhost')
   .action(async (opts) => {
     try {
       const config = loadConfig(process.cwd());
@@ -133,31 +130,6 @@ export const devCommand = new Command('dev')
 
       // Initial lint run
       await runLint(contextDir, fix);
-
-      // Studio server (started before watcher so recompileAndBroadcast is available)
-      let recompileAndBroadcast: (() => Promise<void>) | undefined;
-
-      if (opts.studio) {
-        const { startStudioServer } = await import('../studio/server.js');
-        const studioPort = parseInt(opts.port, 10);
-        const { server: _studioServer, recompileAndBroadcast: rab } = await startStudioServer({
-          contextDir,
-          rootDir: process.cwd(),
-          port: studioPort,
-          host: opts.host,
-        });
-        recompileAndBroadcast = rab;
-        const studioUrl = `http://${opts.host === '0.0.0.0' ? 'localhost' : opts.host}:${studioPort}`;
-        console.log(chalk.green(`\n  Studio running at ${chalk.bold(studioUrl)}\n`));
-
-        // Open browser safely using execFile (no shell injection)
-        const { execFile } = await import('node:child_process');
-        const openCmd = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'cmd' : 'xdg-open';
-        const openArgs = process.platform === 'win32' ? ['/c', 'start', studioUrl] : [studioUrl];
-        execFile(openCmd, openArgs, (err) => {
-          if (err) console.log(chalk.gray(`  Open ${studioUrl} in your browser`));
-        });
-      }
 
       // Dynamic import of chokidar for watch mode
       const { watch } = await import('chokidar');
@@ -175,9 +147,6 @@ export const devCommand = new Command('dev')
         debounceTimer = setTimeout(async () => {
           try {
             await runLint(contextDir, fix);
-            if (recompileAndBroadcast) {
-              await recompileAndBroadcast();
-            }
           } catch (err) {
             console.error(
               chalk.red(`Lint error: ${(err as Error).message}`),

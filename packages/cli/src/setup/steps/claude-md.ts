@@ -173,9 +173,7 @@ This is the full workflow for building a semantic layer. Check off each task as 
 
 - [ ] **Task 11: Build the AI Blueprint.** Run \`context blueprint ${modelName}\` to export the Gold-tier data product as a portable YAML file. Show the user where it was saved.
 
-- [ ] **Task 12: Serve the metadata site.** Run \`context dev --studio\` to start the interactive metadata browser. Tell the user: "Your metadata catalog is now live — open the link above to browse your semantic layer in the browser."
-
-- [ ] **Task 13: Summary.** Give the user a final summary:
+- [ ] **Task 12: Summary.** Give the user a final summary:
   - Current tier score
   - Number of datasets, fields, metrics, glossary terms, golden queries
   - What's complete and what still needs human input
@@ -222,7 +220,6 @@ context verify                  # Validate metadata against the live database
 
 # Serve to other agents
 context serve --stdio           # Start MCP server (for Claude, Cursor, etc.)
-context dev --studio            # Open visual editor in browser
 \`\`\`
 
 ### Do NOT Stop Until Gold (Task 10)
@@ -242,8 +239,7 @@ You must iterate — a single pass is never enough. Each \`context tier\` run ma
 **Do NOT skip these.** Once you reach Gold (or as close as possible):
 
 1. Run \`context blueprint ${modelName}\` — export the AI Blueprint
-2. Run \`context dev --studio\` — start the metadata browser for the user
-3. Give the user a summary of what was built and what needs human input
+2. Give the user a summary of what was built and what needs human input
 
 ## How to Curate Metadata (the right way)
 

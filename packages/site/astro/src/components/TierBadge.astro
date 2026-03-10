@@ -1,9 +1,0 @@
----
-interface Props {
-  tier: string | null | undefined;
-}
-const { tier } = Astro.props;
-const cls = tier ? `tag-${tier}` : '';
----
-
-<span class={`tag ${cls}`}>{tier || 'none'}</span>

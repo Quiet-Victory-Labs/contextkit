@@ -29,7 +29,6 @@
     "@runcontext/uxd": "file:../../../runcontext-uxd",
     "@runcontext/ui": "workspace:^",
     "@runcontext/mcp": "workspace:^",
-    "@runcontext/site": "workspace:^",
     "chalk": "^5.4.0",
     "chokidar": "^4.0.0",
     "commander": "^14.0.0",
