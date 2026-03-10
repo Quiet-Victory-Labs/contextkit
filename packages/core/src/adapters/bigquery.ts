@@ -77,7 +77,7 @@ export class BigQueryAdapter implements DataAdapter {
     const colRows = await this.runQuery(`
       SELECT column_name, data_type, is_nullable
       FROM \`${this.config.project}.${dataset}.INFORMATION_SCHEMA.COLUMNS\`
-      WHERE table_name = '${table.replace(/'/g, "\\'")}'
+      WHERE table_name = '${table.replace(/'/g, "''")}'
       ORDER BY ordinal_position
     `);
 

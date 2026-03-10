@@ -1,12 +1,38 @@
 import { Hono } from 'hono';
 import { execFile as execFileCb } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 
 const execFile = promisify(execFileCb);
+
+/**
+ * Resolve the CLI entry point. Prefers the local monorepo build
+ * (so `context setup` in dev always uses the local code), falling
+ * back to the currently-running process argv, then npx.
+ */
+function resolveCliBin(): { cmd: string; prefix: string[] } {
+  // 1. Try to find the local CLI dist relative to this package
+  //    (packages/ui → packages/cli/dist/index.js)
+  try {
+    const thisDir = dirname(fileURLToPath(import.meta.url));
+    const localCli = join(thisDir, '..', '..', '..', 'cli', 'dist', 'index.js');
+    if (existsSync(localCli)) {
+      return { cmd: process.execPath, prefix: [localCli] };
+    }
+  } catch { /* ignore */ }
+
+  // 2. If this process was started via the CLI binary, reuse it
+  if (process.argv[1] && existsSync(process.argv[1])) {
+    return { cmd: process.execPath, prefix: [process.argv[1]] };
+  }
+
+  // 3. Fall back to npx (published CLI)
+  return { cmd: 'npx', prefix: ['--yes', '@runcontext/cli'] };
+}
 
 export type PipelineStage =
   | 'introspect'
@@ -73,6 +99,17 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
       return c.json({ error: 'targetTier must be bronze, silver, or gold' }, 400);
     }
 
+    // Validate productName: alphanumeric, hyphens, underscores only
+    const safeNamePattern = /^[a-zA-Z0-9_-]+$/;
+    if (!safeNamePattern.test(productName)) {
+      return c.json({ error: 'productName must contain only letters, numbers, hyphens, and underscores' }, 400);
+    }
+
+    // Validate dataSource if provided
+    if (dataSource && !safeNamePattern.test(dataSource)) {
+      return c.json({ error: 'dataSource must contain only letters, numbers, hyphens, and underscores' }, 400);
+    }
+
     const id = randomUUID();
     const activeStages = stagesForTier(targetTier);
     const skippedStages = ALL_STAGES.filter((s) => !activeStages.includes(s));
@@ -130,10 +167,11 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
       // Config file missing or unparseable – proceed without db entry
     }
 
+    const cli = resolveCliBin();
     const mcpServers: Record<string, unknown> = {
       runcontext: {
-        command: 'npx',
-        args: ['--yes', '@runcontext/cli', 'serve'],
+        command: cli.cmd,
+        args: [...cli.prefix, 'serve'],
         cwd: rootDir,
       },
     };
@@ -157,28 +195,28 @@ function buildCliArgs(
 ): string[] {
   switch (stage) {
     case 'introspect': {
-      const args = ['@runcontext/cli', 'introspect'];
+      const args = ['introspect'];
       if (dataSource) args.push('--source', dataSource);
       return args;
     }
     case 'scaffold':
-      return ['@runcontext/cli', 'build'];
+      return ['build'];
     case 'enrich-silver': {
-      const args = ['@runcontext/cli', 'enrich', '--target', 'silver', '--apply'];
+      const args = ['enrich', '--target', 'silver', '--apply'];
       if (dataSource) args.push('--source', dataSource);
       return args;
     }
     case 'enrich-gold': {
-      const args = ['@runcontext/cli', 'enrich', '--target', 'gold', '--apply'];
+      const args = ['enrich', '--target', 'gold', '--apply'];
       if (dataSource) args.push('--source', dataSource);
       return args;
     }
     case 'verify':
-      return ['@runcontext/cli', 'verify'];
+      return ['verify'];
     case 'autofix':
-      return ['@runcontext/cli', 'fix'];
+      return ['fix'];
     case 'agent-instructions':
-      return ['@runcontext/cli', 'build'];
+      return ['build'];
   }
 }
 
@@ -200,8 +238,9 @@ async function executePipeline(
     stage.startedAt = new Date().toISOString();
 
     try {
-      const args = buildCliArgs(stage.stage, dataSource);
-      const { stdout } = await execFile('npx', ['--yes', ...args], {
+      const cliArgs = buildCliArgs(stage.stage, dataSource);
+      const cli = resolveCliBin();
+      const { stdout } = await execFile(cli.cmd, [...cli.prefix, ...cliArgs], {
         cwd: rootDir,
         timeout: 120_000,
         env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=4096' },

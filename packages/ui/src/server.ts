@@ -24,7 +24,17 @@ const staticDir = path.resolve(__dirname, '..', 'static');
 export function createApp(opts: UIServerOptions): Hono {
   const app = new Hono();
 
-  app.use('*', cors());
+  app.use('*', cors({
+    origin: (origin) => {
+      // Allow requests with no origin (e.g. same-origin, curl, server-to-server)
+      if (!origin) return origin;
+      // Allow localhost on any port
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return origin;
+      }
+      return null;
+    },
+  }));
 
   app.route('', briefRoutes(opts.contextDir));
   app.route('', sourcesRoutes(opts.rootDir, opts.contextDir));

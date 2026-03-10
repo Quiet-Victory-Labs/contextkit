@@ -49,7 +49,7 @@ export class ClickHouseAdapter implements DataAdapter {
     const rows = await this.runQuery(`
       SELECT name, engine, total_rows
       FROM system.tables
-      WHERE database = '${dbName.replace(/'/g, "\\'")}'
+      WHERE database = '${dbName.replace(/'/g, "''")}'
         AND name NOT LIKE '.%'
       ORDER BY name
     `);
@@ -68,8 +68,8 @@ export class ClickHouseAdapter implements DataAdapter {
     const colRows = await this.runQuery(`
       SELECT name AS column_name, type AS data_type, position
       FROM system.columns
-      WHERE database = '${dbName.replace(/'/g, "\\'")}'
-        AND table = '${table.replace(/'/g, "\\'")}'
+      WHERE database = '${dbName.replace(/'/g, "''")}'
+        AND table = '${table.replace(/'/g, "''")}'
       ORDER BY position
     `);
 
@@ -79,8 +79,8 @@ export class ClickHouseAdapter implements DataAdapter {
       const tableRows = await this.runQuery(`
         SELECT sorting_key
         FROM system.tables
-        WHERE database = '${dbName.replace(/'/g, "\\'")}'
-          AND name = '${table.replace(/'/g, "\\'")}'
+        WHERE database = '${dbName.replace(/'/g, "''")}'
+          AND name = '${table.replace(/'/g, "''")}'
       `);
       if (tableRows[0]?.sorting_key) {
         const keys = (tableRows[0].sorting_key as string)

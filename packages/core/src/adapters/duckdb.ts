@@ -51,7 +51,7 @@ export class DuckDBAdapter implements DataAdapter {
       const isView = (row.table_type as string) === 'VIEW';
       let rowCount = 0;
       try {
-        const countResult = await this.query(`SELECT COUNT(*) AS cnt FROM "${name}"`);
+        const countResult = await this.query(`SELECT COUNT(*) AS cnt FROM "${name.replace(/"/g, '""')}"`);
         rowCount = Number(countResult.rows[0]?.cnt ?? 0);
       } catch {
         // view or inaccessible table
@@ -67,10 +67,11 @@ export class DuckDBAdapter implements DataAdapter {
   }
 
   async listColumns(table: string): Promise<ColumnInfo[]> {
+    const escapedTable = table.replace(/'/g, "''");
     const colResult = await this.query(`
       SELECT column_name, data_type, is_nullable
       FROM information_schema.columns
-      WHERE table_name = '${table}' AND table_schema = 'main'
+      WHERE table_name = '${escapedTable}' AND table_schema = 'main'
       ORDER BY ordinal_position
     `);
 
@@ -78,7 +79,7 @@ export class DuckDBAdapter implements DataAdapter {
     const pkResult = await this.query(`
       SELECT column_name
       FROM information_schema.key_column_usage
-      WHERE table_name = '${table}' AND table_schema = 'main'
+      WHERE table_name = '${escapedTable}' AND table_schema = 'main'
         AND constraint_name LIKE '%_pkey'
     `).catch(() => ({ rows: [], columns: [], row_count: 0 }));
 

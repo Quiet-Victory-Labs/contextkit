@@ -135,5 +135,21 @@ export function validateReadOnlySQL(sql: string): SQLValidation {
     return { valid: false, reason: `Statement type '${firstWord}' is not recognized as a read-only query` };
   }
 
+  // If query starts with WITH (CTE), check all CTE bodies for mutating keywords.
+  // This prevents bypass via e.g. WITH cte AS (DELETE FROM t RETURNING *) SELECT * FROM cte
+  if (firstWord === 'WITH') {
+    const allMutating = [...DDL_KEYWORDS, ...DML_KEYWORDS, ...ADMIN_KEYWORDS];
+    const mutatingPattern = new RegExp(
+      `\\b(${allMutating.join('|')})\\b`,
+      'i',
+    );
+    if (mutatingPattern.test(withoutTrailingSemicolon)) {
+      return {
+        valid: false,
+        reason: 'CTE body contains a mutating statement. Only read-only queries are permitted.',
+      };
+    }
+  }
+
   return { valid: true };
 }

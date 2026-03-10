@@ -6,6 +6,14 @@ const execFileAsync = promisify(execFileCb);
 const SERVICE_NAME = 'runcontext';
 
 /**
+ * Escape a string for safe interpolation into a single-quoted PowerShell string.
+ * PowerShell single-quoted strings only need single quotes escaped (by doubling them).
+ */
+function escapePowerShellString(value: string): string {
+  return value.replace(/'/g, "''");
+}
+
+/**
  * OS keychain abstraction. Shells out to platform-specific credential tools.
  * - macOS: `security` (Keychain Services)
  * - Linux: `secret-tool` (libsecret / GNOME Keyring)
@@ -65,7 +73,7 @@ export class Keychain {
       if (this.platform === 'win32') {
         const { stdout } = await execFileAsync('powershell', [
           '-Command',
-          `(Get-StoredCredential -Target '${SERVICE_NAME}:${account}').GetNetworkCredential().Password`,
+          `(Get-StoredCredential -Target '${escapePowerShellString(SERVICE_NAME)}:${escapePowerShellString(account)}').GetNetworkCredential().Password`,
         ]);
         return stdout.trim() || null;
       }
@@ -122,7 +130,7 @@ export class Keychain {
       if (this.platform === 'win32') {
         await execFileAsync('powershell', [
           '-Command',
-          `New-StoredCredential -Target '${SERVICE_NAME}:${account}' -UserName '${account}' -Password '${password}' -Type Generic -Persist LocalMachine`,
+          `New-StoredCredential -Target '${escapePowerShellString(SERVICE_NAME)}:${escapePowerShellString(account)}' -UserName '${escapePowerShellString(account)}' -Password '${escapePowerShellString(password)}' -Type Generic -Persist LocalMachine`,
         ]);
         return;
       }
@@ -149,7 +157,7 @@ export class Keychain {
       } else if (this.platform === 'win32') {
         await execFileAsync('powershell', [
           '-Command',
-          `Remove-StoredCredential -Target '${SERVICE_NAME}:${account}'`,
+          `Remove-StoredCredential -Target '${escapePowerShellString(SERVICE_NAME)}:${escapePowerShellString(account)}'`,
         ]);
       }
     } catch {

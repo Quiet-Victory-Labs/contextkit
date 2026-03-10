@@ -10,6 +10,11 @@ import { formatError, formatSuccess } from '../formatters/pretty.js';
 const DEFAULT_CLOUD_URL = 'https://app.runcontext.dev';
 const DEFAULT_API_URL = 'https://api.runcontext.dev';
 
+const ALLOWED_ORIGINS = [
+  'https://app.runcontext.dev',
+  'https://api.runcontext.dev',
+];
+
 export interface CloudCredentials {
   token: string;
   org: string;
@@ -86,10 +91,13 @@ export function waitForAuthCallback(
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
+      const origin = req.headers.origin ?? '';
+      const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
       // Handle CORS preflight
       if (req.method === 'OPTIONS') {
         res.writeHead(204, {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': allowedOrigin,
           'Access-Control-Allow-Methods': 'POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
         });
@@ -118,7 +126,7 @@ export function waitForAuthCallback(
 
           res.writeHead(200, {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': allowedOrigin,
           });
           res.end(JSON.stringify({ ok: true }));
 

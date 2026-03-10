@@ -179,7 +179,7 @@ export async function listRelationships(
         const allRels: Relationship[] = [];
         for (const t of tables) {
           try {
-            const result = await adapter.query(`PRAGMA foreign_key_list("${escapeString(t.name)}")`);
+            const result = await adapter.query(`PRAGMA foreign_key_list("${t.name.replace(/"/g, '""')}")`);
             for (const row of result.rows) {
               allRels.push({
                 constraint_name: `fk_${t.name}_${row['from']}`,
@@ -195,7 +195,7 @@ export async function listRelationships(
         }
         return { relationships: allRels };
       }
-      sql = `PRAGMA foreign_key_list("${escapeString(table)}")`;
+      sql = `PRAGMA foreign_key_list("${table.replace(/"/g, '""')}")`;
       try {
         const result = await adapter.query(sql);
         const relationships = result.rows.map((row) => ({
