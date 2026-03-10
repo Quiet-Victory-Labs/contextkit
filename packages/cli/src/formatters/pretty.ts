@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { colors } from '@runcontext/uxd';
 import type { Diagnostic, TierScore, TierCheckResult } from '@runcontext/core';
 
 /**
@@ -78,11 +79,11 @@ function formatTierSection(
 function getTierColor(tier: string): (text: string) => string {
   switch (tier) {
     case 'gold':
-      return chalk.yellow;
+      return chalk.hex(colors.tier.gold);
     case 'silver':
-      return chalk.white;
+      return chalk.hex(colors.tier.silver);
     case 'bronze':
-      return chalk.hex('#CD7F32');
+      return chalk.hex(colors.tier.bronze);
     default:
       return chalk.gray;
   }

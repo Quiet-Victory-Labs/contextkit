@@ -44,6 +44,9 @@ importers:
       '@runcontext/ui':
         specifier: workspace:^
         version: link:../ui
+      '@runcontext/uxd':
+        specifier: file:../../../runcontext-uxd
+        version: file:../runcontext-uxd
       chalk:
         specifier: ^5.4.0
         version: 5.6.2
@@ -901,6 +904,17 @@ packages:
     resolution: {integrity: sha512-2HRCml6OztYXyJXAvdDXPKcawukWY2GpR5/nxKp4iBgiO3wcoEGkAaqctIbZcNB6KlUQBIqt8VYkNSj2397EfA==}
     cpu: [x64]
     os: [win32]
+
+  '@runcontext/uxd@file:../runcontext-uxd':
+    resolution: {directory: ../runcontext-uxd, type: directory}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
 
   '@shikijs/core@3.23.0':
     resolution: {integrity: sha512-NSWQz0riNb67xthdm5br6lAkvpDJRTgB36fxlo37ZzM2yq0PQFFzbd8psqC2XMPgCzo1fW6cVi18+ArJ44wqgA==}
@@ -3513,6 +3527,8 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.59.0':
     optional: true
+
+  '@runcontext/uxd@file:../runcontext-uxd': {}
 
   '@shikijs/core@3.23.0':
     dependencies:
