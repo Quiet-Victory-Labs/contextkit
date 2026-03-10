@@ -1,11 +1,11 @@
 /* RunContext — Custom Starlight Theme */
 
 :root {
-  --sl-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --sl-font-mono: 'Geist Mono', 'SF Mono', 'Consolas', monospace;
-  --sl-color-accent-low: #1a1508;
-  --sl-color-accent: #c9a55a;
-  --sl-color-accent-high: #f5e6c0;
+  --sl-font: var(--rc-font-sans);
+  --sl-font-mono: var(--rc-font-mono);
+  --sl-color-accent-low: var(--rc-color-brand-gold-dim);
+  --sl-color-accent: var(--rc-color-brand-gold);
+  --sl-color-accent-high: var(--rc-color-brand-gold-light);
   --sl-color-white: #e8e6e1;
   --sl-color-gray-1: #d0cdc6;
   --sl-color-gray-2: #9a978e;
@@ -13,7 +13,7 @@
   --sl-color-gray-4: #36342e;
   --sl-color-gray-5: #1e1c18;
   --sl-color-gray-6: #121110;
-  --sl-color-black: #0a0908;
+  --sl-color-black: var(--rc-color-surface-bg);
   --sl-color-bg-nav: rgba(10, 9, 8, 0.9);
   --sl-color-bg-sidebar: rgba(18, 17, 16, 0.8);
   --sl-color-hairline-light: rgba(201, 165, 90, 0.08);
@@ -81,7 +81,7 @@ starlight-header {
 }
 
 .hero-section .hero-accent {
-  background: linear-gradient(135deg, #c9a55a, var(--rc-color-brand-gold-light));
+  background: linear-gradient(135deg, var(--rc-color-brand-gold), var(--rc-color-brand-gold-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -206,9 +206,9 @@ starlight-header {
   border-radius: 3px;
 }
 
-.tier-badge.bronze { background: rgba(184, 122, 74, 0.15); color: #b87a4a; }
-.tier-badge.silver { background: rgba(160, 168, 184, 0.12); color: #a0a8b8; }
-.tier-badge.gold { background: rgba(201, 165, 90, 0.15); color: var(--rc-color-brand-gold); }
+.tier-badge.bronze { background: color-mix(in srgb, var(--rc-color-tier-bronze) 15%, transparent); color: var(--rc-color-tier-bronze); }
+.tier-badge.silver { background: color-mix(in srgb, var(--rc-color-tier-silver) 12%, transparent); color: var(--rc-color-tier-silver); }
+.tier-badge.gold { background: color-mix(in srgb, var(--rc-color-brand-gold) 15%, transparent); color: var(--rc-color-brand-gold); }
 
 /* Comparison grid */
 .comparison {
@@ -229,13 +229,13 @@ starlight-header {
 }
 
 .comparison .without {
-  border-color: rgba(212, 80, 80, 0.2);
-  background: rgba(212, 80, 80, 0.03);
+  border-color: color-mix(in srgb, var(--rc-color-status-error) 20%, transparent);
+  background: color-mix(in srgb, var(--rc-color-status-error) 3%, transparent);
 }
 
 .comparison .with {
-  border-color: rgba(74, 186, 106, 0.2);
-  background: rgba(74, 186, 106, 0.03);
+  border-color: color-mix(in srgb, var(--rc-color-status-success) 20%, transparent);
+  background: color-mix(in srgb, var(--rc-color-status-success) 3%, transparent);
 }
 
 .comparison h4 {
@@ -246,8 +246,8 @@ starlight-header {
   margin: 0 0 0.75rem;
 }
 
-.comparison .without h4 { color: #d45050; }
-.comparison .with h4 { color: #4aba6a; }
+.comparison .without h4 { color: var(--rc-color-status-error); }
+.comparison .with h4 { color: var(--rc-color-status-success); }
 
 /* Trust strip */
 .trust-strip {
@@ -347,7 +347,7 @@ starlight-header {
 
 .db-badge:hover {
   border-color: var(--sl-color-accent);
-  background: rgba(201, 165, 90, 0.05);
+  background: color-mix(in srgb, var(--rc-color-brand-gold) 5%, transparent);
 }
 
 /* Final CTA block */
@@ -484,11 +484,11 @@ starlight-header {
 }
 
 .form-status.success {
-  color: #4aba6a;
+  color: var(--rc-color-status-success);
 }
 
 .form-status.error {
-  color: #d45050;
+  color: var(--rc-color-status-error);
 }
 
 /* Light mode form */
