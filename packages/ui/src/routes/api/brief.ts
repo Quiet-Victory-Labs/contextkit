@@ -16,6 +16,7 @@ export function briefRoutes(contextDir: string): Hono {
     const brief = ContextBriefSchema.parse(body);
     brief.created_at = brief.created_at || new Date().toISOString();
     const briefPath = path.join(contextDir, `${brief.product_name}.context-brief.yaml`);
+    fs.mkdirSync(contextDir, { recursive: true });
     fs.writeFileSync(briefPath, stringify(brief), 'utf-8');
     return c.json({ ok: true, path: `${brief.product_name}.context-brief.yaml` });
   });
