@@ -9,6 +9,7 @@ import { sourcesRoutes } from './routes/api/sources.js';
 import { uploadRoutes } from './routes/api/upload.js';
 import { pipelineRoutes } from './routes/api/pipeline.js';
 import { productsRoutes } from './routes/api/products.js';
+import { authRoutes } from './routes/api/auth.js';
 
 export interface UIServerOptions {
   rootDir: string;
@@ -30,6 +31,7 @@ export function createApp(opts: UIServerOptions): Hono {
   app.route('', uploadRoutes(opts.contextDir));
   app.route('', pipelineRoutes(opts.rootDir, opts.contextDir));
   app.route('', productsRoutes(opts.contextDir));
+  app.route('', authRoutes(opts.rootDir));
 
   app.get('/api/health', (c) => c.json({ ok: true }));
 
