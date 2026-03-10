@@ -3,8 +3,18 @@ export { MissingDriverError, getDriverPackage } from './errors.js';
 
 import type { DataAdapter, DataSourceConfig } from './types.js';
 import { MissingDriverError } from './errors.js';
+import { resolveAuthConnection } from '../auth/resolve.js';
+import { createDefaultRegistry } from '../auth/providers/index.js';
+import { CredentialStore } from '../auth/credential-store.js';
 
 export async function createAdapter(config: DataSourceConfig): Promise<DataAdapter> {
+  // If auth key is present, resolve it to a connection string
+  if (config.auth && !config.connection) {
+    const registry = createDefaultRegistry();
+    const store = new CredentialStore();
+    config = { ...config, connection: await resolveAuthConnection(config.auth, registry, store) };
+  }
+
   try {
     return await createAdapterInner(config);
   } catch (err) {
