@@ -14,6 +14,7 @@ import {
 } from '@runcontext/core';
 import type { DataSourceConfig } from '@runcontext/core';
 import { parseDbUrl } from './introspect.js';
+import { createSessionBridge } from '../session-bridge.js';
 
 /**
  * Recursively search a directory for a file matching a glob-like pattern.
@@ -41,8 +42,11 @@ export const enrichCommand = new Command('enrich')
   .option('--source <name>', 'Data source for sample values')
   .option('--db <url>', 'Database URL for sample values')
   .option('--context-dir <path>', 'Path to context directory')
+  .option('--session <id>', 'Send progress to wizard session')
   .action(async (opts) => {
+    const bridge = createSessionBridge(opts.session);
     try {
+      bridge.send('pipeline:stage', { stage: 'enrich', status: 'running' });
       const config = loadConfig(process.cwd());
       const contextDir = opts.contextDir
         ? path.resolve(opts.contextDir)
@@ -66,6 +70,7 @@ export const enrichCommand = new Command('enrich')
           continue;
         }
 
+        bridge.send('enrich:progress', { model: modelName, step: 'analyzing' });
         const model = graph.models.get(modelName)!;
         const datasetNames = model.datasets.map((d) => d.name);
         const suggestions = suggestEnrichments(target as 'silver' | 'gold', tierScore, datasetNames);
@@ -113,6 +118,7 @@ export const enrichCommand = new Command('enrich')
           continue;
         }
 
+        bridge.send('enrich:progress', { model: modelName, step: 'applying' });
         // Apply suggestions to governance YAML
         const govFilePath = findFileRecursive(contextDir, `${modelName}.governance.yaml`);
         if (govFilePath) {
@@ -275,8 +281,11 @@ export const enrichCommand = new Command('enrich')
 
         console.log('');
       }
+      bridge.send('pipeline:stage', { stage: 'enrich', status: 'done' });
+      bridge.close();
     } catch (err) {
       console.error(chalk.red(`Enrich failed: ${(err as Error).message}`));
+      bridge.close();
       process.exit(1);
     }
   });

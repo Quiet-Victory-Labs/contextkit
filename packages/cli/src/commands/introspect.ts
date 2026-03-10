@@ -10,6 +10,7 @@ import {
   MissingDriverError,
 } from '@runcontext/core';
 import type { DataSourceConfig } from '@runcontext/core';
+import { createSessionBridge } from '../session-bridge.js';
 
 export function parseDbUrl(db: string): DataSourceConfig {
   // URL-scheme based detection
@@ -81,8 +82,11 @@ export const introspectCommand = new Command('introspect')
     '--model-name <name>',
     'Name for the generated model (default: derived from source)',
   )
+  .option('--session <id>', 'Send progress to wizard session')
   .action(async (opts) => {
+    const bridge = createSessionBridge(opts.session);
     try {
+      bridge.send('pipeline:stage', { stage: 'introspect', status: 'running' });
       const config = loadConfig(process.cwd());
       const contextDir = path.resolve(config.context_dir);
 
@@ -239,6 +243,8 @@ export const introspectCommand = new Command('introspect')
       console.log(
         chalk.cyan('Run `context verify` to validate against data.'),
       );
+      bridge.send('pipeline:stage', { stage: 'introspect', status: 'done' });
+      bridge.close();
     } catch (err) {
       if (err instanceof MissingDriverError) {
         console.error(chalk.yellow(`\nMissing driver: "${err.driverPackage}" is required for ${err.adapter}.\n`));
@@ -248,6 +254,7 @@ export const introspectCommand = new Command('introspect')
           chalk.red(`Introspect failed: ${(err as Error).message}`),
         );
       }
+      bridge.close();
       process.exit(1);
     }
   });

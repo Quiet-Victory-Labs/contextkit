@@ -11,8 +11,30 @@
     "directory": "packages/cli"
   },
   "bugs": "https://github.com/RunContext/runcontext/issues",
-  "engines": { "node": ">=18.0.0" },
-  "keywords": ["runcontext", "semantic-plane", "semantic-layer", "data-product", "ai-ready-data", "data-catalog", "data-governance", "mcp", "model-context-protocol", "ai-agent", "database-metadata", "schema-introspection", "claude-code", "cursor", "copilot", "dbt-alternative", "osi", "open-semantic-interchange", "cli"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "runcontext",
+    "semantic-plane",
+    "semantic-layer",
+    "data-product",
+    "ai-ready-data",
+    "data-catalog",
+    "data-governance",
+    "mcp",
+    "model-context-protocol",
+    "ai-agent",
+    "database-metadata",
+    "schema-introspection",
+    "claude-code",
+    "cursor",
+    "copilot",
+    "dbt-alternative",
+    "osi",
+    "open-semantic-interchange",
+    "cli"
+  ],
   "type": "module",
   "bin": {
     "context": "./dist/index.js"
@@ -25,18 +47,20 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@clack/prompts": "^1.1.0",
     "@runcontext/core": "workspace:^",
-    "@runcontext/uxd": "workspace:^",
-    "@runcontext/ui": "workspace:^",
     "@runcontext/mcp": "workspace:^",
+    "@runcontext/ui": "workspace:^",
+    "@runcontext/uxd": "workspace:^",
     "chalk": "^5.4.0",
     "chokidar": "^4.0.0",
     "commander": "^14.0.0",
-    "@clack/prompts": "^1.1.0",
+    "ws": "^8.19.0",
     "yaml": "^2.7.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
+    "@types/ws": "^8.18.1",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0",
     "vitest": "^3.2.0"

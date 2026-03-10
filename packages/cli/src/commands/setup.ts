@@ -10,6 +10,8 @@ export const setupCommand = new Command('setup')
   .option('--port <port>', 'Port for setup UI', '4040')
   .option('--host <host>', 'Host to bind', '127.0.0.1')
   .option('--no-browser', "Don't open browser automatically")
+  .option('--session <id>', 'Bind to an existing wizard session')
+  .option('--agent', 'Agent mode: create session, print ID, drive via CLI')
   .action(async (opts) => {
     const rootDir = process.cwd();
     const config = loadConfig(rootDir);
@@ -30,6 +32,12 @@ export const setupCommand = new Command('setup')
     const displayHost = (opts.host === '0.0.0.0' || opts.host === '::') ? '127.0.0.1' : opts.host;
     const url = `http://${displayHost}:${port}/setup`;
     console.log(chalk.green(`\n  Setup UI ready at ${url}\n`));
+
+    if (opts.agent) {
+      const res = await fetch(`http://127.0.0.1:${port}/api/session`, { method: 'POST' });
+      const { sessionId } = (await res.json()) as { sessionId: string };
+      console.log(chalk.green(`Session ID: ${sessionId}`));
+    }
 
     if (opts.browser !== false) {
       if (process.platform === 'darwin') {
