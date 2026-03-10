@@ -1,0 +1,66 @@
+/* Auto-generated from @runcontext/uxd tokens. Do not edit. */
+
+:root {
+  --rc-color-brand-gold: #c9a55a;
+  --rc-color-brand-gold-light: #f5e6c0;
+  --rc-color-brand-gold-dim: #1a1508;
+  --rc-color-surface-bg: #0a0908;
+  --rc-color-surface-card: #121110;
+  --rc-color-surface-card-hover: #1e1c18;
+  --rc-color-border-default: #36342e;
+  --rc-color-border-hover: #6a675e;
+  --rc-color-text-primary: #e8e6e1;
+  --rc-color-text-secondary: #9a978e;
+  --rc-color-text-muted: #6a675e;
+  --rc-color-tier-gold: #c9a55a;
+  --rc-color-tier-silver: #a0a8b8;
+  --rc-color-tier-bronze: #b87a4a;
+  --rc-color-status-success: #22c55e;
+  --rc-color-status-error: #ef4444;
+  --rc-color-status-warning: #eab308;
+  --rc-color-status-info: #4f9eff;
+
+  --rc-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --rc-font-mono: 'Geist Mono', 'SF Mono', Consolas, 'Liberation Mono', monospace;
+
+  --rc-text-xs: 0.75rem;
+  --rc-text-sm: 0.875rem;
+  --rc-text-base: 1rem;
+  --rc-text-lg: 1.125rem;
+  --rc-text-xl: 1.25rem;
+  --rc-text-2xl: 1.5rem;
+  --rc-text-3xl: 2rem;
+
+  --rc-font-weight-normal: 400;
+  --rc-font-weight-medium: 500;
+  --rc-font-weight-semibold: 600;
+  --rc-font-weight-bold: 700;
+
+  --rc-leading-tight: 1.25;
+  --rc-leading-normal: 1.5;
+  --rc-leading-relaxed: 1.75;
+
+  --rc-space-0: 0rem;
+  --rc-space-1: 0.25rem;
+  --rc-space-2: 0.5rem;
+  --rc-space-3: 0.75rem;
+  --rc-space-4: 1rem;
+  --rc-space-5: 1.25rem;
+  --rc-space-6: 1.5rem;
+  --rc-space-8: 2rem;
+  --rc-space-10: 2.5rem;
+  --rc-space-12: 3rem;
+  --rc-space-16: 4rem;
+  --rc-space-0_5: 0.125rem;
+  --rc-space-1_5: 0.375rem;
+
+  --rc-radius-none: 0;
+  --rc-radius-sm: 4px;
+  --rc-radius-md: 8px;
+  --rc-radius-lg: 12px;
+  --rc-radius-full: 9999px;
+
+  --rc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --rc-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --rc-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}

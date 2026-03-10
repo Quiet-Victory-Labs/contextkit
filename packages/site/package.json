@@ -36,11 +36,13 @@
     "astro"
   ],
   "scripts": {
+    "prebuild": "cp node_modules/@runcontext/uxd/dist/css/tokens.css astro/public/uxd-tokens.css",
     "build": "tsup",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@runcontext/core": "workspace:^",
+    "@runcontext/uxd": "link:../../../runcontext-uxd",
     "astro": "^5.18.0",
 "minisearch": "^7.1.0"
   },

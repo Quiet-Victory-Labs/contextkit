@@ -23,6 +23,7 @@ const products = (manifest as any).products;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title} — {siteTitle}</title>
+  <link rel="stylesheet" href="/uxd-tokens.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -293,31 +294,31 @@ const products = (manifest as any).products;
 
 <style is:global>
   :root {
-    --accent: #c9a55a;
-    --accent-light: #e0be6a;
+    --accent: var(--rc-color-brand-gold);
+    --accent-light: var(--rc-color-brand-gold-light);
     --accent-dim: rgba(201, 165, 90, 0.12);
     --accent-border: rgba(201, 165, 90, 0.25);
-    --bg: #0a0908;
+    --bg: var(--rc-color-surface-bg);
     --bg-sidebar: #0f0e0d;
-    --bg-card: #141312;
-    --bg-hover: #1a1918;
+    --bg-card: var(--rc-color-surface-card);
+    --bg-hover: var(--rc-color-surface-card-hover);
     --bg-code: #111010;
-    --text: #e8e6e1;
-    --text-secondary: #a09d94;
-    --text-dim: #6a675e;
-    --border: #252320;
-    --border-light: #302d28;
-    --green: #4aba6a;
+    --text: var(--rc-color-text-primary);
+    --text-secondary: var(--rc-color-text-secondary);
+    --text-dim: var(--rc-color-text-muted);
+    --border: var(--rc-color-border-default);
+    --border-light: var(--rc-color-border-hover);
+    --green: var(--rc-color-status-success);
     --green-dim: rgba(74, 186, 106, 0.1);
-    --red: #d45050;
+    --red: var(--rc-color-status-error);
     --red-dim: rgba(212, 80, 80, 0.08);
-    --blue: #5b9cf5;
+    --blue: var(--rc-color-status-info);
     --blue-dim: rgba(91, 156, 245, 0.1);
     --purple: #a78bfa;
     --cyan: #22d3ee;
-    --orange: #f59e0b;
-    --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mono: 'Geist Mono', 'SF Mono', 'Consolas', monospace;
+    --orange: var(--rc-color-status-warning);
+    --sans: var(--rc-font-sans);
+    --mono: var(--rc-font-mono);
     --sidebar-w: 260px;
     --topbar-h: 48px;
   }

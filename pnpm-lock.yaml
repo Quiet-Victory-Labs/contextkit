@@ -168,6 +168,9 @@ importers:
       '@runcontext/core':
         specifier: workspace:^
         version: link:../core
+      '@runcontext/uxd':
+        specifier: link:../../../runcontext-uxd
+        version: link:../../../runcontext-uxd
       astro:
         specifier: ^5.18.0
         version: 5.18.0(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2)
