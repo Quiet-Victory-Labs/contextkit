@@ -377,16 +377,155 @@
     }
   }
 
-  // ---- Step 2: Define (placeholder) ----
+  // ---- Step 2: Define ----
 
   function renderDefineStep() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
+
     var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Define' }));
-    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
-    card.appendChild(createStepActions(true, true));
+
+    card.appendChild(createElement('h2', { textContent: 'Define Your Data Product' }));
+    card.appendChild(createElement('p', { className: 'muted', textContent: 'Tell us about your data product. This metadata helps AI agents understand what they\u2019re working with.' }));
+
+    var form = createElement('div', { className: 'define-form' });
+
+    // Product Name (full width, required)
+    var nameGroup = createElement('div', { className: 'field full-width' });
+    nameGroup.appendChild(createElement('label', { htmlFor: 'product_name', textContent: 'Product Name *' }));
+    nameGroup.appendChild(createElement('input', {
+      className: 'input',
+      id: 'product_name',
+      type: 'text',
+      placeholder: 'my-data-product',
+    }));
+    nameGroup.appendChild(createElement('p', { className: 'hint', textContent: 'Alphanumeric, hyphens, and underscores only.' }));
+    form.appendChild(nameGroup);
+
+    // Description (full width, required)
+    var descGroup = createElement('div', { className: 'field full-width' });
+    descGroup.appendChild(createElement('label', { htmlFor: 'description', textContent: 'Description *' }));
+    var descInput = createElement('textarea', {
+      className: 'textarea',
+      id: 'description',
+      placeholder: 'What does this data product provide?',
+    });
+    descGroup.appendChild(descInput);
+    form.appendChild(descGroup);
+
+    // Owner Name (left column)
+    var ownerNameGroup = createElement('div', { className: 'field' });
+    ownerNameGroup.appendChild(createElement('label', { htmlFor: 'owner_name', textContent: 'Owner Name' }));
+    ownerNameGroup.appendChild(createElement('input', {
+      className: 'input',
+      id: 'owner_name',
+      type: 'text',
+      placeholder: 'Jane Doe',
+    }));
+    form.appendChild(ownerNameGroup);
+
+    // Team (right column)
+    var teamGroup = createElement('div', { className: 'field' });
+    teamGroup.appendChild(createElement('label', { htmlFor: 'owner_team', textContent: 'Team' }));
+    teamGroup.appendChild(createElement('input', {
+      className: 'input',
+      id: 'owner_team',
+      type: 'text',
+      placeholder: 'Data Engineering',
+    }));
+    form.appendChild(teamGroup);
+
+    // Email (left column)
+    var emailGroup = createElement('div', { className: 'field' });
+    emailGroup.appendChild(createElement('label', { htmlFor: 'owner_email', textContent: 'Email' }));
+    emailGroup.appendChild(createElement('input', {
+      className: 'input',
+      id: 'owner_email',
+      type: 'text',
+      placeholder: 'jane@example.com',
+    }));
+    form.appendChild(emailGroup);
+
+    // Sensitivity (right column)
+    var sensGroup = createElement('div', { className: 'field' });
+    sensGroup.appendChild(createElement('label', { htmlFor: 'sensitivity', textContent: 'Sensitivity' }));
+    var sensSelect = createElement('select', { className: 'select', id: 'sensitivity' });
+    [
+      { value: 'public', text: 'Public' },
+      { value: 'internal', text: 'Internal' },
+      { value: 'confidential', text: 'Confidential' },
+      { value: 'restricted', text: 'Restricted' },
+    ].forEach(function (opt) {
+      var option = createElement('option', { value: opt.value, textContent: opt.text });
+      sensSelect.appendChild(option);
+    });
+    sensSelect.value = 'internal';
+    sensGroup.appendChild(sensSelect);
+    form.appendChild(sensGroup);
+
+    // Action buttons (full width)
+    var actions = createElement('div', { className: 'define-actions' });
+
+    var backBtn = createElement('button', { className: 'btn btn-secondary', textContent: 'Back' });
+    backBtn.addEventListener('click', function () { goToStep(1); });
+    actions.appendChild(backBtn);
+
+    var continueBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Continue' });
+    continueBtn.addEventListener('click', async function () {
+      clearErrors();
+      var valid = true;
+
+      var productName = document.getElementById('product_name').value.trim();
+      var description = document.getElementById('description').value.trim();
+
+      if (!productName) {
+        showError('product_name', 'Product name is required.');
+        valid = false;
+      } else if (!/^[a-zA-Z0-9_-]+$/.test(productName)) {
+        showError('product_name', 'Only letters, numbers, hyphens, and underscores allowed.');
+        valid = false;
+      }
+
+      if (!description) {
+        showError('description', 'Description is required.');
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      state.brief.product_name = productName;
+      state.brief.description = description;
+      state.brief.owner.name = document.getElementById('owner_name').value.trim();
+      state.brief.owner.team = document.getElementById('owner_team').value.trim();
+      state.brief.owner.email = document.getElementById('owner_email').value.trim();
+      state.brief.sensitivity = document.getElementById('sensitivity').value;
+      saveState();
+
+      continueBtn.textContent = 'Saving\u2026';
+      continueBtn.disabled = true;
+      try {
+        await api('POST', '/api/brief', state.brief);
+        goToStep(3);
+      } catch (e) {
+        continueBtn.textContent = 'Continue';
+        continueBtn.disabled = false;
+        var errP = createElement('p', { className: 'field-error', textContent: e.message || 'Failed to save. Please try again.' });
+        actions.appendChild(errP);
+      }
+    });
+    actions.appendChild(continueBtn);
+    form.appendChild(actions);
+
+    card.appendChild(form);
     content.appendChild(card);
+
+    // Pre-fill from saved state
+    if (state.brief.product_name) document.getElementById('product_name').value = state.brief.product_name;
+    if (state.brief.description) document.getElementById('description').value = state.brief.description;
+    if (state.brief.owner.name) document.getElementById('owner_name').value = state.brief.owner.name;
+    if (state.brief.owner.team) document.getElementById('owner_team').value = state.brief.owner.team;
+    if (state.brief.owner.email) document.getElementById('owner_email').value = state.brief.owner.email;
+    if (state.brief.sensitivity) document.getElementById('sensitivity').value = state.brief.sensitivity;
   }
 
   // ---- Step 3: Scaffold (placeholder) ----

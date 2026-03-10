@@ -1090,3 +1090,24 @@ code, pre, .mono {
 .manual-connect-row input {
   flex: 1;
 }
+
+/* ================================================================
+   Define Step
+   ================================================================ */
+.define-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--rc-space-4, 16px);
+  max-width: 700px;
+  margin-top: var(--rc-space-6, 24px);
+}
+.define-form .full-width {
+  grid-column: 1 / -1;
+}
+.define-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--rc-space-3, 12px);
+  justify-content: flex-end;
+  margin-top: var(--rc-space-4, 16px);
+}
