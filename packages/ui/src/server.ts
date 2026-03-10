@@ -79,138 +79,94 @@ function setupPageHTML(): string {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RunContext — Build Your Data Product</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/uxd.css" />
   <link rel="stylesheet" href="/static/setup.css" />
 </head>
 <body>
-  <div class="wizard">
-    <header class="wizard-header">
-      <h1>RunContext</h1>
-      <p class="tagline">Build your data product. AI handles the rest.</p>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-chevron" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4 4l8 8-8 8" stroke="#c9a55a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 4l8 8-8 8" stroke="#c9a55a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+        </svg>
+        <span class="brand-text">
+          <span class="brand-run">Run</span><span class="brand-context">Context</span>
+        </span>
+        <span class="brand-badge">Local</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-nav="setup">
+          <span>Setup</span>
+        </a>
+        <a class="nav-item locked" data-nav="planes">
+          <span>Semantic Planes</span>
+          <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </a>
+        <a class="nav-item locked" data-nav="analytics">
+          <span>Analytics</span>
+          <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </a>
+        <a class="nav-item" data-nav="mcp">
+          <span class="status-dot" id="mcp-status-dot"></span>
+          <span>MCP Server</span>
+          <span class="nav-detail" id="mcp-status-text">checking...</span>
+        </a>
+        <a class="nav-item locked" data-nav="settings">
+          <span>Settings</span>
+          <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </a>
+      </nav>
+      <div class="sidebar-status">
+        <div class="status-row">
+          <span class="status-dot" id="db-status-dot"></span>
+          <span id="db-status-text">No database</span>
+        </div>
+        <div class="status-row">
+          <span class="status-dot" id="mcp-server-dot"></span>
+          <span id="mcp-server-text">MCP stopped</span>
+        </div>
+        <div class="status-row" id="tier-row">
+          <span class="tier-badge" id="tier-badge">Free</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-stepper" id="stepper"></div>
     </header>
 
-    <div class="progress-bar">
-      <div class="progress-step active" data-step="1"><span class="step-num">1</span><span class="step-label">Product</span></div>
-      <div class="progress-step" data-step="2"><span class="step-num">2</span><span class="step-label">Owner</span></div>
-      <div class="progress-step" data-step="3"><span class="step-num">3</span><span class="step-label">Context</span></div>
-      <div class="progress-step" data-step="4"><span class="step-num">4</span><span class="step-label">Review</span></div>
-      <div class="progress-step" data-step="5"><span class="step-num">5</span><span class="step-label">Build</span></div>
-    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-wrapper" id="wizard-content"></div>
+    </main>
 
-    <!-- Step 1: Product Name + Description -->
-    <div class="step active" id="step-1">
-      <h2>Name your data product</h2>
-      <div class="field">
-        <label for="product-name">Product Name</label>
-        <input type="text" id="product-name" class="input" placeholder="e.g. player-engagement" />
-        <p class="hint">Letters, numbers, dashes, underscores only</p>
-      </div>
-      <div class="field">
-        <label for="description">Description</label>
-        <div class="textarea-wrapper">
-          <textarea id="description" class="textarea" rows="4" placeholder="Describe what this data product covers..."></textarea>
-          <button type="button" id="voice-btn" class="btn-icon" title="Voice input">\u{1F3A4}</button>
-        </div>
-      </div>
-      <div class="step-actions">
-        <div></div>
-        <button type="button" class="btn btn-primary" data-next>Next</button>
-      </div>
-    </div>
-
-    <!-- Step 2: Owner -->
-    <div class="step" id="step-2">
-      <h2>Who owns this data?</h2>
-      <div class="field">
-        <label for="owner-name">Your Name</label>
-        <input type="text" id="owner-name" class="input" placeholder="e.g. Tyler" />
-      </div>
-      <div class="field">
-        <label for="owner-team">Team</label>
-        <input type="text" id="owner-team" class="input" placeholder="e.g. Analytics" />
-      </div>
-      <div class="field">
-        <label for="owner-email">Email</label>
-        <input type="email" id="owner-email" class="input" placeholder="e.g. tyler@company.com" />
-      </div>
-      <div class="step-actions">
-        <button type="button" class="btn btn-secondary" data-prev>Back</button>
-        <button type="button" class="btn btn-primary" data-next>Next</button>
-      </div>
-    </div>
-
-    <!-- Step 3: Sensitivity + Sources + Upload -->
-    <div class="step" id="step-3">
-      <h2>Context &amp; sensitivity</h2>
-      <div class="field">
-        <label>Data Sensitivity</label>
-        <div class="sensitivity-cards">
-          <div class="card" data-sensitivity="public">
-            <strong>Public</strong>
-            <p>Open data, no restrictions</p>
-          </div>
-          <div class="card selected" data-sensitivity="internal">
-            <strong>Internal</strong>
-            <p>Company use only</p>
-          </div>
-          <div class="card" data-sensitivity="confidential">
-            <strong>Confidential</strong>
-            <p>Need-to-know basis</p>
-          </div>
-          <div class="card" data-sensitivity="restricted">
-            <strong>Restricted</strong>
-            <p>Strict access controls</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Data Sources</label>
-        <div id="sources-list" class="source-cards">
-          <p class="muted">Detecting data sources...</p>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Documentation (optional)</label>
-        <div id="upload-area" class="upload-area">
-          <p>Drop files here or click to upload</p>
-          <p class="hint">Supports .md, .txt, .pdf, .csv, .json, .yaml, .sql</p>
-          <input type="file" id="file-input" hidden multiple accept=".md,.txt,.pdf,.csv,.json,.yaml,.yml,.sql,.html" />
-        </div>
-        <div id="uploaded-files"></div>
-      </div>
-
-      <div class="step-actions">
-        <button type="button" class="btn btn-secondary" data-prev>Back</button>
-        <button type="button" class="btn btn-primary" data-next>Next</button>
-      </div>
-    </div>
-
-    <!-- Step 4: Review -->
-    <div class="step" id="step-4">
-      <h2>Review your data product</h2>
-      <div id="review-content" class="review-content"></div>
-      <div class="step-actions">
-        <button type="button" class="btn btn-secondary" data-prev>Back</button>
-        <button type="button" class="btn btn-primary" data-next>Build it</button>
-      </div>
-    </div>
-
-    <!-- Step 5: Build Pipeline -->
-    <div class="step" id="step-5">
-      <h2>Building your semantic plane</h2>
-      <div id="pipeline-timeline" class="pipeline-timeline"></div>
-      <div id="pipeline-done" class="pipeline-done" style="display:none">
-        <p>Your semantic plane is live. AI agents can now query your data with context.</p>
-        <p class="muted">Powered by RunContext \u00B7 Open Semantic Interchange</p>
-      </div>
-    </div>
-
-    <footer class="wizard-footer">
-      <p>Powered by RunContext \u00B7 Open Semantic Interchange</p>
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>Powered by RunContext &middot; Open Semantic Interchange</span>
     </footer>
   </div>
+
+  <!-- Locked tooltip (hidden by default) -->
+  <div class="locked-tooltip" id="locked-tooltip" style="display:none">
+    <p>Available on RunContext Cloud</p>
+    <a href="https://runcontext.dev/pricing" target="_blank" rel="noopener">Learn more</a>
+  </div>
+
   <script src="/static/setup.js"></script>
 </body>
 </html>`;
