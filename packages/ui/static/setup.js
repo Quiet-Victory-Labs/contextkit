@@ -535,9 +535,8 @@
       // Hide the other providers / platform grid — show only database results
       providerWrapper.style.display = 'none';
 
-      oauthResult.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Select a database from ' + (provider.displayName || provider.display_name || provider.id) }));
-
-      // Back button to return to provider selection
+      var oauthHeader = createElement('div', { className: 'oauth-result-header' });
+      oauthHeader.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Select a database from ' + (provider.displayName || provider.display_name || provider.id) }));
       var backLink = createElement('button', { className: 'btn btn-secondary btn-sm', textContent: '\u2190 Back to providers' });
       backLink.addEventListener('click', function () {
         oauthResult.textContent = '';
@@ -545,7 +544,8 @@
         providerWrapper.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = false; });
         providerWrapper.querySelectorAll('.source-card .btn').forEach(function (b) { b.disabled = false; });
       });
-      oauthResult.appendChild(backLink);
+      oauthHeader.appendChild(backLink);
+      oauthResult.appendChild(oauthHeader);
 
       var dbGrid = createElement('div', { className: 'source-cards' });
       databases.forEach(function (db) {

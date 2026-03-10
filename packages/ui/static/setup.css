@@ -855,6 +855,19 @@ body {
   font-size: 0.8125rem;
 }
 
+/* OAuth result header: label + back button */
+.oauth-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--rc-space-4, 16px);
+}
+#connect-oauth-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-3, 12px);
+}
+
 /* ================================================================
    Steps (wizard step visibility)
    ================================================================ */
