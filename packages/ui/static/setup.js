@@ -42,6 +42,88 @@
     mcpPollTimer: null,
   };
 
+  // ---- WebSocket Client ----
+  var ws = null;
+  var wsSessionId = null;
+
+  function connectWebSocket(sessionId) {
+    wsSessionId = sessionId;
+    var protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(protocol + '//' + location.host + '/ws?session=' + encodeURIComponent(sessionId) + '&role=wizard');
+
+    ws.onmessage = function (evt) {
+      try {
+        var event = JSON.parse(evt.data);
+        handleWsEvent(event);
+      } catch (e) { /* ignore */ }
+    };
+
+    ws.onclose = function () {
+      setTimeout(function () {
+        if (wsSessionId) connectWebSocket(wsSessionId);
+      }, 2000);
+    };
+
+    ws.onerror = function () { /* ignore, onclose handles reconnect */ };
+  }
+
+  function sendWsEvent(type, payload) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: type, sessionId: wsSessionId, payload: payload || {} }));
+    }
+  }
+
+  function handleWsEvent(event) {
+    switch (event.type) {
+      case 'setup:step':
+        if (event.payload && event.payload.step) {
+          goToStep(event.payload.step);
+        }
+        break;
+      case 'setup:field':
+        if (event.payload && event.payload.fieldId) {
+          var input = document.getElementById(event.payload.fieldId);
+          if (input) {
+            input.value = event.payload.value || '';
+            input.dispatchEvent(new Event('input'));
+          }
+        }
+        break;
+      case 'pipeline:stage':
+        updateStageFromWs(event.payload || {});
+        break;
+      case 'enrich:progress':
+        updateEnrichProgress(event.payload || {});
+        break;
+      case 'enrich:log':
+        appendEnrichLog(event.payload || {});
+        break;
+      case 'tier:update':
+        if (event.payload && event.payload.tier) {
+          var badge = document.getElementById('tier-badge');
+          if (badge) badge.textContent = event.payload.tier;
+        }
+        break;
+    }
+  }
+
+  function updateStageFromWs(payload) {
+    // Update stage dots in the scaffold step
+    var stageEl = document.querySelector('[data-stage="' + payload.stage + '"]');
+    if (!stageEl) return;
+    var dot = stageEl.querySelector('.stage-dot');
+    if (dot) {
+      dot.className = 'stage-dot';
+      if (payload.status === 'running') dot.className += ' running';
+      else if (payload.status === 'done') dot.className += ' done';
+      else if (payload.status === 'error') dot.className += ' error';
+    }
+    var summary = stageEl.querySelector('.stage-summary');
+    if (summary && payload.summary) {
+      summary.textContent = payload.summary;
+    }
+  }
+
   // ---- Helpers ----
 
   function $(sel) { return document.querySelector(sel); }
@@ -550,7 +632,7 @@
     // Stage rows container
     var stagesContainer = createElement('div', { className: 'scaffold-stages', id: 'scaffold-stages' });
     SCAFFOLD_STAGES.forEach(function (stage) {
-      var row = createElement('div', { className: 'stage-row', id: 'stage-' + stage.key }, [
+      var row = createElement('div', { className: 'stage-row', id: 'stage-' + stage.key, 'data-stage': stage.key }, [
         createElement('span', { className: 'stage-dot' }),
         createElement('span', { className: 'stage-name', textContent: stage.label }),
       ]);
@@ -1001,7 +1083,7 @@
     card.appendChild(createElement('h2', { textContent: 'Your Semantic Plane is Ready' }));
 
     // Tier detection placeholder — will be filled async
-    var tierBadge = createElement('span', { className: 'serve-tier-badge bronze', textContent: 'Bronze' });
+    var tierBadge = createElement('span', { className: 'serve-tier-badge bronze', id: 'tier-badge', textContent: 'Bronze' });
     card.appendChild(tierBadge);
 
     var messageEl = createElement('p', { className: 'muted' });
@@ -1287,6 +1369,25 @@
     setupSidebarLocked();
     pollMcpStatus();
     goToStep(state.step);
+
+    // Create or resume a WebSocket session
+    var urlParams = new URLSearchParams(window.location.search);
+    var sessionParam = urlParams.get('session');
+    if (sessionParam) {
+      connectWebSocket(sessionParam);
+    } else {
+      fetch('/api/session', { method: 'POST' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.sessionId) {
+            connectWebSocket(data.sessionId);
+            // Update URL without reload so session persists on refresh
+            var newUrl = window.location.pathname + '?session=' + encodeURIComponent(data.sessionId);
+            window.history.replaceState({}, '', newUrl);
+          }
+        })
+        .catch(function () { /* WebSocket is best-effort */ });
+    }
   }
 
   document.addEventListener('DOMContentLoaded', init);
