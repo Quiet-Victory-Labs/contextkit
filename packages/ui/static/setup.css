@@ -639,6 +639,16 @@ body {
   border-bottom: none;
 }
 
+.pipeline-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.stage-detail-item {
+  padding: 2px 0;
+}
+
 /* ================================================================
    Pipeline Timeline (legacy, kept for backward compat)
    ================================================================ */

@@ -606,12 +606,24 @@
     'Writing OSI-ready context',
   ];
 
+  var userExpandedStages = new Set();
+
   function renderStep5() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
 
     var card = createElement('div', { className: 'card' });
     card.appendChild(createElement('h2', { textContent: 'Building Your Data Product' }));
+
+    // Descriptive line above the pipeline
+    var source = state.brief.data_source || '';
+    var descP = createElement('p', { className: 'pipeline-desc' }, [
+      document.createTextNode('Building semantic plane for '),
+      createElement('strong', { textContent: state.brief.product_name || '' }),
+      document.createTextNode(' from '),
+      createElement('strong', { textContent: source }),
+    ]);
+    card.appendChild(descP);
 
     var timeline = createElement('div', { className: 'pipeline-timeline', id: 'pipeline-timeline' });
     card.appendChild(timeline);
@@ -628,7 +640,112 @@
     startBuild();
   }
 
-  function buildStageElement(item) {
+  function maskConnectionString(str) {
+    if (!str) return '';
+    return str.replace(/:([^@:]+)@/, ':****@');
+  }
+
+  function buildStageDetailContent(item) {
+    var frag = document.createDocumentFragment();
+    if (!item.details) return frag;
+    var name = (item.stage || '').toLowerCase();
+
+    if (name.indexOf('introspect') !== -1 || name.indexOf('scanning') !== -1) {
+      if (item.details.connection_string) {
+        var connP = createElement('p', { className: 'mono', textContent: maskConnectionString(item.details.connection_string) });
+        connP.style.fontSize = '0.8rem';
+        connP.style.marginBottom = '0.5rem';
+        frag.appendChild(connP);
+      }
+      if (item.details.tables && item.details.tables.length) {
+        var tbl = document.createElement('table');
+        tbl.className = 'stage-detail-table';
+        item.details.tables.forEach(function (t) {
+          var tr = document.createElement('tr');
+          var td1 = document.createElement('td');
+          td1.textContent = t.name || t;
+          tr.appendChild(td1);
+          var td2 = document.createElement('td');
+          td2.textContent = t.row_count != null ? t.row_count + ' rows' : '';
+          tr.appendChild(td2);
+          tbl.appendChild(tr);
+        });
+        frag.appendChild(tbl);
+      }
+    } else if (name.indexOf('scaffold') !== -1 || name.indexOf('schema') !== -1) {
+      if (item.details.files && item.details.files.length) {
+        var ul = document.createElement('ul');
+        ul.className = 'stage-detail-list';
+        item.details.files.forEach(function (f) {
+          var li = document.createElement('li');
+          li.textContent = (f.name || f) + (f.size ? ' (' + f.size + ')' : '');
+          ul.appendChild(li);
+        });
+        frag.appendChild(ul);
+      }
+    } else if (name.indexOf('silver') !== -1 || name.indexOf('description') !== -1) {
+      if (item.details.fields_enriched != null) {
+        frag.appendChild(createElement('p', { textContent: item.details.fields_enriched + ' fields enriched' }));
+      }
+      if (item.details.samples && item.details.samples.length) {
+        var ul2 = document.createElement('ul');
+        ul2.className = 'stage-detail-list';
+        var limit = Math.min(item.details.samples.length, 3);
+        for (var i = 0; i < limit; i++) {
+          var li2 = document.createElement('li');
+          li2.textContent = item.details.samples[i];
+          ul2.appendChild(li2);
+        }
+        frag.appendChild(ul2);
+      }
+    } else if (name.indexOf('gold') !== -1 || name.indexOf('semantic') !== -1) {
+      if (item.details.semantic_roles != null) {
+        frag.appendChild(createElement('p', { textContent: item.details.semantic_roles + ' semantic roles added' }));
+      }
+      if (item.details.aggregations != null) {
+        frag.appendChild(createElement('p', { textContent: item.details.aggregations + ' aggregations set' }));
+      }
+    } else if (name.indexOf('verify') !== -1) {
+      var counts = [];
+      if (item.details.pass != null) {
+        var passSpan = createElement('span', { textContent: item.details.pass + ' pass' });
+        passSpan.style.color = 'var(--success)';
+        counts.push(passSpan);
+      }
+      if (item.details.warn != null) {
+        var warnSpan = createElement('span', { textContent: item.details.warn + ' warn' });
+        warnSpan.style.color = 'var(--warning)';
+        counts.push(warnSpan);
+      }
+      if (item.details.fail != null) {
+        var failSpan = createElement('span', { textContent: item.details.fail + ' fail' });
+        failSpan.style.color = 'var(--error)';
+        counts.push(failSpan);
+      }
+      if (counts.length) {
+        var countsP = document.createElement('p');
+        counts.forEach(function (sp, idx) {
+          if (idx > 0) countsP.appendChild(document.createTextNode(' / '));
+          countsP.appendChild(sp);
+        });
+        frag.appendChild(countsP);
+      }
+    } else if (name.indexOf('autofix') !== -1 || name.indexOf('fix') !== -1) {
+      if (item.details.fixes_applied != null) {
+        frag.appendChild(createElement('p', { textContent: item.details.fixes_applied + ' fixes applied' }));
+      }
+    } else if (name.indexOf('agent') !== -1 || name.indexOf('instruction') !== -1) {
+      if (item.details.file_path) {
+        var codePath = createElement('code', { textContent: item.details.file_path });
+        codePath.style.fontSize = '0.8125rem';
+        frag.appendChild(codePath);
+      }
+    }
+
+    return frag;
+  }
+
+  function buildStageElement(item, stageIndex) {
     var statusClass = 'stage-pending';
     var dotText = '';
     if (item.status === 'done' || item.status === 'completed' || item.status === 'complete') {
@@ -653,12 +770,23 @@
       bodyInner.appendChild(createElement('p', { className: 'muted', textContent: item.detail }));
     }
 
+    // Render rich detail content
+    var detailContent = buildStageDetailContent(item);
+    if (detailContent.childNodes.length > 0) {
+      bodyInner.appendChild(detailContent);
+    }
+
     var body = createElement('div', { className: 'pipeline-stage-body' }, [bodyInner]);
 
     var stage = createElement('div', { className: 'pipeline-stage ' + statusClass }, [header, body]);
 
     header.addEventListener('click', function () {
       stage.classList.toggle('expanded');
+      if (stage.classList.contains('expanded')) {
+        userExpandedStages.add(stageIndex);
+      } else {
+        userExpandedStages.delete(stageIndex);
+      }
     });
 
     return stage;
@@ -669,12 +797,29 @@
     if (!el) return;
     if (items.length === 0) {
       items = STAGES.map(function (name) {
-        return { stage: name, status: 'pending', detail: '' };
+        return { stage: name, status: 'pending', detail: '', details: null };
       });
     }
     el.textContent = '';
-    items.forEach(function (item) {
-      el.appendChild(buildStageElement(item));
+    items.forEach(function (item, idx) {
+      var stageEl = buildStageElement(item, idx);
+      el.appendChild(stageEl);
+    });
+
+    // Auto-expand/collapse logic
+    var stageEls = el.querySelectorAll('.pipeline-stage');
+    stageEls.forEach(function (stageEl, idx) {
+      var isRunning = stageEl.classList.contains('stage-running');
+      var isDone = stageEl.classList.contains('stage-done');
+      var userOpened = userExpandedStages.has(idx);
+
+      if (isRunning) {
+        stageEl.classList.add('expanded');
+      } else if (userOpened) {
+        stageEl.classList.add('expanded');
+      } else if (isDone) {
+        stageEl.classList.remove('expanded');
+      }
     });
   }
 
@@ -685,6 +830,7 @@
         stage: s.name || s.stage || s.label || '',
         status: s.status || 'pending',
         detail: s.detail || s.message || '',
+        details: s.details || s.data || null,
       };
     });
     if (items.length === 0 && typeof data.currentStep === 'number') {
