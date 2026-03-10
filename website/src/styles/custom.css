@@ -1,4 +1,4 @@
-/* ContextKit — Custom Starlight Theme */
+/* RunContext — Custom Starlight Theme */
 
 :root {
   --sl-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -81,7 +81,7 @@ starlight-header {
 }
 
 .hero-section .hero-accent {
-  background: linear-gradient(135deg, #c9a55a, #e0be6a);
+  background: linear-gradient(135deg, #c9a55a, var(--rc-color-brand-gold-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -144,7 +144,7 @@ starlight-header {
 
 .hero-actions .primary {
   background: var(--sl-color-accent);
-  color: #0a0908;
+  color: var(--rc-color-surface-bg);
 }
 
 .hero-actions .primary:hover {
@@ -208,7 +208,7 @@ starlight-header {
 
 .tier-badge.bronze { background: rgba(184, 122, 74, 0.15); color: #b87a4a; }
 .tier-badge.silver { background: rgba(160, 168, 184, 0.12); color: #a0a8b8; }
-.tier-badge.gold { background: rgba(201, 165, 90, 0.15); color: #c9a55a; }
+.tier-badge.gold { background: rgba(201, 165, 90, 0.15); color: var(--rc-color-brand-gold); }
 
 /* Comparison grid */
 .comparison {
@@ -460,7 +460,7 @@ starlight-header {
   border: none;
   border-radius: 6px;
   background: var(--sl-color-accent);
-  color: #0a0908;
+  color: var(--rc-color-surface-bg);
   cursor: pointer;
   transition: filter 0.2s, transform 0.2s;
   width: fit-content;
