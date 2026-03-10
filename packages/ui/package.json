@@ -45,7 +45,7 @@
     "static"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "cp node_modules/@runcontext/uxd/dist/css/index.css static/uxd.css && tsup",
     "clean": "rm -rf dist",
     "dev": "tsup --watch"
   },
