@@ -1,10 +1,11 @@
 import { currentStep } from './state';
 import { Connect } from './steps/Connect';
+import { Define } from './steps/Define';
 
 function StepContent() {
   switch (currentStep.value) {
     case 1: return <Connect />;
-    case 2: return <div>Define step (coming soon)</div>;
+    case 2: return <Define />;
     case 3: return <div>Scaffold step (coming soon)</div>;
     case 4: return <div>Checkpoint step (coming soon)</div>;
     case 5: return <div>Enrich step (coming soon)</div>;
