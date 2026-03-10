@@ -36,7 +36,7 @@ export class CredentialStore {
         await this.keychain.set(cred.key, cred.token);
       }
       // Store metadata (without token) in file
-      const { token, refreshToken, ...metadata } = cred;
+      const { token, ...metadata } = cred;
       this.writeToFile(cred.key, metadata as StoredCredential);
     } else {
       // No keychain — store everything in file
