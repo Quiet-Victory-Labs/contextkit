@@ -990,14 +990,167 @@
     log.scrollTop = log.scrollHeight;
   }
 
-  // ---- Step 6: Serve (placeholder) ----
+  // ---- Step 6: Serve ----
 
   function renderServeStep() {
     var content = document.getElementById('wizard-content');
     if (!content) return;
-    var card = createElement('div', { className: 'card' });
-    card.appendChild(createElement('h2', { textContent: 'Serve' }));
-    card.appendChild(createElement('p', { className: 'muted', textContent: 'Coming soon.' }));
+
+    var card = createElement('div', { className: 'card serve-card' });
+
+    card.appendChild(createElement('h2', { textContent: 'Your Semantic Plane is Ready' }));
+
+    // Tier detection placeholder — will be filled async
+    var tierBadge = createElement('span', { className: 'serve-tier-badge bronze', textContent: 'Bronze' });
+    card.appendChild(tierBadge);
+
+    var messageEl = createElement('p', { className: 'muted' });
+    messageEl.textContent = 'Your Bronze tier semantic plane is ready for AI agents.';
+    card.appendChild(messageEl);
+
+    var upgradeHint = createElement('p', { className: 'muted' });
+    upgradeHint.style.marginTop = '8px';
+    upgradeHint.style.display = 'none';
+    card.appendChild(upgradeHint);
+
+    // Fetch tier from pipeline status
+    if (state.pipelineId) {
+      fetch('/api/pipeline/status/' + state.pipelineId)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          var stages = data.stages || [];
+          var tier = 'Bronze';
+          var tierClass = 'bronze';
+          var hasSilver = false;
+          var hasGold = false;
+          for (var i = 0; i < stages.length; i++) {
+            if (stages[i].name === 'enrich-gold' && stages[i].status === 'done') {
+              hasGold = true;
+            }
+            if (stages[i].name === 'enrich-silver' && stages[i].status === 'done') {
+              hasSilver = true;
+            }
+          }
+          if (hasGold) {
+            tier = 'Gold';
+            tierClass = 'gold';
+          } else if (hasSilver) {
+            tier = 'Silver';
+            tierClass = 'silver';
+          }
+
+          tierBadge.className = 'serve-tier-badge ' + tierClass;
+          tierBadge.textContent = tier;
+          messageEl.textContent = 'Your ' + tier + ' tier semantic plane is ready for AI agents.';
+
+          if (!hasGold) {
+            var missing = [];
+            if (!hasSilver) missing.push('Silver enrichment');
+            missing.push('Gold enrichment');
+            upgradeHint.textContent = 'To reach Gold, you still need: ' + missing.join(', ') + '. You can run enrichment later with `context enrich --target gold`.';
+            upgradeHint.style.display = 'block';
+          }
+        })
+        .catch(function () { /* keep Bronze default */ });
+    }
+
+    // CTAs
+    var ctas = createElement('div', { className: 'serve-ctas' });
+
+    var startBtn = createElement('button', { className: 'btn btn-primary', textContent: 'Start MCP Server' });
+    startBtn.addEventListener('click', function () {
+      startBtn.disabled = true;
+      startBtn.textContent = 'Loading...';
+      fetch('/api/mcp-config')
+        .then(function (res) { return res.json(); })
+        .then(function (config) {
+          startBtn.textContent = 'Start MCP Server';
+          startBtn.disabled = false;
+          // Remove existing config block if any
+          var existing = card.querySelector('.mcp-config-block');
+          if (existing) existing.remove();
+          var configBlock = createElement('div', { className: 'mcp-config-block' });
+          configBlock.textContent = JSON.stringify(config, null, 2);
+          // Insert after CTAs
+          var ctaParent = ctas.parentNode;
+          if (ctaParent) ctaParent.insertBefore(configBlock, ctas.nextSibling);
+
+          var copyHint = card.querySelector('.mcp-copy-hint');
+          if (!copyHint) {
+            copyHint = createElement('p', { className: 'muted mcp-copy-hint' });
+            copyHint.textContent = 'Copy the JSON above into your IDE\'s MCP settings, or run: context serve';
+            copyHint.style.marginTop = '8px';
+            copyHint.style.fontSize = '0.85rem';
+            var configEl = card.querySelector('.mcp-config-block');
+            if (configEl && configEl.nextSibling) {
+              ctaParent.insertBefore(copyHint, configEl.nextSibling);
+            } else if (configEl) {
+              ctaParent.appendChild(copyHint);
+            }
+          }
+        })
+        .catch(function () {
+          startBtn.textContent = 'Start MCP Server';
+          startBtn.disabled = false;
+        });
+    });
+    ctas.appendChild(startBtn);
+
+    var publishBtn = createElement('button', { className: 'btn btn-secondary', textContent: 'Publish to Cloud' });
+    publishBtn.disabled = true;
+    publishBtn.title = 'Coming soon';
+    ctas.appendChild(publishBtn);
+
+    card.appendChild(ctas);
+
+    // CLI Commands section
+    var cmds = createElement('div', { className: 'serve-commands' });
+    cmds.appendChild(createElement('div', { className: 'serve-commands-title', textContent: 'CLI Commands' }));
+
+    var cmdData = [
+      ['context serve', 'Start the MCP server'],
+      ['context tier', 'Check your current tier'],
+      ['context enrich --target gold', 'Enrich to Gold tier'],
+      ['context verify', 'Validate your semantic plane'],
+    ];
+    for (var i = 0; i < cmdData.length; i++) {
+      var row = createElement('div', { className: 'serve-cmd-row' }, [
+        createElement('span', { className: 'serve-cmd', textContent: cmdData[i][0] }),
+        createElement('span', { className: 'serve-cmd-desc', textContent: cmdData[i][1] }),
+      ]);
+      cmds.appendChild(row);
+    }
+    card.appendChild(cmds);
+
+    // Continue Enrichment link (shown if not Gold — updated async)
+    var continueLink = createElement('p', {});
+    continueLink.style.marginTop = '16px';
+    var linkEl = createElement('a', { textContent: 'Continue Enrichment' });
+    linkEl.style.color = 'var(--rc-color-accent, #c9a55a)';
+    linkEl.style.cursor = 'pointer';
+    linkEl.style.fontSize = '0.875rem';
+    linkEl.addEventListener('click', function () {
+      goToStep(5);
+    });
+    continueLink.appendChild(linkEl);
+    card.appendChild(continueLink);
+
+    // Hide continue link if Gold
+    if (state.pipelineId) {
+      fetch('/api/pipeline/status/' + state.pipelineId)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          var stages = data.stages || [];
+          for (var j = 0; j < stages.length; j++) {
+            if (stages[j].name === 'enrich-gold' && stages[j].status === 'done') {
+              continueLink.style.display = 'none';
+              break;
+            }
+          }
+        })
+        .catch(function () { /* keep visible */ });
+    }
+
     card.appendChild(createStepActions(true, false));
     content.appendChild(card);
   }

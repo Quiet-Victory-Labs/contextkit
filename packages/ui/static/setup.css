@@ -1292,3 +1292,71 @@ code, pre, .mono {
   font-family: var(--rc-font-mono, 'Geist Mono', monospace);
   font-size: 12px;
 }
+
+/* ================================================================
+   Serve Step
+   ================================================================ */
+.serve-card {
+  max-width: 650px;
+}
+.serve-tier-badge {
+  display: inline-block;
+  padding: var(--rc-space-2) var(--rc-space-4);
+  border-radius: var(--rc-radius-md, 8px);
+  font-weight: 700;
+  font-size: var(--rc-font-lg);
+  margin: var(--rc-space-4) 0;
+}
+.serve-tier-badge.bronze { background: rgba(205, 127, 50, 0.15); color: #cd7f32; border: 1px solid rgba(205, 127, 50, 0.3); }
+.serve-tier-badge.silver { background: rgba(192, 192, 192, 0.15); color: #c0c0c0; border: 1px solid rgba(192, 192, 192, 0.3); }
+.serve-tier-badge.gold { background: rgba(201, 165, 90, 0.15); color: var(--rc-color-accent, #c9a55a); border: 1px solid rgba(201, 165, 90, 0.3); }
+
+.serve-ctas {
+  display: flex;
+  gap: var(--rc-space-3);
+  margin: var(--rc-space-6) 0;
+}
+
+.serve-commands {
+  background: var(--rc-color-bg-secondary, #1e293b);
+  border: 1px solid var(--rc-color-border, #334155);
+  border-radius: var(--rc-radius-md, 8px);
+  padding: var(--rc-space-4);
+  margin: var(--rc-space-4) 0;
+}
+.serve-commands-title {
+  font-weight: 600;
+  margin-bottom: var(--rc-space-3);
+  font-size: var(--rc-font-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rc-color-text-secondary, #94a3b8);
+}
+.serve-cmd-row {
+  display: flex;
+  gap: var(--rc-space-4);
+  padding: var(--rc-space-2) 0;
+  font-family: var(--rc-font-mono, 'Geist Mono', monospace);
+  font-size: var(--rc-font-sm);
+}
+.serve-cmd {
+  color: var(--rc-color-accent, #c9a55a);
+  min-width: 280px;
+}
+.serve-cmd-desc {
+  color: var(--rc-color-text-secondary, #94a3b8);
+}
+
+.mcp-config-block {
+  background: #0f172a;
+  border: 1px solid var(--rc-color-border, #334155);
+  border-radius: var(--rc-radius-md, 8px);
+  padding: var(--rc-space-4);
+  margin: var(--rc-space-4) 0;
+  font-family: var(--rc-font-mono, 'Geist Mono', monospace);
+  font-size: var(--rc-font-sm);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 300px;
+  overflow-y: auto;
+}
