@@ -37,6 +37,11 @@
   --sl-color-black: #fafaf5;
 }
 
+/* Site title — white text next to gold logo */
+.site-title {
+  color: var(--sl-color-white) !important;
+}
+
 /* Nav bar polish */
 starlight-header {
   backdrop-filter: blur(16px) saturate(180%);
