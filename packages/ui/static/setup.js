@@ -651,7 +651,7 @@
     doneEl.style.display = 'none';
 
     doneEl.appendChild(createElement('h2', { textContent: 'Your semantic plane is ready' }));
-    doneEl.appendChild(createElement('span', { className: 'tier-badge', id: 'completion-tier', textContent: 'Gold' }));
+    doneEl.appendChild(createElement('span', { className: 'tier-badge', id: 'completion-tier', textContent: '...' }));
 
     var subtitleText = (state.brief.product_name || 'Your product') + ' is now AI-ready. AI agents can query your data with full semantic context.';
     doneEl.appendChild(createElement('p', { className: 'completion-subtitle', textContent: subtitleText }));
@@ -831,10 +831,8 @@
     var dotText = '';
     if (item.status === 'done' || item.status === 'completed' || item.status === 'complete') {
       statusClass = 'stage-done';
-      dotText = '\u2713';
     } else if (item.status === 'running' || item.status === 'in_progress') {
       statusClass = 'stage-running';
-      dotText = '\u2026';
     } else if (item.status === 'error') {
       statusClass = 'stage-error';
       dotText = '!';
@@ -946,7 +944,51 @@
       pollPipeline();
     } catch (e) {
       renderTimeline([{ stage: 'Error', status: 'error', detail: e.message }]);
+      showRetryButton();
     }
+  }
+
+  function detectAndShowTier(data) {
+    // Run the tier command via the CLI to get the actual tier
+    var tierBadge = document.getElementById('completion-tier');
+    var sidebarBadge = document.getElementById('tier-badge');
+    // Check if enrich-gold completed successfully
+    var stages = data.stages || [];
+    var goldDone = stages.some(function (s) {
+      return (s.stage === 'enrich-gold') && (s.status === 'done');
+    });
+    var silverDone = stages.some(function (s) {
+      return (s.stage === 'enrich-silver') && (s.status === 'done');
+    });
+    // Check verify for actual tier info from summary
+    var verifyStage = stages.find(function (s) { return s.stage === 'verify'; });
+    var verifySummary = (verifyStage && (verifyStage.summary || '')) || '';
+    var hasErrors = verifySummary.indexOf('error') !== -1;
+
+    // Determine tier: gold only if gold enrichment ran AND no verify errors
+    var tier = 'Bronze';
+    if (goldDone && !hasErrors) tier = 'Gold';
+    else if (silverDone && !hasErrors) tier = 'Silver';
+    else if (goldDone || silverDone) tier = hasErrors ? 'Bronze' : 'Silver';
+
+    if (tierBadge) tierBadge.textContent = tier;
+    if (sidebarBadge) sidebarBadge.textContent = tier;
+  }
+
+  function showRetryButton() {
+    var timeline = $('#pipeline-timeline');
+    if (!timeline) return;
+    // Don't add duplicate retry buttons
+    if (timeline.parentElement.querySelector('.retry-build-btn')) return;
+    var retryBtn = createElement('button', { className: 'btn btn-primary retry-build-btn', textContent: 'Retry Build' });
+    retryBtn.style.marginTop = '16px';
+    retryBtn.addEventListener('click', function () {
+      retryBtn.remove();
+      state.pipelineId = null;
+      saveState();
+      startBuild();
+    });
+    timeline.parentElement.appendChild(retryBtn);
   }
 
   function pollPipeline() {
@@ -960,6 +1002,10 @@
           if (data.status !== 'error') {
             var doneEl = $('#pipeline-done');
             if (doneEl) doneEl.style.display = '';
+            // Detect actual tier from stage summaries
+            detectAndShowTier(data);
+          } else {
+            showRetryButton();
           }
         }
       } catch (e) {
