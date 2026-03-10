@@ -3,3 +3,4 @@ export { Keychain } from './keychain.js';
 export { CredentialStore } from './credential-store.js';
 export { ProviderRegistry } from './registry.js';
 export { resolveAuthConnection } from './resolve.js';
+export { createDefaultRegistry } from './providers/index.js';

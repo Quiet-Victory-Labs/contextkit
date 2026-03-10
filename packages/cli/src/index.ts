@@ -20,6 +20,7 @@ import { blueprintCommand } from './commands/blueprint.js';
 import { newCommand } from './commands/new.js';
 import { publishCommand } from './commands/publish.js';
 import { cloudInitCommand } from './commands/cloud-init.js';
+import { authCommand } from './commands/auth.js';
 
 const program = new Command();
 
@@ -48,5 +49,6 @@ program.addCommand(blueprintCommand);
 program.addCommand(newCommand);
 program.addCommand(publishCommand);
 program.addCommand(cloudInitCommand);
+program.addCommand(authCommand);
 
 program.parse();
