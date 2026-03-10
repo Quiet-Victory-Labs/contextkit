@@ -580,7 +580,22 @@
     ctxSection.appendChild(ctxHeader);
     var ctxBody = createElement('div', { className: 'review-body' });
     ctxBody.appendChild(createReviewRow('Sensitivity', state.brief.sensitivity));
-    ctxBody.appendChild(createReviewRow('Data Source', state.brief.data_source || '(none selected) \u2014 ' + state.sources.length + ' detected'));
+
+    // Data Source row with status dot
+    var dsRow = createElement('div', { className: 'review-row' });
+    dsRow.appendChild(createElement('span', { className: 'review-label', textContent: 'Data Source' }));
+    var dsValue = createElement('span', { className: 'review-value' });
+    var dsDot = createElement('span', { className: 'status-dot' });
+    if (state.brief.data_source) {
+      dsDot.classList.add('success');
+    } else {
+      dsDot.classList.add('error');
+    }
+    dsValue.appendChild(dsDot);
+    dsValue.appendChild(document.createTextNode(' ' + (state.brief.data_source || '(none selected) \u2014 ' + state.sources.length + ' detected')));
+    dsRow.appendChild(dsValue);
+    ctxBody.appendChild(dsRow);
+
     ctxBody.appendChild(createReviewRow('Uploaded Docs', state.brief.docs.length > 0 ? state.brief.docs.join(', ') : '(none)'));
     ctxSection.appendChild(ctxBody);
     card.appendChild(ctxSection);
@@ -628,11 +643,61 @@
     var timeline = createElement('div', { className: 'pipeline-timeline', id: 'pipeline-timeline' });
     card.appendChild(timeline);
 
-    var doneEl = createElement('div', { className: 'pipeline-done', id: 'pipeline-done' }, [
-      createElement('p', { textContent: 'Your data product has been built successfully.' }),
-      createElement('p', { className: 'muted', textContent: 'You can now use it with any MCP-compatible tool.' }),
-    ]);
+    // Completion card
+    var doneEl = createElement('div', { className: 'completion-card', id: 'pipeline-done' });
     doneEl.style.display = 'none';
+
+    doneEl.appendChild(createElement('h2', { textContent: 'Your semantic plane is ready' }));
+    doneEl.appendChild(createElement('span', { className: 'tier-badge', id: 'completion-tier', textContent: 'Gold' }));
+
+    var subtitleText = (state.brief.product_name || 'Your product') + ' is now AI-ready. AI agents can query your data with full semantic context.';
+    doneEl.appendChild(createElement('p', { className: 'completion-subtitle', textContent: subtitleText }));
+
+    var actions = createElement('div', { className: 'completion-actions' });
+    var startBtn = createElement('button', { className: 'btn btn-primary', id: 'start-mcp-btn', textContent: 'Start MCP Server' });
+    actions.appendChild(startBtn);
+    var publishLink = createElement('a', { className: 'btn btn-secondary', textContent: 'Publish to Cloud' });
+    publishLink.href = 'https://app.runcontext.dev';
+    publishLink.target = '_blank';
+    publishLink.rel = 'noopener';
+    actions.appendChild(publishLink);
+    doneEl.appendChild(actions);
+
+    var nextSteps = createElement('div', { className: 'completion-next-steps' });
+    nextSteps.appendChild(createElement('h3', { textContent: 'Next Steps' }));
+    nextSteps.appendChild(createElement('p', { textContent: 'Start the MCP server to make your data available to AI tools:' }));
+    var cli1 = createElement('div', { className: 'completion-cli' });
+    cli1.appendChild(createElement('code', { textContent: 'npx runcontext serve' }));
+    nextSteps.appendChild(cli1);
+    nextSteps.appendChild(createElement('p', { textContent: 'Or configure your AI tool to connect to:' }));
+    var cli2 = createElement('div', { className: 'completion-cli' });
+    cli2.appendChild(createElement('code', { textContent: 'http://localhost:3333/mcp' }));
+    nextSteps.appendChild(cli2);
+    doneEl.appendChild(nextSteps);
+
+    // Start MCP Server button handler
+    startBtn.addEventListener('click', function () {
+      startBtn.textContent = 'Starting...';
+      startBtn.disabled = true;
+      fetch('http://localhost:3333/health', { method: 'GET' })
+        .then(function (res) {
+          if (res.ok) {
+            startBtn.textContent = 'MCP Server Running';
+            var serverDot = document.getElementById('mcp-server-dot');
+            var serverText = document.getElementById('mcp-server-text');
+            if (serverDot) { serverDot.classList.remove('error'); serverDot.classList.add('success'); }
+            if (serverText) serverText.textContent = 'running on :3333';
+          } else {
+            throw new Error('not running');
+          }
+        })
+        .catch(function () {
+          startBtn.textContent = 'Start MCP Server';
+          startBtn.disabled = false;
+          alert('MCP server is not running. Start it from your terminal:\n\nnpx runcontext serve');
+        });
+    });
+
     card.appendChild(doneEl);
 
     content.appendChild(card);

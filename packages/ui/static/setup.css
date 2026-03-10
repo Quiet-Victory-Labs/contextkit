@@ -812,6 +812,29 @@ body {
   margin-top: var(--rc-space-4, 16px);
 }
 
+.completion-subtitle {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  margin-top: var(--rc-space-2, 8px);
+  margin-bottom: var(--rc-space-4, 16px);
+}
+
+.completion-next-steps {
+  margin-top: var(--rc-space-6, 24px);
+  text-align: center;
+}
+
+.completion-next-steps h3 {
+  font-size: 1rem;
+  margin-bottom: var(--rc-space-2, 8px);
+}
+
+.completion-next-steps p {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-bottom: var(--rc-space-1, 4px);
+}
+
 .completion-cli {
   font-family: var(--font-mono);
   background: var(--bg);
