@@ -7,8 +7,7 @@ const execFile = promisify(execFileCb);
 export class MongoDbProvider implements AuthProvider {
   id = 'mongodb' as const;
   displayName = 'MongoDB Atlas';
-  // MongoDB doesn't have a native adapter type; use sqlite cast as placeholder
-  adapters = ['sqlite' as any];
+  adapters = ['mongodb' as const];
 
   async detectCli(): Promise<{ installed: boolean; authenticated: boolean }> {
     try {
@@ -44,7 +43,7 @@ export class MongoDbProvider implements AuthProvider {
     }
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     return [];
   }
 

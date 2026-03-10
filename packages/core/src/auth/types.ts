@@ -48,8 +48,8 @@ export interface AuthProvider {
   /** Authenticate with the provider. Tries CLI credentials first, then OAuth. */
   authenticate(): Promise<AuthResult>;
 
-  /** List available databases after authentication. */
-  listDatabases(): Promise<DatabaseEntry[]>;
+  /** List available databases after authentication. Token from authenticate() may be passed. */
+  listDatabases(token?: string): Promise<DatabaseEntry[]>;
 
   /** Build a connection string for a selected database. */
   getConnectionString(db: DatabaseEntry): Promise<string>;

@@ -56,7 +56,7 @@ export class PlanetScaleProvider implements AuthProvider {
     return { ok: false, error: 'Failed to authenticate with PlanetScale' };
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     return [];
   }
 

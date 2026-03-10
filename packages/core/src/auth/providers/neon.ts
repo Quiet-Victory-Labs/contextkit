@@ -10,7 +10,7 @@ const execFile = promisify(execFileCb);
 
 const NEON_API = 'https://console.neon.tech/api/v2';
 const NEON_OAUTH_URL = 'https://console.neon.tech/oauth/authorize';
-const NEON_CREDS_PATH = path.join(os.homedir(), '.neon', 'credentials.json');
+const NEON_CREDS_PATH = path.join(os.homedir(), '.config', 'neonctl', 'credentials.json');
 
 export class NeonProvider implements AuthProvider {
   id = 'neon' as const;
@@ -24,11 +24,11 @@ export class NeonProvider implements AuthProvider {
       return { installed: false, authenticated: false };
     }
 
-    // Check for stored credentials
+    // Check for stored credentials (neonctl uses access_token)
     try {
       if (fs.existsSync(NEON_CREDS_PATH)) {
         const creds = JSON.parse(fs.readFileSync(NEON_CREDS_PATH, 'utf-8'));
-        return { installed: true, authenticated: !!creds.token };
+        return { installed: true, authenticated: !!(creds.access_token || creds.token) };
       }
     } catch { /* ignore */ }
 
@@ -36,22 +36,27 @@ export class NeonProvider implements AuthProvider {
   }
 
   async authenticate(): Promise<AuthResult> {
-    // Strategy 1: Read existing neonctl credentials
+    // Strategy 1: Read existing neonctl credentials — validate before trusting
     try {
       if (fs.existsSync(NEON_CREDS_PATH)) {
         const creds = JSON.parse(fs.readFileSync(NEON_CREDS_PATH, 'utf-8'));
-        if (creds.token) {
-          return { ok: true, provider: 'neon', token: creds.token };
+        const token = creds.access_token || creds.token;
+        if (token) {
+          const valid = await this.isTokenValid(token);
+          if (valid) {
+            return { ok: true, provider: 'neon', token };
+          }
         }
       }
     } catch { /* fall through */ }
 
-    // Strategy 2: Try neonctl auth command
+    // Strategy 2: Try neonctl auth command (opens browser for OAuth)
     try {
-      await execFile('neonctl', ['auth']);
+      await execFile('neonctl', ['auth'], { timeout: 120_000 });
       const creds = JSON.parse(fs.readFileSync(NEON_CREDS_PATH, 'utf-8'));
-      if (creds.token) {
-        return { ok: true, provider: 'neon', token: creds.token };
+      const token = creds.access_token || creds.token;
+      if (token) {
+        return { ok: true, provider: 'neon', token };
       }
     } catch { /* fall through */ }
 
@@ -64,18 +69,100 @@ export class NeonProvider implements AuthProvider {
     }
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
-    // Requires a valid token — caller should authenticate first
-    // This is a skeleton; the actual implementation calls Neon API
-    return [];
+  async listDatabases(authToken?: string): Promise<DatabaseEntry[]> {
+    // Use provided token or fall back to stored credentials
+    let token = authToken;
+    if (!token) {
+      try {
+        if (fs.existsSync(NEON_CREDS_PATH)) {
+          const creds = JSON.parse(fs.readFileSync(NEON_CREDS_PATH, 'utf-8'));
+          token = creds.access_token || creds.token;
+        }
+      } catch { /* ignore */ }
+    }
+    if (!token) return [];
+
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // List all projects
+      const projRes = await fetch(`${NEON_API}/projects`, { headers });
+      if (!projRes.ok) return [];
+      const projData = await projRes.json() as { projects: Array<{ id: string; name: string }> };
+
+      const entries: DatabaseEntry[] = [];
+      for (const proj of projData.projects) {
+        try {
+          // Get branches (databases are per-branch in Neon API)
+          const brRes = await fetch(`${NEON_API}/projects/${proj.id}/branches`, { headers });
+          if (!brRes.ok) continue;
+          const brData = await brRes.json() as {
+            branches: Array<{ id: string; name: string }>;
+          };
+
+          // Get endpoints for connection hosts
+          const epRes = await fetch(`${NEON_API}/projects/${proj.id}/endpoints`, { headers });
+          const epData = epRes.ok
+            ? (await epRes.json() as { endpoints: Array<{ host: string; branch_id: string }> })
+            : { endpoints: [] };
+
+          for (const branch of brData.branches) {
+            // List databases in each branch
+            const dbRes = await fetch(
+              `${NEON_API}/projects/${proj.id}/branches/${branch.id}/databases`,
+              { headers },
+            );
+            if (!dbRes.ok) continue;
+            const dbData = await dbRes.json() as {
+              databases: Array<{ id: number; name: string; owner_name: string; branch_id: string }>;
+            };
+
+            const endpoint = epData.endpoints.find((e) => e.branch_id === branch.id);
+            for (const db of dbData.databases) {
+              entries.push({
+                id: `${proj.id}:${db.name}`,
+                name: db.name,
+                host: endpoint?.host ?? '',
+                adapter: 'postgres',
+                metadata: {
+                  project: proj.name,
+                  projectId: proj.id,
+                  branch: branch.name,
+                  user: db.owner_name,
+                  token,
+                },
+              });
+            }
+          }
+        } catch { /* skip project on error */ }
+      }
+      return entries;
+    } catch {
+      return [];
+    }
   }
 
   async getConnectionString(db: DatabaseEntry): Promise<string> {
+    // Prefer neonctl to get the real connection string (includes actual DB password)
+    const projectId = (db.metadata?.projectId as string) ?? '';
+    if (projectId) {
+      try {
+        const { stdout } = await execFile('neonctl', [
+          'connection-string',
+          '--project-id', projectId,
+          '--database-name', db.name || 'neondb',
+        ]);
+        const connStr = stdout.trim();
+        if (connStr.startsWith('postgres')) return connStr;
+      } catch { /* fall through to manual build */ }
+    }
+
+    // Fallback: build manually (requires password in metadata)
     const user = (db.metadata?.user as string) ?? 'neondb_owner';
-    const token = (db.metadata?.token as string) ?? '';
+    const password = (db.metadata?.password as string) ?? (db.metadata?.token as string) ?? '';
     const host = db.host ?? '';
     const dbName = db.name ?? 'neondb';
-    return `postgresql://${user}:${encodeURIComponent(token)}@${host}/${dbName}?sslmode=require`;
+    return `postgresql://${user}:${encodeURIComponent(password)}@${host}/${dbName}?sslmode=require`;
   }
 
   async validateCredentials(creds: StoredCredential): Promise<boolean> {
@@ -94,6 +181,17 @@ export class NeonProvider implements AuthProvider {
   }
 
   // -- Private --
+
+  private async isTokenValid(token: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${NEON_API}/projects`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
 
   private openBrowser(url: string): void {
     const cmd = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';

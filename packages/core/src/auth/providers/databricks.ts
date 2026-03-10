@@ -61,7 +61,7 @@ export class DatabricksProvider implements AuthProvider {
     return { ok: false, error: 'Failed to authenticate with Databricks' };
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     return [];
   }
 

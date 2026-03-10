@@ -411,7 +411,7 @@
     // Show loading state on the platform grid
     platformGrid.querySelectorAll('.platform-btn').forEach(function (b) { b.disabled = true; });
     oauthResult.textContent = '';
-    oauthResult.appendChild(createElement('p', { className: 'muted', textContent: 'Connecting to ' + (provider.display_name || provider.id) + '\u2026' }));
+    oauthResult.appendChild(createElement('p', { className: 'muted', textContent: 'Connecting to ' + (provider.display_name || provider.id) + '\u2026 A browser window may open for authentication.' }));
 
     try {
       var data = await api('POST', '/api/auth/start', { provider: provider.id });
@@ -427,9 +427,12 @@
       oauthResult.appendChild(createElement('label', { className: 'label-uppercase', textContent: 'Select a database' }));
       var dbGrid = createElement('div', { className: 'source-cards' });
       databases.forEach(function (db) {
+        var meta = db.adapter || db.type || '';
+        if (db.metadata && db.metadata.project) meta = db.metadata.project + (meta ? ' \u2022 ' + meta : '');
+        if (db.host) meta += (meta ? ' \u2022 ' : '') + db.host;
         var dbCard = createElement('div', { className: 'source-card' }, [
           createElement('span', { className: 'source-card-name', textContent: db.name || db.database }),
-          createElement('span', { className: 'source-card-meta', textContent: db.adapter || db.type || '' }),
+          createElement('span', { className: 'source-card-meta', textContent: meta }),
           createElement('button', { className: 'btn btn-primary', textContent: 'Use This' }),
         ]);
         dbCard.querySelector('.btn').addEventListener('click', async function () {

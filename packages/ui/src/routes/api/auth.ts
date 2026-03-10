@@ -42,8 +42,8 @@ export function authRoutes(rootDir: string): Hono {
       return c.json({ error: result.error }, 401);
     }
 
-    // List databases after successful auth
-    const databases = await provider.listDatabases();
+    // List databases after successful auth — pass the fresh token
+    const databases = await provider.listDatabases(result.token);
 
     return c.json({
       ok: true,

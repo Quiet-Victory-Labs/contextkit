@@ -44,7 +44,7 @@ export class AwsRdsProvider implements AuthProvider {
     }
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     try {
       const { stdout } = await execFile('aws', [
         'rds', 'describe-db-instances',

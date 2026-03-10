@@ -18,7 +18,7 @@ export class ClickHouseProvider implements AuthProvider {
     return { ok: false, error: 'ClickHouse requires user-provided credentials (host, user, password)' };
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     return [];
   }
 

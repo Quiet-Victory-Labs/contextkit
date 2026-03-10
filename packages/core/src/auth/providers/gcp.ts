@@ -65,7 +65,7 @@ export class GcpProvider implements AuthProvider {
     }
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     return [];
   }
 

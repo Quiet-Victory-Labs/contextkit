@@ -56,7 +56,7 @@ export class SupabaseProvider implements AuthProvider {
     return { ok: false, error: 'Failed to authenticate with Supabase' };
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     return [];
   }
 

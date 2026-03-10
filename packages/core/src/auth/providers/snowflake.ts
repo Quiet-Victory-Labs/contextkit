@@ -48,7 +48,7 @@ export class SnowflakeProvider implements AuthProvider {
     return { ok: false, error: 'Snowflake requires snowsql configuration. Run: snowsql -a <account>' };
   }
 
-  async listDatabases(): Promise<DatabaseEntry[]> {
+  async listDatabases(_token?: string): Promise<DatabaseEntry[]> {
     return [];
   }
 
