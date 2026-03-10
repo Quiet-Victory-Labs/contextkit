@@ -1,0 +1,52 @@
+/* ============================================================
+   RunContext UXD — Utility Classes
+   All values reference CSS custom properties from tokens.css.
+   ============================================================ */
+
+/* ── Text Colors ──────────────────────────────────────────── */
+
+.rc-text-primary   { color: var(--rc-color-text-primary); }
+.rc-text-secondary { color: var(--rc-color-text-secondary); }
+.rc-text-muted     { color: var(--rc-color-text-muted); }
+.rc-text-brand     { color: var(--rc-color-brand-gold); }
+
+/* ── Text Sizes ───────────────────────────────────────────── */
+
+.rc-text-xs   { font-size: var(--rc-text-xs); }
+.rc-text-sm   { font-size: var(--rc-text-sm); }
+.rc-text-base { font-size: var(--rc-text-base); }
+.rc-text-lg   { font-size: var(--rc-text-lg); }
+.rc-text-xl   { font-size: var(--rc-text-xl); }
+.rc-text-2xl  { font-size: var(--rc-text-2xl); }
+.rc-text-3xl  { font-size: var(--rc-text-3xl); }
+
+/* ── Font Families ────────────────────────────────────────── */
+
+.rc-font-sans { font-family: var(--rc-font-sans); }
+.rc-font-mono { font-family: var(--rc-font-mono); }
+
+/* ── Tier Colors ──────────────────────────────────────────── */
+
+.rc-tier-gold   { color: var(--rc-color-tier-gold); }
+.rc-tier-silver { color: var(--rc-color-tier-silver); }
+.rc-tier-bronze { color: var(--rc-color-tier-bronze); }
+
+/* ── Status Colors ────────────────────────────────────────── */
+
+.rc-status-success { color: var(--rc-color-status-success); }
+.rc-status-error   { color: var(--rc-color-status-error); }
+.rc-status-warning { color: var(--rc-color-status-warning); }
+.rc-status-info    { color: var(--rc-color-status-info); }
+
+/* ── Backgrounds ──────────────────────────────────────────── */
+
+.rc-bg-surface { background-color: var(--rc-color-surface-bg); }
+.rc-bg-card    { background-color: var(--rc-color-surface-card); }
+
+/* ── Truncate ─────────────────────────────────────────────── */
+
+.rc-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

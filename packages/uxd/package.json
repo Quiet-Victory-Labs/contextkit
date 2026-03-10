@@ -1,0 +1,55 @@
+{
+  "name": "@runcontext/uxd",
+  "version": "0.5.2",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/tokens/index.js",
+      "types": "./dist/tokens/index.d.ts"
+    },
+    "./css": "./dist/css/index.css",
+    "./css/tokens": "./dist/css/tokens.css",
+    "./tailwind": {
+      "import": "./dist/tailwind/index.js",
+      "types": "./dist/tailwind/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react/index.js",
+      "types": "./dist/react/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "pnpm build:tokens && pnpm build:css && pnpm build:ts",
+    "build:tokens": "tsx scripts/generate-css.ts",
+    "build:css": "cat src/css/tokens.css src/css/components.css src/css/utilities.css > dist/css/index.css && cp src/css/tokens.css dist/css/tokens.css",
+    "build:ts": "tsup",
+    "clean": "rm -rf dist",
+    "dev": "tsup --watch",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  }
+}

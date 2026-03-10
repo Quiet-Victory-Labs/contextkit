@@ -1,0 +1,7 @@
+src/
+scripts/
+dev.html
+vitest.config.ts
+tsup.config.ts
+tsconfig.json
+.git/

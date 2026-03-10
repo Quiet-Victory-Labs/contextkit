@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@runcontext/core": "workspace:^",
-    "@runcontext/uxd": "file:../../../runcontext-uxd",
+    "@runcontext/uxd": "workspace:^",
     "@runcontext/ui": "workspace:^",
     "@runcontext/mcp": "workspace:^",
     "chalk": "^5.4.0",

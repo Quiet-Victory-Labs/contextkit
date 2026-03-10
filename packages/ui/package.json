@@ -52,7 +52,7 @@
   "dependencies": {
     "@hono/node-server": "^1.19.11",
     "@runcontext/core": "workspace:^",
-    "@runcontext/uxd": "file:../../../runcontext-uxd",
+    "@runcontext/uxd": "workspace:^",
     "hono": "^4.12.5",
     "yaml": "^2.7.0"
   },

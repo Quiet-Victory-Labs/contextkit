@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RunContext UXD — Component Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dist/css/index.css" />
+  <style>
+    .dev-container { max-width: 56rem; margin: 0 auto; padding: 2rem; }
+    .dev-section { margin-bottom: 3rem; }
+    .dev-section h2 {
+      font-size: var(--rc-text-xl);
+      font-weight: var(--rc-font-weight-bold);
+      color: var(--rc-color-brand-gold);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--rc-color-border-default);
+    }
+    .dev-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .dev-label {
+      font-size: var(--rc-text-xs);
+      color: var(--rc-color-text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .dev-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 1rem; }
+    .dev-swatch {
+      height: 3rem;
+      border-radius: var(--rc-radius-md);
+      border: 1px solid var(--rc-color-border-default);
+      display: flex;
+      align-items: flex-end;
+      padding: 0.25rem 0.5rem;
+      font-size: var(--rc-text-xs);
+      color: var(--rc-color-text-secondary);
+    }
+    .dev-form-group { max-width: 24rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body class="rc-reset">
+  <div class="dev-container">
+    <h1 style="font-size: var(--rc-text-3xl); font-weight: 700; margin-bottom: 0.5rem;">
+      RunContext <span style="color: var(--rc-color-brand-gold);">UXD</span>
+    </h1>
+    <p style="color: var(--rc-color-text-secondary); margin-bottom: 2rem;">Component preview for visual verification</p>
+
+    <!-- ── Buttons ──────────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Buttons</h2>
+
+      <div class="dev-label">Variants (medium)</div>
+      <div class="dev-row">
+        <button class="rc-btn rc-btn--primary rc-btn--md">Primary</button>
+        <button class="rc-btn rc-btn--secondary rc-btn--md">Secondary</button>
+        <button class="rc-btn rc-btn--ghost rc-btn--md">Ghost</button>
+        <button class="rc-btn rc-btn--danger rc-btn--md">Danger</button>
+        <button class="rc-btn rc-btn--primary rc-btn--md" disabled>Disabled</button>
+      </div>
+
+      <div class="dev-label">Sizes (primary)</div>
+      <div class="dev-row">
+        <button class="rc-btn rc-btn--primary rc-btn--sm">Small</button>
+        <button class="rc-btn rc-btn--primary rc-btn--md">Medium</button>
+        <button class="rc-btn rc-btn--primary rc-btn--lg">Large</button>
+      </div>
+
+      <div class="dev-label">Sizes (secondary)</div>
+      <div class="dev-row">
+        <button class="rc-btn rc-btn--secondary rc-btn--sm">Small</button>
+        <button class="rc-btn rc-btn--secondary rc-btn--md">Medium</button>
+        <button class="rc-btn rc-btn--secondary rc-btn--lg">Large</button>
+      </div>
+    </div>
+
+    <!-- ── Badges ───────────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Badges</h2>
+
+      <div class="dev-label">Tier</div>
+      <div class="dev-row">
+        <span class="rc-badge rc-badge--gold">Gold</span>
+        <span class="rc-badge rc-badge--silver">Silver</span>
+        <span class="rc-badge rc-badge--bronze">Bronze</span>
+      </div>
+
+      <div class="dev-label">Status</div>
+      <div class="dev-row">
+        <span class="rc-badge rc-badge--success">Success</span>
+        <span class="rc-badge rc-badge--error">Error</span>
+        <span class="rc-badge rc-badge--warning">Warning</span>
+        <span class="rc-badge rc-badge--info">Info</span>
+      </div>
+    </div>
+
+    <!-- ── Cards ────────────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Cards</h2>
+      <div class="dev-grid">
+        <div class="rc-card">
+          <div class="dev-label">Default Card</div>
+          <p style="font-size: var(--rc-text-sm); color: var(--rc-color-text-secondary);">
+            Static content card with no interaction.
+          </p>
+        </div>
+        <div class="rc-card rc-card--interactive">
+          <div class="dev-label">Interactive Card</div>
+          <p style="font-size: var(--rc-text-sm); color: var(--rc-color-text-secondary);">
+            Hover to see the interactive state.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Stat Cards ───────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Stat Cards</h2>
+      <div class="dev-grid">
+        <div class="rc-stat-card">
+          <div class="rc-stat-card__header">
+            <span class="rc-stat-card__label">Total Users</span>
+            <span class="rc-stat-card__icon">&#x1f465;</span>
+          </div>
+          <div class="rc-stat-card__value">2,847</div>
+        </div>
+        <div class="rc-stat-card">
+          <div class="rc-stat-card__header">
+            <span class="rc-stat-card__label">Revenue</span>
+            <span class="rc-stat-card__icon">&#x1f4b0;</span>
+          </div>
+          <div class="rc-stat-card__value">$48.2k</div>
+        </div>
+        <div class="rc-stat-card">
+          <div class="rc-stat-card__header">
+            <span class="rc-stat-card__label">Active Now</span>
+            <span class="rc-stat-card__icon">&#x26a1;</span>
+          </div>
+          <div class="rc-stat-card__value">142</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Form Controls ────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Form Controls</h2>
+
+      <div class="dev-form-group">
+        <div class="dev-label">Input</div>
+        <input class="rc-input" type="text" placeholder="Enter your name" />
+      </div>
+
+      <div class="dev-form-group">
+        <div class="dev-label">Input (error)</div>
+        <input class="rc-input rc-input--error" type="text" value="bad@" />
+      </div>
+
+      <div class="dev-form-group">
+        <div class="dev-label">Select</div>
+        <select class="rc-select">
+          <option>Choose an option</option>
+          <option>Gold Tier</option>
+          <option>Silver Tier</option>
+          <option>Bronze Tier</option>
+        </select>
+      </div>
+
+      <div class="dev-form-group">
+        <div class="dev-label">Select (error)</div>
+        <select class="rc-select rc-select--error">
+          <option>Invalid selection</option>
+        </select>
+      </div>
+
+      <div class="dev-form-group">
+        <div class="dev-label">Textarea</div>
+        <textarea class="rc-textarea" placeholder="Write a message..."></textarea>
+      </div>
+
+      <div class="dev-form-group">
+        <div class="dev-label">Textarea (error)</div>
+        <textarea class="rc-textarea rc-textarea--error">This field has an error.</textarea>
+      </div>
+    </div>
+
+    <!-- ── Progress Bar ─────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Progress Bar</h2>
+      <div class="rc-progress">
+        <div class="rc-progress__step rc-progress__step--completed">
+          <div class="rc-progress__dot"></div>
+          <span class="rc-progress__label">Account</span>
+        </div>
+        <div class="rc-progress__step rc-progress__step--completed">
+          <div class="rc-progress__dot"></div>
+          <span class="rc-progress__label">Profile</span>
+        </div>
+        <div class="rc-progress__step rc-progress__step--active">
+          <div class="rc-progress__dot"></div>
+          <span class="rc-progress__label">Settings</span>
+        </div>
+        <div class="rc-progress__step">
+          <div class="rc-progress__dot"></div>
+          <span class="rc-progress__label">Review</span>
+        </div>
+        <div class="rc-progress__step">
+          <div class="rc-progress__dot"></div>
+          <span class="rc-progress__label">Complete</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Activity Feed ────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Activity Feed</h2>
+      <div class="rc-card">
+        <div class="rc-activity-feed">
+          <div class="rc-activity-feed__item">
+            <div class="rc-activity-feed__dot"></div>
+            <span class="rc-activity-feed__message">User upgraded to Gold tier</span>
+            <span class="rc-activity-feed__meta">2 min ago</span>
+          </div>
+          <div class="rc-activity-feed__item">
+            <div class="rc-activity-feed__dot"></div>
+            <span class="rc-activity-feed__message">New context created: "Q1 Planning"</span>
+            <span class="rc-activity-feed__meta">15 min ago</span>
+          </div>
+          <div class="rc-activity-feed__item">
+            <div class="rc-activity-feed__dot"></div>
+            <span class="rc-activity-feed__message">Payment processed successfully</span>
+            <span class="rc-activity-feed__meta">1 hr ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Code Block ───────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Code Block</h2>
+      <pre class="rc-code">import { tokens } from '@runcontext/uxd';
+
+const theme = {
+  brand: tokens.color.brand.gold,
+  surface: tokens.color.surface.bg,
+};</pre>
+    </div>
+
+    <!-- ── Empty State ──────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Empty State</h2>
+      <div class="rc-card">
+        <div class="rc-empty">
+          <div class="rc-empty__icon">&#x1f4ed;</div>
+          <div class="rc-empty__message">No contexts found. Create your first context to get started.</div>
+          <button class="rc-btn rc-btn--primary rc-btn--sm">Create Context</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Error Card ───────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Error Card</h2>
+      <div class="rc-error-card">
+        <div class="rc-error-card__message">
+          Failed to load dashboard data. Please check your connection and try again.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Spinner ──────────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Spinner</h2>
+      <div class="dev-row" style="align-items: center; gap: 1.5rem;">
+        <div class="rc-spinner"></div>
+        <span style="font-size: var(--rc-text-sm); color: var(--rc-color-text-secondary);">Loading...</span>
+      </div>
+    </div>
+
+    <!-- ── Color Palette ────────────────────────────────────── -->
+    <div class="dev-section">
+      <h2>Color Palette</h2>
+
+      <div class="dev-label">Brand</div>
+      <div class="dev-grid" style="margin-bottom: 1rem;">
+        <div class="dev-swatch" style="background-color: var(--rc-color-brand-gold);">brand-gold</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-brand-gold-light); color: #333;">brand-gold-light</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-brand-gold-dim);">brand-gold-dim</div>
+      </div>
+
+      <div class="dev-label">Surfaces</div>
+      <div class="dev-grid" style="margin-bottom: 1rem;">
+        <div class="dev-swatch" style="background-color: var(--rc-color-surface-bg);">surface-bg</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-surface-card);">surface-card</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-surface-card-hover);">surface-card-hover</div>
+      </div>
+
+      <div class="dev-label">Borders</div>
+      <div class="dev-grid" style="margin-bottom: 1rem;">
+        <div class="dev-swatch" style="background-color: var(--rc-color-border-default);">border-default</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-border-hover);">border-hover</div>
+      </div>
+
+      <div class="dev-label">Text</div>
+      <div class="dev-grid" style="margin-bottom: 1rem;">
+        <div class="dev-swatch" style="background-color: var(--rc-color-text-primary);">text-primary</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-text-secondary);">text-secondary</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-text-muted);">text-muted</div>
+      </div>
+
+      <div class="dev-label">Tiers</div>
+      <div class="dev-grid" style="margin-bottom: 1rem;">
+        <div class="dev-swatch" style="background-color: var(--rc-color-tier-gold);">tier-gold</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-tier-silver);">tier-silver</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-tier-bronze);">tier-bronze</div>
+      </div>
+
+      <div class="dev-label">Status</div>
+      <div class="dev-grid">
+        <div class="dev-swatch" style="background-color: var(--rc-color-status-success);">status-success</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-status-error);">status-error</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-status-warning); color: #333;">status-warning</div>
+        <div class="dev-swatch" style="background-color: var(--rc-color-status-info);">status-info</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
