@@ -6,6 +6,7 @@ import { join, dirname } from 'node:path';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
+import { setupBus } from '../../events.js';
 
 const execFile = promisify(execFileCb);
 
@@ -89,7 +90,7 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
 
   app.post('/api/pipeline/start', async (c) => {
     const body = await c.req.json();
-    const { productName, targetTier, dataSource } = body;
+    const { productName, targetTier, dataSource, sessionId } = body;
 
     if (!productName || !targetTier) {
       return c.json({ error: 'productName and targetTier required' }, 400);
@@ -129,7 +130,7 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
     runs.set(id, run);
 
     // Start the pipeline asynchronously (non-blocking)
-    executePipeline(run, rootDir, contextDir, dataSource).catch((err) => {
+    executePipeline(run, rootDir, contextDir, dataSource, sessionId).catch((err) => {
       run.status = 'error';
       const currentStage = run.stages.find((s) => s.status === 'running');
       if (currentStage) {
@@ -230,12 +231,20 @@ async function executePipeline(
   rootDir: string,
   contextDir: string,
   dataSource?: string,
+  sessionId?: string,
 ): Promise<void> {
   for (const stage of run.stages) {
     if (stage.status === 'skipped') continue;
 
     stage.status = 'running';
     stage.startedAt = new Date().toISOString();
+    if (sessionId) {
+      setupBus.emitEvent({
+        type: 'pipeline:stage',
+        sessionId,
+        payload: { stage: stage.stage, status: 'running' },
+      });
+    }
 
     try {
       const cliArgs = buildCliArgs(stage.stage, dataSource);
@@ -251,6 +260,13 @@ async function executePipeline(
       stage.status = 'done';
       stage.summary = extractSummary(stdout);
       stage.completedAt = new Date().toISOString();
+      if (sessionId) {
+        setupBus.emitEvent({
+          type: 'pipeline:stage',
+          sessionId,
+          payload: { stage: stage.stage, status: 'done', summary: stage.summary },
+        });
+      }
     } catch (err: unknown) {
       // If the command produced stdout despite failing, treat warnings-only
       // exits as success (e.g. verify with SSL deprecation warnings)
@@ -259,11 +275,25 @@ async function executePipeline(
         stage.status = 'done';
         stage.summary = extractSummary(execErr.stdout);
         stage.completedAt = new Date().toISOString();
+        if (sessionId) {
+          setupBus.emitEvent({
+            type: 'pipeline:stage',
+            sessionId,
+            payload: { stage: stage.stage, status: 'done', summary: stage.summary },
+          });
+        }
         continue;
       }
       stage.status = 'error';
       stage.error = err instanceof Error ? err.message : String(err);
       stage.completedAt = new Date().toISOString();
+      if (sessionId) {
+        setupBus.emitEvent({
+          type: 'pipeline:stage',
+          sessionId,
+          payload: { stage: stage.stage, status: 'error', error: stage.error },
+        });
+      }
       run.status = 'error';
       return;
     }
