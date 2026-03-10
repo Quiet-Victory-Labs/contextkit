@@ -86,7 +86,7 @@ export class NeonProvider implements AuthProvider {
       const headers = { Authorization: `Bearer ${token}` };
 
       // Collect projects from personal account + all organizations
-      interface NeonProject { id: string; name: string; region_id?: string; org_id?: string; created_at?: string }
+      interface NeonProject { id: string; name: string; region_id?: string; org_id?: string; org_name?: string; created_at?: string }
       const allProjects: NeonProject[] = [];
 
       // Personal projects
@@ -109,6 +109,7 @@ export class NeonProvider implements AuthProvider {
               for (const p of orgProjData.projects) {
                 if (!allProjects.some((e) => e.id === p.id)) {
                   p.org_id = org.id;
+                  p.org_name = org.name;
                   allProjects.push(p);
                 }
               }
@@ -162,6 +163,7 @@ export class NeonProvider implements AuthProvider {
                   branchId: branch.id,
                   user: db.owner_name,
                   region,
+                  org: proj.org_name || 'Personal',
                   token,
                 },
               });

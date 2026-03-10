@@ -449,9 +449,12 @@
   function fetchAuthProviders(container, oauthResult) {
     api('GET', '/api/auth/providers').then(function (data) {
       var providers = data.providers || data || [];
-      container.textContent = '';
+      // Replace the platform-grid with a plain wrapper for mixed content
+      var wrapper = createElement('div', { className: 'connect-providers' });
+      container.replaceWith(wrapper);
+
       if (providers.length === 0) {
-        container.appendChild(createElement('p', { className: 'muted', textContent: 'No OAuth providers available.' }));
+        wrapper.appendChild(createElement('p', { className: 'muted', textContent: 'No OAuth providers available.' }));
         return;
       }
 
@@ -479,24 +482,29 @@
             createElement('button', { className: 'btn btn-primary', textContent: 'Connect via OAuth' }),
           ]);
           card.querySelector('.btn').addEventListener('click', function () {
-            startOAuthFlow(prov, container, oauthResult);
+            startOAuthFlow(prov, wrapper, oauthResult);
           });
           detectedGrid.appendChild(card);
         });
-        container.appendChild(detectedGrid);
-        container.appendChild(createElement('div', { className: 'section-divider' }, ['Other providers']));
+        wrapper.appendChild(detectedGrid);
+
+        if (otherProvs.length > 0) {
+          wrapper.appendChild(createElement('div', { className: 'section-divider' }, ['Other providers']));
+        }
       }
 
       // Other providers as button grid
-      var grid = createElement('div', { className: 'platform-grid' });
-      otherProvs.forEach(function (prov) {
-        var btn = createElement('button', { className: 'platform-btn', textContent: prov.displayName || prov.display_name || prov.name || prov.id });
-        btn.addEventListener('click', function () {
-          startOAuthFlow(prov, container, oauthResult);
+      if (otherProvs.length > 0) {
+        var grid = createElement('div', { className: 'platform-grid' });
+        otherProvs.forEach(function (prov) {
+          var btn = createElement('button', { className: 'platform-btn', textContent: prov.displayName || prov.display_name || prov.name || prov.id });
+          btn.addEventListener('click', function () {
+            startOAuthFlow(prov, wrapper, oauthResult);
+          });
+          grid.appendChild(btn);
         });
-        grid.appendChild(btn);
-      });
-      container.appendChild(grid);
+        wrapper.appendChild(grid);
+      }
     }).catch(function () {
       container.textContent = '';
       container.appendChild(createElement('p', { className: 'muted', textContent: 'Could not load providers.' }));
@@ -526,10 +534,13 @@
         var m = db.metadata || {};
         // Title: "project / branch" if available, else just db name
         var title = m.project ? m.project + ' / ' + (m.branch || 'main') : (db.name || db.database);
-        // Subtitle line 1: db name + adapter
-        var line1 = (db.name || db.database);
-        if (db.adapter) line1 += ' \u2022 ' + db.adapter;
-        if (m.region) line1 += ' \u2022 ' + m.region;
+        // Subtitle line 1: db name + adapter + region + org
+        var parts = [db.name || db.database];
+        if (db.adapter) parts.push(db.adapter);
+        if (m.region) parts.push(m.region);
+        if (m.org && m.org !== 'Personal') parts.push(m.org);
+        else if (m.org === 'Personal') parts.push('personal');
+        var line1 = parts.join(' \u2022 ');
         // Subtitle line 2: host (truncated)
         var line2 = db.host || '';
 
