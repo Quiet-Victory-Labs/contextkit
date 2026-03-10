@@ -1,22 +1,23 @@
 /* ContextKit Setup Wizard — Dark Theme */
 
 :root {
-  --bg: #0a0a0f;
-  --surface: #111118;
-  --surface-hover: #16161f;
-  --border: #222233;
-  --border-focus: #4f9eff;
-  --text: #e4e4e7;
-  --text-muted: #71717a;
-  --accent: #4f9eff;
-  --accent-hover: #3b8beb;
-  --success: #22c55e;
-  --error: #ef4444;
-  --warning: #eab308;
-  --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --radius: 8px;
-  --radius-sm: 4px;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  /* Map wizard variables to uxd tokens */
+  --bg: var(--rc-color-surface-bg);
+  --surface: var(--rc-color-surface-card);
+  --surface-hover: var(--rc-color-surface-card-hover);
+  --border: var(--rc-color-border-default);
+  --border-focus: var(--rc-color-brand-gold);
+  --text: var(--rc-color-text-primary);
+  --text-muted: var(--rc-color-text-muted);
+  --accent: var(--rc-color-brand-gold);
+  --accent-hover: var(--rc-color-brand-gold-light);
+  --success: var(--rc-color-status-success);
+  --error: var(--rc-color-status-error);
+  --warning: var(--rc-color-status-warning);
+  --font: var(--rc-font-sans);
+  --radius: var(--rc-radius-md);
+  --radius-sm: var(--rc-radius-sm);
+  --shadow: var(--rc-shadow-md);
 }
 
 *, *::before, *::after {

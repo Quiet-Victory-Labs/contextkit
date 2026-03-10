@@ -69,6 +69,7 @@ function setupPageHTML(): string {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RunContext — Build Your Data Product</title>
+  <link rel="stylesheet" href="/static/uxd.css" />
   <link rel="stylesheet" href="/static/setup.css" />
 </head>
 <body>

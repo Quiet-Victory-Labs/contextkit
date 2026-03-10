@@ -196,6 +196,9 @@ importers:
       '@runcontext/core':
         specifier: workspace:^
         version: link:../core
+      '@runcontext/uxd':
+        specifier: file:../../../runcontext-uxd
+        version: file:../runcontext-uxd
       hono:
         specifier: ^4.12.5
         version: 4.12.5

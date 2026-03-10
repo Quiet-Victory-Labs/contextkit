@@ -1,0 +1,672 @@
+/* Auto-generated from @runcontext/uxd tokens. Do not edit. */
+
+:root {
+  --rc-color-brand-gold: #c9a55a;
+  --rc-color-brand-gold-light: #f5e6c0;
+  --rc-color-brand-gold-dim: #1a1508;
+  --rc-color-surface-bg: #0a0908;
+  --rc-color-surface-card: #121110;
+  --rc-color-surface-card-hover: #1e1c18;
+  --rc-color-border-default: #36342e;
+  --rc-color-border-hover: #6a675e;
+  --rc-color-text-primary: #e8e6e1;
+  --rc-color-text-secondary: #9a978e;
+  --rc-color-text-muted: #6a675e;
+  --rc-color-tier-gold: #c9a55a;
+  --rc-color-tier-silver: #a0a8b8;
+  --rc-color-tier-bronze: #b87a4a;
+  --rc-color-status-success: #22c55e;
+  --rc-color-status-error: #ef4444;
+  --rc-color-status-warning: #eab308;
+  --rc-color-status-info: #4f9eff;
+
+  --rc-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --rc-font-mono: 'Geist Mono', 'SF Mono', Consolas, 'Liberation Mono', monospace;
+
+  --rc-text-xs: 0.75rem;
+  --rc-text-sm: 0.875rem;
+  --rc-text-base: 1rem;
+  --rc-text-lg: 1.125rem;
+  --rc-text-xl: 1.25rem;
+  --rc-text-2xl: 1.5rem;
+  --rc-text-3xl: 2rem;
+
+  --rc-font-weight-normal: 400;
+  --rc-font-weight-medium: 500;
+  --rc-font-weight-semibold: 600;
+  --rc-font-weight-bold: 700;
+
+  --rc-leading-tight: 1.25;
+  --rc-leading-normal: 1.5;
+  --rc-leading-relaxed: 1.75;
+
+  --rc-space-0: 0rem;
+  --rc-space-1: 0.25rem;
+  --rc-space-2: 0.5rem;
+  --rc-space-3: 0.75rem;
+  --rc-space-4: 1rem;
+  --rc-space-5: 1.25rem;
+  --rc-space-6: 1.5rem;
+  --rc-space-8: 2rem;
+  --rc-space-10: 2.5rem;
+  --rc-space-12: 3rem;
+  --rc-space-16: 4rem;
+  --rc-space-0_5: 0.125rem;
+  --rc-space-1_5: 0.375rem;
+
+  --rc-radius-none: 0;
+  --rc-radius-sm: 4px;
+  --rc-radius-md: 8px;
+  --rc-radius-lg: 12px;
+  --rc-radius-full: 9999px;
+
+  --rc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --rc-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --rc-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+/* ============================================================
+   RunContext UXD — Component Classes
+   All values reference CSS custom properties from tokens.css.
+   ============================================================ */
+
+/* ── Reset ────────────────────────────────────────────────── */
+
+.rc-reset {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--rc-font-sans);
+  background-color: var(--rc-color-surface-bg);
+  color: var(--rc-color-text-primary);
+  line-height: var(--rc-leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Button ───────────────────────────────────────────────── */
+
+.rc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rc-space-2);
+  font-family: var(--rc-font-sans);
+  font-weight: var(--rc-font-weight-semibold);
+  border-radius: var(--rc-radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+  line-height: 1;
+}
+
+/* Sizes */
+.rc-btn--sm {
+  font-size: var(--rc-text-sm);
+  padding: var(--rc-space-1_5) var(--rc-space-3);
+  height: 2rem;
+}
+
+.rc-btn--md {
+  font-size: var(--rc-text-sm);
+  padding: var(--rc-space-2) var(--rc-space-4);
+  height: 2.5rem;
+}
+
+.rc-btn--lg {
+  font-size: var(--rc-text-base);
+  padding: var(--rc-space-3) var(--rc-space-5);
+  height: 3rem;
+}
+
+/* Variants */
+.rc-btn--primary {
+  background-color: var(--rc-color-brand-gold);
+  color: var(--rc-color-brand-gold-dim);
+  border-color: var(--rc-color-brand-gold);
+}
+
+.rc-btn--primary:hover {
+  background-color: var(--rc-color-brand-gold-light);
+  border-color: var(--rc-color-brand-gold-light);
+}
+
+.rc-btn--secondary {
+  background-color: transparent;
+  color: var(--rc-color-text-primary);
+  border-color: var(--rc-color-border-default);
+}
+
+.rc-btn--secondary:hover {
+  border-color: var(--rc-color-brand-gold);
+  color: var(--rc-color-brand-gold);
+}
+
+.rc-btn--ghost {
+  background-color: transparent;
+  color: var(--rc-color-text-secondary);
+  border-color: transparent;
+}
+
+.rc-btn--ghost:hover {
+  background-color: var(--rc-color-surface-card);
+  color: var(--rc-color-text-primary);
+}
+
+.rc-btn--danger {
+  background-color: var(--rc-color-status-error);
+  color: #fff;
+  border-color: var(--rc-color-status-error);
+}
+
+.rc-btn--danger:hover {
+  opacity: 0.9;
+}
+
+/* States */
+.rc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.rc-btn:focus-visible {
+  outline: 2px solid var(--rc-color-brand-gold);
+  outline-offset: 2px;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+
+.rc-card {
+  background-color: var(--rc-color-surface-card);
+  border: 1px solid var(--rc-color-border-default);
+  border-radius: var(--rc-radius-lg);
+  padding: var(--rc-space-5);
+}
+
+.rc-card--interactive {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.rc-card--interactive:hover {
+  background-color: var(--rc-color-surface-card-hover);
+  border-color: var(--rc-color-border-hover);
+}
+
+/* ── Stat Card ────────────────────────────────────────────── */
+
+.rc-stat-card {
+  background-color: var(--rc-color-surface-card);
+  border: 1px solid var(--rc-color-border-default);
+  border-radius: var(--rc-radius-lg);
+  padding: var(--rc-space-5);
+}
+
+.rc-stat-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--rc-space-2);
+}
+
+.rc-stat-card__label {
+  font-size: var(--rc-text-sm);
+  color: var(--rc-color-text-secondary);
+  font-weight: var(--rc-font-weight-medium);
+}
+
+.rc-stat-card__value {
+  font-size: var(--rc-text-2xl);
+  font-weight: var(--rc-font-weight-bold);
+  color: var(--rc-color-text-primary);
+  line-height: var(--rc-leading-tight);
+}
+
+.rc-stat-card__icon {
+  color: var(--rc-color-text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Badge ────────────────────────────────────────────────── */
+
+.rc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rc-space-1);
+  font-size: var(--rc-text-xs);
+  font-weight: var(--rc-font-weight-medium);
+  padding: var(--rc-space-0_5) var(--rc-space-2);
+  border-radius: var(--rc-radius-full);
+  border: 1px solid transparent;
+  line-height: var(--rc-leading-normal);
+  white-space: nowrap;
+}
+
+/* Tier variants */
+.rc-badge--gold {
+  background-color: rgba(201, 165, 90, 0.15);
+  color: var(--rc-color-tier-gold);
+  border-color: rgba(201, 165, 90, 0.3);
+}
+
+.rc-badge--silver {
+  background-color: rgba(160, 168, 184, 0.15);
+  color: var(--rc-color-tier-silver);
+  border-color: rgba(160, 168, 184, 0.3);
+}
+
+.rc-badge--bronze {
+  background-color: rgba(184, 122, 74, 0.15);
+  color: var(--rc-color-tier-bronze);
+  border-color: rgba(184, 122, 74, 0.3);
+}
+
+/* Status variants */
+.rc-badge--success {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: var(--rc-color-status-success);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.rc-badge--error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--rc-color-status-error);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.rc-badge--warning {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: var(--rc-color-status-warning);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.rc-badge--info {
+  background-color: rgba(79, 158, 255, 0.15);
+  color: var(--rc-color-status-info);
+  border-color: rgba(79, 158, 255, 0.3);
+}
+
+/* ── Form Controls ────────────────────────────────────────── */
+
+.rc-input,
+.rc-select,
+.rc-textarea {
+  display: block;
+  width: 100%;
+  font-family: var(--rc-font-sans);
+  font-size: var(--rc-text-sm);
+  color: var(--rc-color-text-primary);
+  background-color: var(--rc-color-surface-bg);
+  border: 1px solid var(--rc-color-border-default);
+  border-radius: var(--rc-radius-md);
+  padding: var(--rc-space-2) var(--rc-space-3);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+
+.rc-input::placeholder,
+.rc-textarea::placeholder {
+  color: var(--rc-color-text-muted);
+}
+
+.rc-input:focus,
+.rc-select:focus,
+.rc-textarea:focus {
+  border-color: var(--rc-color-brand-gold);
+  box-shadow: 0 0 0 2px rgba(201, 165, 90, 0.25);
+}
+
+.rc-input--error,
+.rc-select--error,
+.rc-textarea--error {
+  border-color: var(--rc-color-status-error);
+}
+
+.rc-input--error:focus,
+.rc-select--error:focus,
+.rc-textarea--error:focus {
+  border-color: var(--rc-color-status-error);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+
+.rc-textarea {
+  resize: vertical;
+  min-height: 5rem;
+}
+
+.rc-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%239a978e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--rc-space-3) center;
+  padding-right: var(--rc-space-8);
+}
+
+/* ── Sidebar ──────────────────────────────────────────────── */
+
+.rc-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 16rem;
+  background-color: var(--rc-color-surface-card);
+  border-right: 1px solid var(--rc-color-border-default);
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+}
+
+.rc-sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-space-2);
+  padding: var(--rc-space-5);
+  border-bottom: 1px solid var(--rc-color-border-default);
+}
+
+.rc-sidebar__logo-text {
+  font-size: var(--rc-text-lg);
+  font-weight: var(--rc-font-weight-bold);
+  color: var(--rc-color-text-primary);
+}
+
+.rc-sidebar__logo-accent {
+  color: var(--rc-color-brand-gold);
+}
+
+.rc-sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--rc-space-3) var(--rc-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-0_5);
+}
+
+.rc-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-space-3);
+  padding: var(--rc-space-2) var(--rc-space-3);
+  border-radius: var(--rc-radius-md);
+  font-size: var(--rc-text-sm);
+  color: var(--rc-color-text-secondary);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+
+.rc-sidebar__item:hover {
+  background-color: var(--rc-color-surface-card-hover);
+  color: var(--rc-color-text-primary);
+}
+
+.rc-sidebar__item--active {
+  background-color: var(--rc-color-brand-gold-dim);
+  color: var(--rc-color-brand-gold);
+}
+
+.rc-sidebar__divider {
+  height: 1px;
+  background-color: var(--rc-color-border-default);
+  margin: var(--rc-space-2) var(--rc-space-3);
+}
+
+.rc-sidebar__footer {
+  padding: var(--rc-space-4);
+  border-top: 1px solid var(--rc-color-border-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-1);
+}
+
+.rc-sidebar__footer-label {
+  font-size: var(--rc-text-xs);
+  color: var(--rc-color-text-muted);
+}
+
+.rc-sidebar__footer-value {
+  font-size: var(--rc-text-sm);
+  color: var(--rc-color-text-primary);
+  font-weight: var(--rc-font-weight-medium);
+}
+
+/* ── Top Bar ──────────────────────────────────────────────── */
+
+.rc-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--rc-space-4) var(--rc-space-6);
+  background-color: var(--rc-color-surface-bg);
+  border-bottom: 1px solid var(--rc-color-border-default);
+}
+
+.rc-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-space-3);
+}
+
+/* ── Progress (Stepped) ───────────────────────────────────── */
+
+.rc-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-space-0_5);
+}
+
+.rc-progress__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rc-space-1);
+  flex: 1;
+  position: relative;
+}
+
+.rc-progress__dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--rc-radius-full);
+  background-color: var(--rc-color-border-default);
+  border: 2px solid var(--rc-color-border-default);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.rc-progress__label {
+  font-size: var(--rc-text-xs);
+  color: var(--rc-color-text-muted);
+  white-space: nowrap;
+}
+
+.rc-progress__step--active .rc-progress__dot {
+  background-color: var(--rc-color-brand-gold);
+  border-color: var(--rc-color-brand-gold);
+}
+
+.rc-progress__step--active .rc-progress__label {
+  color: var(--rc-color-brand-gold);
+  font-weight: var(--rc-font-weight-semibold);
+}
+
+.rc-progress__step--completed .rc-progress__dot {
+  background-color: var(--rc-color-brand-gold);
+  border-color: var(--rc-color-brand-gold);
+}
+
+.rc-progress__step--completed .rc-progress__label {
+  color: var(--rc-color-text-secondary);
+}
+
+/* ── Activity Feed ────────────────────────────────────────── */
+
+.rc-activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rc-activity-feed__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rc-space-3);
+  padding: var(--rc-space-3) 0;
+  position: relative;
+}
+
+.rc-activity-feed__item + .rc-activity-feed__item {
+  border-top: 1px solid var(--rc-color-border-default);
+}
+
+.rc-activity-feed__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--rc-radius-full);
+  background-color: var(--rc-color-brand-gold);
+  flex-shrink: 0;
+  margin-top: var(--rc-space-1_5);
+}
+
+.rc-activity-feed__message {
+  font-size: var(--rc-text-sm);
+  color: var(--rc-color-text-primary);
+  flex: 1;
+}
+
+.rc-activity-feed__meta {
+  font-size: var(--rc-text-xs);
+  color: var(--rc-color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Code Block ───────────────────────────────────────────── */
+
+.rc-code {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-text-sm);
+  background-color: var(--rc-color-surface-bg);
+  border: 1px solid var(--rc-color-border-default);
+  border-radius: var(--rc-radius-md);
+  padding: var(--rc-space-4);
+  overflow-x: auto;
+  color: var(--rc-color-text-primary);
+  line-height: var(--rc-leading-relaxed);
+  white-space: pre;
+}
+
+/* ── Empty State ──────────────────────────────────────────── */
+
+.rc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--rc-space-12) var(--rc-space-6);
+  gap: var(--rc-space-3);
+}
+
+.rc-empty__icon {
+  color: var(--rc-color-text-muted);
+  font-size: var(--rc-text-3xl);
+}
+
+.rc-empty__message {
+  font-size: var(--rc-text-sm);
+  color: var(--rc-color-text-secondary);
+  max-width: 24rem;
+}
+
+/* ── Spinner ──────────────────────────────────────────────── */
+
+.rc-spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--rc-color-border-default);
+  border-top-color: var(--rc-color-brand-gold);
+  border-radius: var(--rc-radius-full);
+  animation: rc-spin 0.6s linear infinite;
+}
+
+@keyframes rc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Error Card ───────────────────────────────────────────── */
+
+.rc-error-card {
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--rc-radius-lg);
+  padding: var(--rc-space-5);
+  color: var(--rc-color-status-error);
+}
+
+.rc-error-card__message {
+  font-size: var(--rc-text-sm);
+  line-height: var(--rc-leading-normal);
+}
+/* ============================================================
+   RunContext UXD — Utility Classes
+   All values reference CSS custom properties from tokens.css.
+   ============================================================ */
+
+/* ── Text Colors ──────────────────────────────────────────── */
+
+.rc-text-primary   { color: var(--rc-color-text-primary); }
+.rc-text-secondary { color: var(--rc-color-text-secondary); }
+.rc-text-muted     { color: var(--rc-color-text-muted); }
+.rc-text-brand     { color: var(--rc-color-brand-gold); }
+
+/* ── Text Sizes ───────────────────────────────────────────── */
+
+.rc-text-xs   { font-size: var(--rc-text-xs); }
+.rc-text-sm   { font-size: var(--rc-text-sm); }
+.rc-text-base { font-size: var(--rc-text-base); }
+.rc-text-lg   { font-size: var(--rc-text-lg); }
+.rc-text-xl   { font-size: var(--rc-text-xl); }
+.rc-text-2xl  { font-size: var(--rc-text-2xl); }
+.rc-text-3xl  { font-size: var(--rc-text-3xl); }
+
+/* ── Font Families ────────────────────────────────────────── */
+
+.rc-font-sans { font-family: var(--rc-font-sans); }
+.rc-font-mono { font-family: var(--rc-font-mono); }
+
+/* ── Tier Colors ──────────────────────────────────────────── */
+
+.rc-tier-gold   { color: var(--rc-color-tier-gold); }
+.rc-tier-silver { color: var(--rc-color-tier-silver); }
+.rc-tier-bronze { color: var(--rc-color-tier-bronze); }
+
+/* ── Status Colors ────────────────────────────────────────── */
+
+.rc-status-success { color: var(--rc-color-status-success); }
+.rc-status-error   { color: var(--rc-color-status-error); }
+.rc-status-warning { color: var(--rc-color-status-warning); }
+.rc-status-info    { color: var(--rc-color-status-info); }
+
+/* ── Backgrounds ──────────────────────────────────────────── */
+
+.rc-bg-surface { background-color: var(--rc-color-surface-bg); }
+.rc-bg-card    { background-color: var(--rc-color-surface-card); }
+
+/* ── Truncate ─────────────────────────────────────────────── */
+
+.rc-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
