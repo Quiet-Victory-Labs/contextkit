@@ -10,6 +10,7 @@ import { uploadRoutes } from './routes/api/upload.js';
 import { pipelineRoutes } from './routes/api/pipeline.js';
 import { productsRoutes } from './routes/api/products.js';
 import { authRoutes } from './routes/api/auth.js';
+import { suggestBriefRoutes } from './routes/api/suggest-brief.js';
 import { attachWebSocket } from './routes/ws.js';
 import { setupBus } from './events.js';
 
@@ -44,6 +45,7 @@ export function createApp(opts: UIServerOptions): Hono {
   app.route('', pipelineRoutes(opts.rootDir, opts.contextDir));
   app.route('', productsRoutes(opts.contextDir));
   app.route('', authRoutes(opts.rootDir));
+  app.route('', suggestBriefRoutes(opts.rootDir));
 
   app.get('/api/health', (c) => c.json({ ok: true }));
 

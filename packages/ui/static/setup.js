@@ -733,13 +733,41 @@
     card.appendChild(form);
     content.appendChild(card);
 
-    // Pre-fill from saved state
+    // Pre-fill from saved state first
     if (state.brief.product_name) document.getElementById('product_name').value = state.brief.product_name;
     if (state.brief.description) document.getElementById('description').value = state.brief.description;
     if (state.brief.owner.name) document.getElementById('owner_name').value = state.brief.owner.name;
     if (state.brief.owner.team) document.getElementById('owner_team').value = state.brief.owner.team;
     if (state.brief.owner.email) document.getElementById('owner_email').value = state.brief.owner.email;
     if (state.brief.sensitivity) document.getElementById('sensitivity').value = state.brief.sensitivity;
+
+    // Auto-suggest from selected source (if fields are still empty)
+    var hasAnyField = state.brief.product_name || state.brief.description || state.brief.owner.name;
+    if (!hasAnyField && state.sources && state.sources.length > 0) {
+      var suggestNote = createElement('p', { className: 'muted suggest-loading', textContent: 'Auto-filling from your database\u2026' });
+      card.insertBefore(suggestNote, form);
+
+      api('POST', '/api/suggest-brief', { source: state.sources[0] }).then(function (data) {
+        suggestNote.remove();
+        // Only fill empty fields
+        var fields = [
+          { id: 'product_name', val: data.product_name, stateKey: 'product_name' },
+          { id: 'description', val: data.description, stateKey: 'description' },
+          { id: 'owner_name', val: data.owner && data.owner.name, stateKey: null },
+          { id: 'owner_team', val: data.owner && data.owner.team, stateKey: null },
+          { id: 'owner_email', val: data.owner && data.owner.email, stateKey: null },
+          { id: 'sensitivity', val: data.sensitivity, stateKey: 'sensitivity' },
+        ];
+        fields.forEach(function (f) {
+          var el = document.getElementById(f.id);
+          if (el && !el.value && f.val) {
+            el.value = f.val;
+          }
+        });
+      }).catch(function () {
+        suggestNote.textContent = '';
+      });
+    }
   }
 
   // ---- Step 3: Scaffold ----
