@@ -192,7 +192,7 @@ body {
 
 .input:focus, .textarea:focus, .select:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(79, 158, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(201, 165, 90, 0.15);
 }
 
 .input::placeholder, .textarea::placeholder {
@@ -275,7 +275,7 @@ body {
 
 .sensitivity-cards .card.selected {
   border-color: var(--accent);
-  background: rgba(79, 158, 255, 0.08);
+  background: rgba(201, 165, 90, 0.08);
 }
 
 .sensitivity-cards .card strong {
@@ -329,7 +329,7 @@ body {
 
 .source-card.selected {
   border-color: var(--accent);
-  background: rgba(79, 158, 255, 0.08);
+  background: rgba(201, 165, 90, 0.08);
   cursor: pointer;
 }
 
@@ -356,7 +356,7 @@ body {
 
 .upload-area:hover, .upload-area.dragover {
   border-color: var(--accent);
-  background: rgba(79, 158, 255, 0.05);
+  background: rgba(201, 165, 90, 0.05);
 }
 
 .upload-area p {
@@ -476,7 +476,7 @@ body {
 
 .pipeline-stage.running .stage-dot {
   border-color: var(--accent);
-  background: rgba(79, 158, 255, 0.15);
+  background: rgba(201, 165, 90, 0.15);
   color: var(--accent);
   animation: pulse 1.2s infinite;
 }
@@ -630,9 +630,9 @@ body {
 
 .product-chip {
   display: inline-block;
-  background: rgba(79, 158, 255, 0.15);
+  background: rgba(201, 165, 90, 0.15);
   color: var(--accent);
-  border: 1px solid rgba(79, 158, 255, 0.3);
+  border: 1px solid rgba(201, 165, 90, 0.3);
   border-radius: 16px;
   padding: 4px 12px;
   font-size: 13px;
