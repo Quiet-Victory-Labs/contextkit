@@ -76,28 +76,53 @@ export function createApp(opts: UIServerOptions): Hono {
     return c.html(setupPageHTML());
   });
 
+  app.get('/planes', (c) => {
+    return c.html(pageHTML({
+      title: 'Semantic Planes',
+      activePage: 'planes',
+      contentId: 'page-content',
+
+    }));
+  });
+
+  app.get('/analytics', (c) => {
+    return c.html(pageHTML({
+      title: 'Analytics',
+      activePage: 'analytics',
+      contentId: 'page-content',
+
+    }));
+  });
+
+  app.get('/settings', (c) => {
+    return c.html(pageHTML({
+      title: 'Settings',
+      activePage: 'settings',
+      contentId: 'page-content',
+
+    }));
+  });
+
   app.get('/', (c) => c.redirect('/setup'));
 
   return app;
 }
 
-function setupPageHTML(): string {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RunContext — Build Your Data Product</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/uxd.css" />
-  <link rel="stylesheet" href="/static/setup.css" />
-</head>
-<body>
-  <div class="app-shell">
-    <!-- Sidebar -->
-    <aside class="sidebar">
+interface PageHTMLOptions {
+  title: string;
+  activePage: 'setup' | 'planes' | 'analytics' | 'settings';
+  contentId: string;
+}
+
+function sidebarHTML(activePage: PageHTMLOptions['activePage']): string {
+  const nav = (page: PageHTMLOptions['activePage'], href: string, label: string) => {
+    const isActive = activePage === page;
+    return `<a class="nav-item${isActive ? ' active' : ''}" href="${href}">
+          <span>${label}</span>
+        </a>`;
+  };
+
+  return `<aside class="sidebar">
       <div class="sidebar-brand">
         <svg class="brand-chevron" width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M4 4l8 8-8 8" stroke="#c9a55a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -109,42 +134,22 @@ function setupPageHTML(): string {
         <span class="brand-badge">Local</span>
       </div>
       <nav class="sidebar-nav">
-        <a class="nav-item active" data-nav="setup">
-          <span>Setup</span>
-        </a>
-        <a class="nav-item locked" data-nav="planes">
-          <span>Semantic Planes</span>
-          <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0110 0v4"/>
-          </svg>
-        </a>
-        <a class="nav-item locked" data-nav="analytics">
-          <span>Analytics</span>
-          <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0110 0v4"/>
-          </svg>
-        </a>
-        <a class="nav-item" data-nav="mcp">
+        ${nav('setup', '/setup', 'Setup')}
+        ${nav('planes', '/planes', 'Semantic Planes')}
+        ${nav('analytics', '/analytics', 'Analytics')}
+        <div class="nav-item mcp-toggle" id="mcp-nav-toggle" title="Click to start/stop MCP server" style="cursor:pointer">
           <span class="status-dot" id="mcp-status-dot"></span>
           <span>MCP Server</span>
           <span class="nav-detail" id="mcp-status-text">checking...</span>
-        </a>
-        <a class="nav-item locked" data-nav="settings">
-          <span>Settings</span>
-          <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0110 0v4"/>
-          </svg>
-        </a>
+        </div>
+        ${nav('settings', '/settings', 'Settings')}
       </nav>
       <div class="sidebar-status">
         <div class="status-row">
           <span class="status-dot" id="db-status-dot"></span>
           <span id="db-status-text">No database</span>
         </div>
-        <div class="status-row">
+        <div class="status-row mcp-toggle" id="mcp-toggle-row" title="Click to start/stop MCP server">
           <span class="status-dot" id="mcp-server-dot"></span>
           <span id="mcp-server-text">MCP stopped</span>
         </div>
@@ -152,33 +157,84 @@ function setupPageHTML(): string {
           <span class="tier-badge" id="tier-badge">Free</span>
         </div>
       </div>
-    </aside>
+      <div class="sidebar-security">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rc-color-status-success)" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span>Local-only processing</span>
+      </div>
+    </aside>`;
+}
+
+function footerHTML(): string {
+  return `<footer class="app-footer">
+      <span>Powered by <a href="https://runcontext.dev" target="_blank" rel="noopener">RunContext</a></span>
+      <span class="footer-links">
+        <a href="https://docs.runcontext.dev" target="_blank" rel="noopener">Docs</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="https://runcontext.dev/pricing" target="_blank" rel="noopener">Cloud</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="https://github.com/Quiet-Victory-Labs/runcontext" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </footer>`;
+}
+
+function pageHTML(opts: PageHTMLOptions): string {
+  const isSetup = opts.activePage === 'setup';
+  const headerContent = isSetup
+    ? `<div class="header-stepper" id="stepper"></div>`
+    : `<h1 class="header-title">${opts.title}</h1>`;
+  const lockedTooltip = isSetup
+    ? `\n  <!-- Locked tooltip (hidden by default) -->
+  <div class="locked-tooltip" id="locked-tooltip" style="display:none">
+    <p><strong>Cloud Feature</strong></p>
+    <p>This feature is available on RunContext Cloud with team collaboration, hosted endpoints, and analytics.</p>
+    <a href="https://runcontext.dev/pricing" target="_blank" rel="noopener">View plans →</a>
+  </div>`
+    : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RunContext — ${opts.title}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/uxd.css" />
+  <link rel="stylesheet" href="/static/setup.css" />
+</head>
+<body data-page="${opts.activePage}">
+  <div class="app-shell">
+    <!-- Sidebar -->
+    ${sidebarHTML(opts.activePage)}
 
     <!-- Header -->
     <header class="app-header">
-      <div class="header-stepper" id="stepper"></div>
+      ${headerContent}
     </header>
 
     <!-- Main Content -->
     <main class="main-content">
-      <div class="content-wrapper" id="wizard-content"></div>
+      <div class="content-wrapper" id="${opts.contentId}"></div>
     </main>
 
     <!-- Footer -->
-    <footer class="app-footer">
-      <span>Powered by RunContext &middot; Open Semantic Interchange</span>
-    </footer>
+    ${footerHTML()}
   </div>
-
-  <!-- Locked tooltip (hidden by default) -->
-  <div class="locked-tooltip" id="locked-tooltip" style="display:none">
-    <p>Available on RunContext Cloud</p>
-    <a href="https://runcontext.dev/pricing" target="_blank" rel="noopener">Learn more</a>
-  </div>
-
-  <script src="/static/setup.js"></script>
+${lockedTooltip}
+  <script src="/static/app.js"></script>
 </body>
 </html>`;
+}
+
+function setupPageHTML(): string {
+  return pageHTML({
+    title: 'Build Your Context Layer',
+    activePage: 'setup',
+    contentId: 'wizard-content',
+  });
 }
 
 export function startUIServer(opts: UIServerOptions): Promise<void> {

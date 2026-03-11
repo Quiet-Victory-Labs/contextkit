@@ -1,12 +1,13 @@
 import { Hono } from 'hono';
-import { execFile as execFileCb } from 'node:child_process';
+import { execFile as execFileCb, spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 import { setupBus } from '../../events.js';
+import type { ChildProcess } from 'node:child_process';
 
 const execFile = promisify(execFileCb);
 
@@ -26,12 +27,18 @@ function resolveCliBin(): { cmd: string; prefix: string[] } {
     }
   } catch { /* ignore */ }
 
-  // 2. If this process was started via the CLI binary, reuse it
+  // 2. Try relative to cwd (monorepo root → packages/cli/dist/index.js)
+  const cwdCli = join(process.cwd(), 'packages', 'cli', 'dist', 'index.js');
+  if (existsSync(cwdCli)) {
+    return { cmd: process.execPath, prefix: [cwdCli] };
+  }
+
+  // 3. If this process was started via the CLI binary, reuse it
   if (process.argv[1] && existsSync(process.argv[1])) {
     return { cmd: process.execPath, prefix: [process.argv[1]] };
   }
 
-  // 3. Fall back to npx (published CLI)
+  // 4. Fall back to npx (published CLI)
   return { cmd: 'npx', prefix: ['--yes', '@runcontext/cli'] };
 }
 
@@ -148,41 +155,49 @@ export function pipelineRoutes(rootDir: string, contextDir: string): Hono {
     return c.json(run);
   });
 
-  app.get('/api/mcp-config', (c) => {
-    // Read runcontext.config.yaml to find a data source connection string
-    let connection: string | undefined;
-    try {
-      const configPath = join(rootDir, 'runcontext.config.yaml');
-      const configRaw = readFileSync(configPath, 'utf-8');
-      const config = parseYaml(configRaw) as Record<string, unknown>;
-      const dataSources = config?.data_sources as
-        | Record<string, { connection?: string; path?: string }>
-        | undefined;
-      if (dataSources) {
-        const firstKey = Object.keys(dataSources)[0];
-        if (firstKey) {
-          connection = dataSources[firstKey].connection || dataSources[firstKey].path;
-        }
-      }
-    } catch {
-      // Config file missing or unparseable – proceed without db entry
-    }
+  // --- MCP server management ---
+  let mcpProcess: ChildProcess | null = null;
 
+  app.post('/api/mcp/start', (c) => {
+    if (mcpProcess && !mcpProcess.killed) {
+      return c.json({ ok: true, status: 'already_running' });
+    }
     const cli = resolveCliBin();
+    mcpProcess = spawn(cli.cmd, [...cli.prefix, 'serve'], {
+      cwd: rootDir,
+      stdio: ['pipe', 'pipe', 'ignore'],
+      detached: false,
+      env: { ...process.env, NODE_OPTIONS: '--no-deprecation' },
+    });
+    // Keep stdin open so the stdio MCP server doesn't exit on EOF
+    mcpProcess.on('exit', () => { mcpProcess = null; });
+    mcpProcess.on('error', () => { mcpProcess = null; });
+    return c.json({ ok: true, status: 'started' });
+  });
+
+  app.post('/api/mcp/stop', (c) => {
+    if (mcpProcess && !mcpProcess.killed) {
+      mcpProcess.kill();
+      mcpProcess = null;
+    }
+    return c.json({ ok: true, status: 'stopped' });
+  });
+
+  app.get('/api/mcp/status', (c) => {
+    const running = mcpProcess !== null && !mcpProcess.killed;
+    return c.json({ running });
+  });
+
+  app.get('/api/mcp-config', (c) => {
+    const cli = resolveCliBin();
+    const absRoot = resolve(rootDir);
     const mcpServers: Record<string, unknown> = {
       runcontext: {
         command: cli.cmd,
         args: [...cli.prefix, 'serve'],
-        cwd: rootDir,
+        cwd: absRoot,
       },
     };
-
-    if (connection) {
-      mcpServers['runcontext-db'] = {
-        command: 'npx',
-        args: ['--yes', '@runcontext/db', '--url', connection],
-      };
-    }
 
     return c.json({ mcpServers });
   });
@@ -212,10 +227,16 @@ function buildCliArgs(
       if (dataSource) args.push('--source', dataSource);
       return args;
     }
-    case 'verify':
-      return ['verify'];
-    case 'autofix':
-      return ['fix'];
+    case 'verify': {
+      const args = ['verify'];
+      if (dataSource) args.push('--source', dataSource);
+      return args;
+    }
+    case 'autofix': {
+      const args = ['fix'];
+      if (dataSource) args.push('--source', dataSource);
+      return args;
+    }
     case 'agent-instructions':
       return ['build'];
   }
@@ -251,7 +272,7 @@ async function executePipeline(
       const cli = resolveCliBin();
       const { stdout } = await execFile(cli.cmd, [...cli.prefix, ...cliArgs], {
         cwd: rootDir,
-        timeout: 120_000,
+        timeout: 300_000,
         env: {
           ...process.env,
           NODE_OPTIONS: '--max-old-space-size=4096 --no-deprecation',
@@ -285,8 +306,10 @@ async function executePipeline(
         continue;
       }
       stage.status = 'error';
-      stage.error = err instanceof Error ? err.message : String(err);
+      const errDetail = execErr.stderr || (err instanceof Error ? err.message : String(err));
+      stage.error = errDetail;
       stage.completedAt = new Date().toISOString();
+      console.error(`[pipeline] Stage ${stage.stage} failed:`, errDetail);
       if (sessionId) {
         setupBus.emitEvent({
           type: 'pipeline:stage',

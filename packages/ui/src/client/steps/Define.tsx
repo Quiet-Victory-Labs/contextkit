@@ -1,7 +1,8 @@
 import { signal } from '@preact/signals';
-import { Button, Card, Input, Textarea, Select } from '@runcontext/uxd/react';
+import { Button, Card, Input, Textarea, Select, InfoCard, ConceptTerm, useToast, Skeleton } from '@runcontext/uxd/react';
 import { api } from '../api';
 import { brief, currentStep, sources } from '../state';
+import { CONCEPTS } from '../concepts';
 
 const saving = signal(false);
 const formError = signal('');
@@ -9,6 +10,7 @@ const fieldErrors = signal<Record<string, string>>({});
 const suggesting = signal(false);
 
 export function Define() {
+  const { toast } = useToast();
   const b = brief.value;
 
   function updateBrief(field: string, value: string) {
@@ -33,9 +35,11 @@ export function Define() {
     formError.value = '';
     try {
       await api('POST', '/api/brief', b);
+      toast('success', 'Semantic plane definition saved');
       currentStep.value = 3;
     } catch (e: any) {
       formError.value = e.message || 'Failed to save. Please try again.';
+      toast('error', e.message || 'Failed to save');
     } finally {
       saving.value = false;
     }
@@ -57,22 +61,34 @@ export function Define() {
         sensitivity: current.sensitivity || data.sensitivity || 'internal',
         docs: current.docs,
       };
+      toast('info', 'Auto-filled from your database schema');
     }).catch(() => {}).finally(() => { suggesting.value = false; });
   }
 
   const errs = fieldErrors.value;
 
   return (
-    <Card>
-      <h2>Define Your Data Product</h2>
-      <p class="muted">Tell us about your data product. This metadata helps AI agents understand what they are working with.</p>
+    <div>
+      <InfoCard title="Define Your Semantic Plane" storageKey="define-step-info">
+        This metadata becomes part of your <ConceptTerm term="semanticPlane" definition={CONCEPTS.semanticPlane.definition}>{CONCEPTS.semanticPlane.label}</ConceptTerm>.
+        It helps AI agents understand what your data represents and who is responsible for it.
+      </InfoCard>
+      <h2>Define Your Semantic Plane</h2>
+      <p class="muted">Tell us about your semantic plane. This metadata helps AI agents understand what they are working with.</p>
 
-      {suggesting.value && <p class="muted suggest-loading">Auto-filling from your database...</p>}
+      {suggesting.value && (
+        <div class="define-form-skeleton">
+          <Skeleton variant="text" width="100%" height="36px" />
+          <Skeleton variant="text" width="100%" height="80px" />
+          <Skeleton variant="text" width="60%" height="36px" />
+          <Skeleton variant="text" width="60%" height="36px" />
+        </div>
+      )}
 
       <div class="define-form">
         <div class="field full-width">
           <label for="product_name">Product Name *</label>
-          <Input id="product_name" value={b.product_name} onInput={(e: any) => updateBrief('product_name', e.currentTarget.value)} placeholder="my-data-product" error={!!errs.product_name} />
+          <Input id="product_name" value={b.product_name} onInput={(e: any) => updateBrief('product_name', e.currentTarget.value)} placeholder="my-semantic-plane" error={!!errs.product_name} />
           {errs.product_name && <p class="field-error">{errs.product_name}</p>}
           <p class="hint">Alphanumeric, hyphens, and underscores only.</p>
         </div>
@@ -117,6 +133,6 @@ export function Define() {
 
         {formError.value && <p class="field-error">{formError.value}</p>}
       </div>
-    </Card>
+    </div>
   );
 }

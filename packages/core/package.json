@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/core",
-  "version": "0.5.3",
+  "version": "0.5.5",
   "description": "Compiler, linter, and tier engine for AI-ready semantic metadata. 40 lint rules, Bronze/Silver/Gold scoring, and OSI-compliant data product validation.",
   "license": "MIT",
   "author": "Eric Kittelson",
@@ -11,8 +11,25 @@
     "directory": "packages/core"
   },
   "bugs": "https://github.com/RunContext/runcontext/issues",
-  "engines": { "node": ">=18.0.0" },
-  "keywords": ["runcontext", "semantic-layer", "semantic-plane", "ai-metadata", "osi", "open-semantic-interchange", "data-governance", "data-catalog", "data-product", "mcp", "model-context-protocol", "schema-validation", "metadata-compiler", "tier-system"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "runcontext",
+    "semantic-layer",
+    "semantic-plane",
+    "ai-metadata",
+    "osi",
+    "open-semantic-interchange",
+    "data-governance",
+    "data-catalog",
+    "data-product",
+    "mcp",
+    "model-context-protocol",
+    "schema-validation",
+    "metadata-compiler",
+    "tier-system"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

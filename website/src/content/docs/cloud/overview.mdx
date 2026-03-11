@@ -1,5 +1,5 @@
 ---
-title: RunContext Cloud
+title: ContextKit Cloud
 description: "Hosted semantic planes for teams. Publish your data products, share an MCP endpoint, and manage metadata together — without running any infrastructure."
 ---
 
@@ -14,7 +14,7 @@ The ContextKit CLI is powerful for solo work — you build a semantic plane on y
 - **Who can edit what?** No access controls on local YAML files
 - **Which version is live?** Multiple people editing the same metadata
 
-RunContext Cloud solves all of this. Publish your semantic plane to a hosted endpoint, and every team member's AI tools connect to the same source of truth.
+ContextKit Cloud solves all of this. Publish your semantic plane to a hosted endpoint, and every team member's AI tools connect to the same source of truth.
 
 ---
 
@@ -30,8 +30,8 @@ RunContext Cloud solves all of this. Publish your semantic plane to a hosted end
   <Card title="Team Collaboration" icon="pen">
     Invite teammates by email. Everyone connects their AI tools to the same hosted endpoint. When someone publishes an updated semantic plane, every agent on the team gets the latest context immediately.
   </Card>
-  <Card title="Managed Connectors" icon="laptop">
-    Connect databases directly to the cloud — PostgreSQL, Snowflake, BigQuery, and more. RunContext Cloud introspects your schema on a schedule, so your semantic plane stays fresh as your database evolves.
+  <Card title="Guardrailed MCP Connectors" icon="laptop">
+    Connect databases through ContextKit's managed MCP connectors — PostgreSQL, Snowflake, BigQuery, and more. Unlike generic MCP database tools that may expose write access or unrestricted queries, ContextKit connectors are strictly read-only. They introspect your schema and serve context to AI agents, nothing else. No mutations, no data extraction, no risk.
   </Card>
 </CardGrid>
 
@@ -47,7 +47,7 @@ You still use the ContextKit CLI to build your semantic plane. Nothing changes a
 context publish --org my-team
 ```
 
-This uploads your compiled semantic plane to RunContext Cloud. Your metadata is now hosted and available to your whole team.
+This uploads your compiled semantic plane to ContextKit Cloud. Your metadata is now hosted and available to your whole team.
 
 ### 2. Connect your AI tools
 
@@ -90,7 +90,7 @@ When you sign in, you'll see:
 
 **Team** — Invite members, set roles (Admin, Editor, Viewer), and manage API keys for each team member's tools.
 
-**Connectors** — Set up managed database connections. Choose which tables to introspect and how often to refresh. The cloud runs the introspection pipeline for you.
+**Connectors** — Set up guardrailed MCP database connectors. Choose which tables to introspect and how often to refresh. Strictly read-only — no write access, no arbitrary queries.
 
 **Usage** — See how many MCP queries your team is making, which tools are connected, and which data products are most accessed.
 
@@ -122,7 +122,7 @@ See [Sign Up & Onboarding](/cloud/signup/) for the full walkthrough.
 | **Hosted MCP endpoint** | — | Yes | Yes |
 | **Web dashboard** | — | Yes | Yes |
 | **Published data products** | — | 10 | Unlimited |
-| **Database connectors** | — | 3 | Unlimited |
+| **MCP connectors** | — | 3 | Unlimited |
 | **Team seats** | 1 (local) | 5 (+$10/seat) | Unlimited |
 | **RBAC** | — | — | Yes |
 | **SSO** | — | — | Yes |

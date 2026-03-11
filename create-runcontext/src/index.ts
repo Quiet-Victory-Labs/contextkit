@@ -83,9 +83,11 @@ function main(): void {
   console.log('');
   console.log('Done! Next steps:');
   console.log(`  cd ${projectName}`);
-  console.log('  pnpm add -D @runcontext/cli');
-  console.log('  npx context lint');
-  console.log('  npx context tier');
+  console.log('  npx @runcontext/cli setup');
+  console.log('');
+  console.log('Or tell your AI agent:');
+  console.log('  "Install @runcontext/cli and run `npx context setup` to build a');
+  console.log('   semantic layer for my database. Follow AGENT_INSTRUCTIONS.md."');
 }
 
 main();

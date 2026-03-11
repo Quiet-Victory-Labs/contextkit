@@ -13,7 +13,7 @@ export default defineConfig({
     rollupOptions: {
       input: path.resolve(__dirname, 'src/client/main.tsx'),
       output: {
-        entryFileNames: 'setup.js',
+        entryFileNames: 'app.js',
         format: 'iife',
       },
     },

@@ -21,7 +21,7 @@ export const governanceRefreshRequired: LintRule = {
 
           if (source) {
             const content = readFileContent(source.filePath);
-            const edit = insertNestedKey(content, 'datasets', 'refresh', '"TODO"', 4);
+            const edit = insertNestedKey(content, 'datasets', 'refresh', '"TODO"', 2, dsName);
             diagnostics.push({
               ruleId: this.id,
               severity: this.defaultSeverity,

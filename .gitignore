@@ -13,3 +13,10 @@ coverage/
 .cache/
 .claude/
 docs/plans/
+docs/superpowers/
+.vercel
+.serena/
+context/
+test-results/
+runcontext.config.yaml
+playwright.config.ts

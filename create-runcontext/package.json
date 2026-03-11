@@ -1,6 +1,6 @@
 {
   "name": "create-runcontext",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Scaffold a new RunContext data product. Run npx create-runcontext, fill out a Context Brief in your browser, and the pipeline builds your semantic plane automatically.",
   "license": "MIT",
   "author": "Eric Kittelson",
@@ -11,11 +11,30 @@
     "directory": "create-runcontext"
   },
   "bugs": "https://github.com/RunContext/runcontext/issues",
-  "engines": { "node": ">=18.0.0" },
-  "keywords": ["create", "scaffold", "semantic-plane", "semantic-layer", "runcontext", "data-product", "ai-ready-data", "npx", "project-generator", "mcp", "data-catalog"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "create",
+    "scaffold",
+    "semantic-plane",
+    "semantic-layer",
+    "runcontext",
+    "data-product",
+    "ai-ready-data",
+    "npx",
+    "project-generator",
+    "mcp",
+    "data-catalog"
+  ],
   "type": "module",
-  "bin": { "create-runcontext": "./dist/index.js" },
-  "files": ["dist", "templates"],
+  "bin": {
+    "create-runcontext": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"

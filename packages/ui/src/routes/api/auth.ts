@@ -37,6 +37,17 @@ export function authRoutes(rootDir: string): Hono {
       return c.json({ error: `Unknown provider: ${providerId}` }, 400);
     }
 
+    // First, try listing databases without full re-auth.
+    // If the provider already has valid stored credentials (e.g. "CLI authenticated"),
+    // this avoids re-running neonctl auth which can open a broken OAuth browser window.
+    try {
+      const databases = await provider.listDatabases();
+      if (databases.length > 0) {
+        return c.json({ ok: true, provider: providerId, databases });
+      }
+    } catch { /* fall through to full authenticate */ }
+
+    // Full authentication flow (may open browser for OAuth)
     const result = await provider.authenticate();
     if (!result.ok) {
       return c.json({ error: result.error }, 401);
@@ -60,14 +71,18 @@ export function authRoutes(rootDir: string): Hono {
       return c.json({ error: `Unknown provider: ${providerId}` }, 400);
     }
 
-    // Re-authenticate to get a fresh token
-    const authResult = await provider.authenticate();
-    if (!authResult.ok) {
-      return c.json({ error: authResult.error }, 401);
+    // Use token from database metadata (set during listDatabases) or re-authenticate
+    let token = database.metadata?.token as string | undefined;
+    if (!token) {
+      const authResult = await provider.authenticate();
+      if (!authResult.ok) {
+        return c.json({ error: authResult.error }, 401);
+      }
+      token = authResult.token;
     }
 
     // Build and test connection
-    database.metadata = { ...database.metadata, token: authResult.token };
+    database.metadata = { ...database.metadata, token };
     const connStr = await provider.getConnectionString(database);
 
     try {
@@ -88,9 +103,9 @@ export function authRoutes(rootDir: string): Hono {
     await store.save({
       provider: providerId,
       key: credKey,
-      token: authResult.token,
-      refreshToken: authResult.ok ? authResult.refreshToken : undefined,
-      expiresAt: authResult.ok ? authResult.expiresAt : undefined,
+      token: token!,
+      refreshToken: undefined,
+      expiresAt: undefined,
       metadata: {
         host: database.host,
         database: database.name,
@@ -107,8 +122,16 @@ export function authRoutes(rootDir: string): Hono {
         config = parseYaml(fs.readFileSync(configPath, 'utf-8')) ?? {};
       } catch { /* start fresh */ }
     }
-    config.data_sources = config.data_sources ?? {};
-    config.data_sources.default = { adapter: database.adapter, auth: credKey };
+    // Remove stale entries (e.g. auth-only refs without connection strings)
+    const existingSources = config.data_sources ?? {};
+    for (const [key, val] of Object.entries(existingSources)) {
+      if (val && typeof val === 'object' && !(val as any).connection && !(val as any).path) {
+        delete existingSources[key];
+      }
+    }
+    config.data_sources = existingSources;
+    const sourceName = (database.name || database.database || 'default').replace(/[^a-zA-Z0-9_-]/g, '_');
+    config.data_sources[sourceName] = { adapter: database.adapter, connection: connStr };
     fs.writeFileSync(configPath, stringifyYaml(config), 'utf-8');
 
     return c.json({ ok: true, auth: credKey });

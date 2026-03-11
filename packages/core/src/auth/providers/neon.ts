@@ -178,25 +178,43 @@ export class NeonProvider implements AuthProvider {
   }
 
   async getConnectionString(db: DatabaseEntry): Promise<string> {
-    // Prefer neonctl to get the real connection string (includes actual DB password)
     const projectId = (db.metadata?.projectId as string) ?? '';
+    const branchId = (db.metadata?.branchId as string) ?? '';
+    const dbName = db.name || 'neondb';
+
+    // Strategy 1: neonctl CLI (has actual DB password)
     if (projectId) {
       try {
         const { stdout } = await execFile('neonctl', [
           'connection-string',
           '--project-id', projectId,
-          '--database-name', db.name || 'neondb',
+          '--database-name', dbName,
         ]);
         const connStr = stdout.trim();
         if (connStr.startsWith('postgres')) return connStr;
-      } catch { /* fall through to manual build */ }
+      } catch { /* fall through */ }
     }
 
-    // Fallback: build manually (requires password in metadata)
+    // Strategy 2: Neon API connection_uri endpoint (returns pooled URI with password)
+    const token = (db.metadata?.token as string) ?? '';
+    if (projectId && token) {
+      try {
+        const params = new URLSearchParams({ database_name: dbName, role_name: (db.metadata?.user as string) || 'neondb_owner' });
+        if (branchId) params.set('branch_id', branchId);
+        const res = await fetch(`${NEON_API}/projects/${projectId}/connection_uri?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json() as { uri: string };
+          if (data.uri?.startsWith('postgres')) return data.uri;
+        }
+      } catch { /* fall through */ }
+    }
+
+    // Strategy 3: Manual build (last resort — may fail without real password)
     const user = (db.metadata?.user as string) ?? 'neondb_owner';
-    const password = (db.metadata?.password as string) ?? (db.metadata?.token as string) ?? '';
+    const password = (db.metadata?.password as string) ?? '';
     const host = db.host ?? '';
-    const dbName = db.name ?? 'neondb';
     return `postgresql://${user}:${encodeURIComponent(password)}@${host}/${dbName}?sslmode=require`;
   }
 
@@ -252,7 +270,12 @@ export class NeonProvider implements AuthProvider {
         }
 
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end('<html><body><h1>Authenticated! You can close this tab.</h1></body></html>');
+        res.end(`<html><body style="font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0f1117;color:#e2e8f0">
+<div style="text-align:center">
+<h1 style="color:#c9a55a">Authenticated!</h1>
+<p>Returning to RunContext...</p>
+<script>setTimeout(function(){window.close()},1500)</script>
+</div></body></html>`);
         server.close();
         resolve(token);
       });

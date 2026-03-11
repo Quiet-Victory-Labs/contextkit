@@ -54,6 +54,7 @@ export function insertTopLevelKey(
 /**
  * Create a TextEdit that inserts a key-value pair under an existing nested key.
  * `parentKey` is the top-level key, and the new entry is inserted as an indented child.
+ * If `subKey` is provided, the insertion targets that specific child under parentKey.
  */
 export function insertNestedKey(
   content: string,
@@ -61,12 +62,43 @@ export function insertNestedKey(
   childKey: string,
   value: string,
   indent: number = 2,
+  subKey?: string,
 ): TextEdit {
   const lines = content.split('\n');
   const parentLine = findKeyLine(content, parentKey);
   if (parentLine === -1) {
     // Fallback: insert at end
     return insertTopLevelKey(content, `${parentKey}`, `\n${' '.repeat(indent)}${childKey}: ${value}`);
+  }
+
+  // If subKey is provided, find that specific child under parentKey and insert under it
+  if (subKey) {
+    const subIndent = ' '.repeat(indent);
+    let subLineIdx = -1;
+    for (let i = parentLine; i < lines.length; i++) {
+      const line = lines[i] as string;
+      const trimmed = line.trimStart();
+      if (trimmed === '') continue;
+      const lineIndent = line.length - trimmed.length;
+      // Exited parent block
+      if (lineIndent === 0 && i > parentLine - 1) break;
+      if (lineIndent === indent && (trimmed.startsWith(subKey + ':') || trimmed === subKey + ':')) {
+        subLineIdx = i;
+        break;
+      }
+    }
+    if (subLineIdx !== -1) {
+      const childIndent = ' '.repeat(indent + 2);
+      const lineContent = lines[subLineIdx] as string;
+      const lastCol = lineContent.length + 1;
+      return {
+        startLine: subLineIdx + 1,
+        startCol: lastCol,
+        endLine: subLineIdx + 1,
+        endCol: lastCol,
+        newText: `\n${childIndent}${childKey}: ${value}`,
+      };
+    }
   }
 
   // Find the end of the parent's block (next line at same or less indentation, or EOF)

@@ -1,8 +1,11 @@
 import { signal } from '@preact/signals';
-import { Button, Card, ErrorCard, ActivityFeed } from '@runcontext/uxd/react';
+import { Button, Card, ErrorCard, ActivityFeed, InfoCard, ConceptTerm, useToast } from '@runcontext/uxd/react';
 import type { ActivityEvent } from '@runcontext/uxd/react';
 import { api } from '../api';
 import { brief, sources, pipelineId, enrichProgress, enrichLogs, currentStep } from '../state';
+import { CONCEPTS } from '../concepts';
+
+let toastRef: ((variant: string, message: string) => void) | null = null;
 
 const ENRICH_REQUIREMENTS = [
   { key: 'column-descriptions', label: 'Column descriptions', initial: '0/45 columns' },
@@ -24,6 +27,7 @@ function stopPolling() {
 }
 
 async function startEnrichment() {
+  toastRef?.('info', 'Starting Gold enrichment...');
   enriching.value = true;
   errorMsg.value = '';
   enrichProgress.value = {};
@@ -56,23 +60,27 @@ function startPolling() {
     try {
       const status = await api<any>('GET', '/api/pipeline/status/' + pipelineId.value);
       const stages = status.stages || [];
-      let hasError = false;
+      let errorStage: any = null;
       let silverDone = false;
       let goldDone = false;
 
       for (const s of stages) {
         if ((s.name === 'enrich-silver' || s.stage === 'enrich-silver') && s.status === 'done') silverDone = true;
         if ((s.name === 'enrich-gold' || s.stage === 'enrich-gold') && s.status === 'done') goldDone = true;
-        if (s.status === 'error') hasError = true;
+        if (s.status === 'error' && !errorStage) errorStage = s;
       }
 
-      if (hasError) {
+      if (errorStage) {
         stopPolling();
         enriching.value = false;
-        errorMsg.value = status.error || 'An enrichment stage failed.';
+        const stageName = errorStage.stage || errorStage.name || 'unknown';
+        const detail = errorStage.error ? `: ${errorStage.error.slice(0, 200)}` : '';
+        errorMsg.value = `Stage "${stageName}" failed${detail}`;
+        toastRef?.('error', `Enrichment failed at ${stageName}`);
       } else if (silverDone && goldDone) {
         stopPolling();
         enriching.value = false;
+        toastRef?.('success', 'Gold tier enrichment complete!');
         enrichLogs.value = [...enrichLogs.value, { message: 'Gold enrichment complete! Advancing...', timestamp: new Date().toISOString() }];
         currentStep.value = 6;
       }
@@ -98,6 +106,8 @@ function toggleReq(key: string) {
 }
 
 export function Enrich() {
+  const { toast } = useToast();
+  toastRef = toast;
   const progress = enrichProgress.value;
   const expanded = expandedReqs.value;
 
@@ -109,14 +119,34 @@ export function Enrich() {
   }));
 
   return (
-    <Card>
-      <h2>Enriching to Gold</h2>
-      <p class="muted">RunContext is analyzing your schema to add descriptions, join rules, and query patterns.</p>
+    <div>
+      <InfoCard title="Enriching to Gold Tier" storageKey="enrich-step-info">
+        Enrichment uses AI to analyze your schema and generate descriptions, join rules, and <ConceptTerm term="guardrails" definition={CONCEPTS.guardrails.definition}>{CONCEPTS.guardrails.label}</ConceptTerm>.
+        All processing happens locally. Review and edit results before serving to AI agents.
+      </InfoCard>
+      <div class="trust-signal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--rc-color-status-success)" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span class="trust-signal-text">AI enrichment runs locally — your schema context stays private</span>
+      </div>
+      <h2 class="connect-heading">Enriching to Gold</h2>
+      <p class="muted" style={{ marginBottom: '16px' }}>RunContext is analyzing your schema to add descriptions, join rules, and query patterns.</p>
 
       {!enriching.value && !errorMsg.value && (
-        <div class="step-actions">
+        <div class="step-actions" style={{ marginTop: '0', marginBottom: '16px', paddingTop: '0', borderTop: 'none' }}>
           <Button variant="secondary" onClick={() => { currentStep.value = 4; }}>Back</Button>
           <Button onClick={startEnrichment}>Start Enrichment</Button>
+        </div>
+      )}
+
+      {enriching.value && (
+        <div class="enrich-progress-banner">
+          <div class="connect-loading-spinner" />
+          <div>
+            <strong>Enrichment in progress...</strong>
+            <p class="muted" style={{ margin: 0 }}>This may take a few minutes. Progress will update below as each stage completes.</p>
+          </div>
         </div>
       )}
 
@@ -131,7 +161,11 @@ export function Enrich() {
               <div class={`enrich-row${expanded.has(req.key) ? ' expanded' : ''}`}>
                 <div class="enrich-row-header" onClick={() => toggleReq(req.key)}>
                   <span class={dotClass} />
-                  <span class="enrich-req-name">{req.label}</span>
+                  <span class="enrich-req-name">
+                    {req.key === 'guardrail-filters'
+                      ? <ConceptTerm term="guardrails" definition={CONCEPTS.guardrails.definition}>{CONCEPTS.guardrails.label}</ConceptTerm>
+                      : req.label}
+                  </span>
                   <span class="enrich-progress">{p?.progress || req.initial}</span>
                   <span class="enrich-arrow">&#9654;</span>
                 </div>
@@ -150,6 +184,6 @@ export function Enrich() {
       {errorMsg.value && (
         <ErrorCard message={errorMsg.value} action={<Button onClick={retry}>Retry</Button>} />
       )}
-    </Card>
+    </div>
   );
 }

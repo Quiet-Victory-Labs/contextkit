@@ -2,9 +2,9 @@ import type { HTMLAttributes } from 'react';
 import { Badge } from './Badge.js';
 
 const tierLabels = {
-  gold: 'AI-Ready',
-  silver: 'Trusted',
-  bronze: 'Discoverable',
+  gold: 'Gold',
+  silver: 'Silver',
+  bronze: 'Bronze',
 } as const;
 
 export interface TierBadgeProps extends HTMLAttributes<HTMLSpanElement> {

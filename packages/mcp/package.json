@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/mcp",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "MCP server that serves semantic metadata to AI agents. Connect your data catalog to Claude Code, Cursor, Copilot, Windsurf, and any MCP-compatible tool.",
   "license": "MIT",
   "author": "Eric Kittelson",
@@ -11,8 +11,24 @@
     "directory": "packages/mcp"
   },
   "bugs": "https://github.com/RunContext/runcontext/issues",
-  "engines": { "node": ">=18.0.0" },
-  "keywords": ["mcp", "model-context-protocol", "ai-agent", "semantic-layer", "semantic-plane", "runcontext", "claude-code", "cursor", "copilot", "windsurf", "ai-ready-data", "data-catalog", "mcp-server"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-agent",
+    "semantic-layer",
+    "semantic-plane",
+    "runcontext",
+    "claude-code",
+    "cursor",
+    "copilot",
+    "windsurf",
+    "ai-ready-data",
+    "data-catalog",
+    "mcp-server"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -29,7 +45,9 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist"

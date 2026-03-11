@@ -2,7 +2,7 @@ import { signal, effect } from '@preact/signals';
 
 const STORAGE_KEY = 'runcontext_wizard_state';
 
-export const STEP_LABELS = ['Connect', 'Define', 'Scaffold', 'Checkpoint', 'Enrich', 'Serve'] as const;
+export const STEP_LABELS = ['Connect', 'Define', 'Scaffold', 'Checkpoint', 'Curate', 'Serve'] as const;
 
 // Core signals
 export const currentStep = signal(1);

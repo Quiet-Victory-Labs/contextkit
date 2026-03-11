@@ -1,6 +1,6 @@
 ---
 title: Sign Up & Onboarding
-description: "Create a RunContext Cloud account, set up your organization, publish your first semantic plane, and connect your team's AI tools."
+description: "Create a ContextKit Cloud account, set up your organization, publish your first semantic plane, and connect your team's AI tools."
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
@@ -63,7 +63,7 @@ You need a semantic plane built locally first. If you haven't done that yet, sta
    context publish --org my-company
    ```
 
-   This compiles your local semantic plane and uploads it to RunContext Cloud. The output shows:
+   This compiles your local semantic plane and uploads it to ContextKit Cloud. The output shows:
    - How many data products were published
    - The MCP endpoint URL for your organization
    - The dashboard URL to view your published plane
@@ -116,9 +116,9 @@ You need a semantic plane built locally first. If you haven't done that yet, sta
 
 ---
 
-## Set Up Managed Connectors
+## Set Up Guardrailed MCP Connectors
 
-Instead of introspecting databases from your local machine, you can connect them directly to the cloud.
+Instead of using generic MCP database tools (which may expose write access), connect your databases through ContextKit's guardrailed connectors. They introspect your schema and serve context to AI agents — strictly read-only, no mutations, no raw data extraction.
 
 <Steps>
 

@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/cli",
-  "version": "0.5.3",
+  "version": "0.5.14",
   "description": "Turn your database into an AI-ready data product. Browser-based Context Brief wizard, automatic schema introspection, Bronze-to-Gold tier enrichment, and MCP server for Claude Code, Cursor, and Copilot.",
   "license": "MIT",
   "author": "Eric Kittelson",
@@ -40,7 +40,8 @@
     "context": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "assets"
   ],
   "scripts": {
     "build": "tsup",
@@ -56,6 +57,7 @@
     "chokidar": "^4.0.0",
     "commander": "^14.0.0",
     "ws": "^8.19.0",
+    "pg": "^8.19.0",
     "yaml": "^2.7.0"
   },
   "devDependencies": {
