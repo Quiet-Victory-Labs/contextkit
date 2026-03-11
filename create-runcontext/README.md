@@ -1,6 +1,6 @@
 # create-runcontext
 
-Scaffold a new [RunContext](https://github.com/RunContext/runcontext) project — one command to start building an AI-ready data product from your database.
+Scaffold a new [RunContext](https://github.com/Quiet-Victory-Labs/runcontext) project — one command to start building an AI-ready semantic plane from your database.
 
 ## Usage
 
@@ -10,7 +10,7 @@ cd my-project
 context setup
 ```
 
-The setup wizard opens in your browser. Fill out a Context Brief (name, owner, sensitivity, database connection), and the pipeline builds your semantic plane automatically.
+The 6-step setup wizard walks you through: Connect > Define > Scaffold > Checkpoint > Curate > Serve.
 
 ## What it creates
 
@@ -29,14 +29,14 @@ my-project/
 
 ## What happens next
 
-1. **`context setup`** — Browser wizard guides you through the Context Brief
-2. **Pipeline runs** — Introspect database → scaffold Bronze → enrich to Silver
-3. **`context dev --studio`** — Visual editor to curate metadata to Gold tier
-4. **`context serve`** — MCP server live, AI agents get full context
+1. **`context setup`** — 6-step wizard guides you from database to semantic plane
+2. **Scaffold & Checkpoint** — Introspect database, scaffold Bronze metadata, lock baseline
+3. **Curate** — Your AI agent (Claude Code, Cursor, Copilot) uses MCP to query the database and write Gold-quality metadata
+4. **`context serve`** — MCP server goes live, AI agents get full context
 
 ## Part of RunContext
 
-See the [RunContext repository](https://github.com/RunContext/runcontext) for full documentation.
+See the [RunContext repository](https://github.com/Quiet-Victory-Labs/runcontext) for full documentation.
 
 ## License
 

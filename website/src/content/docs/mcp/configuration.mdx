@@ -1,11 +1,11 @@
 ---
 title: MCP Configuration
-description: How to configure the ContextKit MCP server for Claude Code, Cursor, VS Code, Windsurf, OpenAI Codex, and other MCP clients.
+description: How to configure the RunContext MCP server for Claude Code, Cursor, VS Code, Windsurf, OpenAI Codex, and other MCP clients.
 ---
 
 import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
-The ContextKit MCP server can be configured for any MCP-compatible client. You can run it **locally** (stdio or self-hosted HTTP) or connect to the **hosted endpoint** at `api.runcontext.dev/mcp`.
+The RunContext MCP server can be configured for any MCP-compatible client. You can run it **locally** (stdio or self-hosted HTTP) or connect to the **hosted endpoint** at `api.runcontext.dev/mcp`.
 
 ## Connection modes
 
@@ -15,7 +15,7 @@ The ContextKit MCP server can be configured for any MCP-compatible client. You c
 | **Local HTTP** | Streamable HTTP | Self-hosted, shared team server |
 | **Hosted** | Streamable HTTP | Managed cloud, no server to run |
 
-For the hosted endpoint, replace `{org}` with your organization slug and set `CONTEXTKIT_API_KEY` to your API key (available from the ContextKit dashboard).
+For the hosted endpoint, replace `{org}` with your organization slug and set `RUNCONTEXT_API_KEY` to your API key (available from the RunContext dashboard).
 
 ---
 
@@ -53,7 +53,7 @@ For the hosted endpoint, replace `{org}` with your organization slug and set `CO
     "contextkit": {
       "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
-        "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
+        "Authorization": "Bearer ${RUNCONTEXT_API_KEY}"
       }
     }
   }
@@ -102,7 +102,7 @@ Set `cwd` to the directory containing your `contextkit.config.yaml` file. If the
     "contextkit": {
       "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
-        "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
+        "Authorization": "Bearer ${RUNCONTEXT_API_KEY}"
       }
     }
   }
@@ -149,7 +149,7 @@ VS Code supports MCP servers via its built-in chat/copilot agent framework. Conf
     "contextkit": {
       "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
-        "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
+        "Authorization": "Bearer ${RUNCONTEXT_API_KEY}"
       }
     }
   }
@@ -185,7 +185,7 @@ Windsurf reads MCP configuration from `~/.codeium/windsurf/mcp_config.json`.
     "contextkit": {
       "serverUrl": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
-        "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
+        "Authorization": "Bearer ${RUNCONTEXT_API_KEY}"
       }
     }
   }
@@ -221,7 +221,7 @@ OpenAI Codex CLI reads MCP configuration from a `mcp.json` file or inline config
     "contextkit": {
       "url": "https://api.runcontext.dev/mcp/{org}",
       "headers": {
-        "Authorization": "Bearer ${CONTEXTKIT_API_KEY}"
+        "Authorization": "Bearer ${RUNCONTEXT_API_KEY}"
       }
     }
   }
@@ -292,7 +292,7 @@ The hosted endpoint uses Streamable HTTP transport. Example `initialize` request
 
 ## Verifying the connection
 
-Once configured, your AI tool should discover the ContextKit resources and tools automatically. You can verify by asking the agent:
+Once configured, your AI tool should discover the RunContext resources and tools automatically. You can verify by asking the agent:
 
 > "What MCP resources are available?"
 

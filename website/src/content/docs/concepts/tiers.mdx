@@ -3,7 +3,7 @@ title: Tier System
 description: Bronze, Silver, and Gold metadata maturity tiers
 ---
 
-ContextKit uses a three-tier maturity model to measure how complete and AI-ready your metadata is. Each tier builds on the previous one, adding more context and governance until your semantic layer is fully prepared for autonomous AI consumption.
+RunContext uses a three-tier maturity model to measure how complete and AI-ready your metadata is. Each tier builds on the previous one, adding more context and governance until your semantic layer is fully prepared for autonomous AI consumption.
 
 You can check your current score at any time with:
 
@@ -13,11 +13,11 @@ context tier
 
 This command evaluates every dataset and field against the tier requirements below, producing a per-model and aggregate score.
 
-## Bronze -- Discoverable
+## Bronze -- Scaffolded
 
-Bronze is the baseline. It means the data exists in your semantic layer and has enough metadata for a human or AI to find it and understand what it is at a surface level.
+Bronze is the baseline — scaffolded metadata generated automatically from database introspection. It means the data exists in your semantic plane and has enough metadata for a human or AI to find it and understand what it is at a surface level.
 
-**How to achieve it:** Run `context introspect` against your data source. ContextKit will connect to your warehouse, read table and column metadata, and generate OSI and governance files automatically.
+**How to achieve it:** Run `context setup` or `context introspect` against your data source. RunContext connects to your database, reads table and column metadata, and generates OSI and governance files automatically.
 
 ```bash
 context introspect --source my_warehouse
@@ -27,19 +27,19 @@ context introspect --source my_warehouse
 
 | Requirement | Description |
 |---|---|
-| **Description** | Every dataset and field must have a human-readable description. |
+| **Description** | Every dataset and field must have a human-readable description (auto-generated from introspection). |
 | **Ownership** | At least one owner (team or individual) is assigned to the dataset. |
 | **Security classification** | Each field has a sensitivity level (e.g., `public`, `internal`, `confidential`, `restricted`). |
 | **Grain** | The dataset declares its grain -- the set of columns that uniquely identify a row. |
 | **Table type** | The dataset is classified as `fact`, `dimension`, `staging`, `snapshot`, or another recognized type. |
 
-At Bronze, you know *what* exists and *who* owns it. You do not yet know whether to trust it or how an AI should use it.
+At Bronze, you know *what* exists and *who* owns it. This is the scaffolded output of introspection — you do not yet know whether to trust it or how an AI should use it.
 
 ## Silver -- Trusted
 
 Silver adds the context needed to trust and correctly interpret the data. Fields are linked to business definitions, lineage is documented, and enough metadata exists for an AI to use the data without hallucinating relationships.
 
-**How to achieve it:** After introspection, run the enrich command targeting Silver. ContextKit uses LLM-assisted enrichment to fill in gaps automatically.
+**How to achieve it:** After introspection, run the enrich command targeting Silver. RunContext uses LLM-assisted enrichment to fill in gaps automatically.
 
 ```bash
 context enrich --target silver
@@ -64,7 +64,7 @@ At Silver, you have a semantic layer that a careful analyst could work with conf
 
 Gold is the highest tier. Every field carries explicit instructions for how AI agents should interpret and use it. Ambiguities are resolved, guardrails are in place, and golden queries provide tested examples of correct usage.
 
-**How to achieve it:** Gold requires human curation. While `context enrich` can suggest semantic roles and draft guardrails, a data team must review, adjust, and approve them. There is no single command that produces Gold automatically -- this is by design.
+**How to achieve it:** Gold requires **agent-driven curation**. Your AI agent (in Claude Code, Cursor, or Copilot) connects to your actual database via MCP, queries real data, and fills in the deep semantic metadata that only comes from understanding the data itself. Copy the MCP config into your IDE and paste the curation prompt — the agent does the heavy lifting, consulting you on business logic along the way.
 
 ### Gold requirements
 
@@ -72,25 +72,26 @@ All Silver requirements, plus:
 
 | Requirement | Description |
 |---|---|
-| **Semantic roles** | Every field has an explicit role: `identifier`, `measure`, `attribute`, `date`, `currency`, `status`, `flag`, `category`, `foreign_key`, etc. |
-| **Aggregation rules** | Measures declare their default aggregation (`sum`, `avg`, `count`, `min`, `max`, `count_distinct`) so AI agents never sum an average or average a count. |
+| **Semantic roles on all fields** | Every field has an explicit role: `identifier`, `measure`, `attribute`, `date`, `currency`, `status`, `flag`, `category`, `foreign_key`, etc. |
+| **Golden queries (3+)** | At least three tested, approved SQL queries that demonstrate correct usage of the dataset. AI agents reference these as examples. |
 | **Guardrail filters** | Required filters are declared on datasets (e.g., "always filter on `is_deleted = false`") to prevent AI from returning misleading results. |
-| **Golden queries** | Tested, approved SQL or semantic-layer queries that demonstrate correct usage of the dataset. AI agents can reference these as examples. |
 | **Business rules** | Prose or structured rules explaining business logic (e.g., "revenue is recognized at shipment, not at order"). |
 | **Hierarchies** | Dimensional hierarchies are defined (e.g., `country > region > city`) so AI agents can drill up and down correctly. |
+| **Rich descriptions** | Detailed, AI-friendly descriptions on every dataset and field, beyond the auto-generated Bronze descriptions. |
+| **Endorsed trust** | Dataset trust status is explicitly set to `trusted` or `verified` by a data owner. |
+| **Contactable owner** | Owner record includes a reachable contact (email, Slack handle, or equivalent). |
 | **Relationships** | All foreign-key and logical relationships between datasets are explicitly declared with cardinality. |
-| **AI context** | Fields and datasets carry `ai_context` blocks with instructions, synonyms, and usage examples specifically written for LLM consumption. |
 
 ## The path from Bronze to Gold
 
-The key insight is that **introspect + enrich gets you to Silver automatically**. The jump from Silver to Gold is intentionally manual -- it requires domain expertise that only your data team has.
+The key insight is that **the setup wizard gets you to Bronze/Silver automatically**. The jump to Gold is driven by your AI agent, which queries your actual database via MCP to build the deep semantic context that automation alone cannot provide.
 
 ```
-context introspect     -->  Bronze (automated)
-context enrich         -->  Silver (automated)
-Human curation         -->  Gold   (manual)
+context setup          -->  Bronze (scaffolded from introspection)
+context enrich         -->  Silver (sample values, tags, lineage, glossary)
+Agent-driven curation  -->  Gold   (agent queries real data via MCP)
 ```
 
-Most teams reach Silver within minutes of setting up ContextKit. Gold is an ongoing process of refinement, typically prioritized for the most business-critical datasets first.
+Most teams reach Silver within minutes of running `context setup`. Gold is achieved through agent-driven curation — your AI agent in Claude Code, Cursor, or Copilot connects to the database, inspects real data, and curates the metadata with your guidance. Prioritize Gold for the most business-critical datasets first.
 
 Use `context tier` regularly to track progress and identify which datasets need attention to reach the next level.

@@ -1,11 +1,11 @@
 ---
 title: Database Support
-description: Connect ContextKit to any data warehouse — PostgreSQL, DuckDB, Snowflake, BigQuery, MySQL, and more.
+description: Connect RunContext to any data warehouse — PostgreSQL, DuckDB, Snowflake, BigQuery, MySQL, and more.
 ---
 
 import { Tabs, TabItem, Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
-ContextKit connects to your database to introspect schemas, validate metadata against live data, and verify golden queries. It supports a wide range of databases through optional peer dependencies — install only the driver you need.
+RunContext connects to your database to introspect schemas, validate metadata against live data, and verify golden queries. It supports a wide range of databases through optional peer dependencies — install only the driver you need.
 
 ## Supported databases
 
@@ -172,12 +172,12 @@ Install the driver: `npm install @databricks/sql`
 </Tabs>
 
 <Aside type="caution">
-Never commit credentials to version control. Use `${ENV_VAR}` syntax in your config — ContextKit expands environment variables at runtime.
+Never commit credentials to version control. Use `${ENV_VAR}` syntax in your config — RunContext expands environment variables at runtime.
 </Aside>
 
 ## Driver installation
 
-ContextKit uses optional peer dependencies — install only the driver for your database:
+RunContext uses optional peer dependencies — install only the driver for your database:
 
 | Database | Driver Package | Install Command |
 |---|---|---|
@@ -191,11 +191,11 @@ ContextKit uses optional peer dependencies — install only the driver for your 
 | Databricks | `@databricks/sql` | `npm install @databricks/sql` |
 | SQLite | `better-sqlite3` | `npm install better-sqlite3` |
 
-If a driver is missing, ContextKit will tell you exactly which package to install.
+If a driver is missing, RunContext will tell you exactly which package to install.
 
 ## MCP config auto-detection
 
-When you run `context setup`, ContextKit scans your IDE MCP configs to find databases you've already connected:
+When you run `context setup`, RunContext scans your IDE MCP configs to find databases you've already connected:
 
 | IDE | Config Location |
 |---|---|

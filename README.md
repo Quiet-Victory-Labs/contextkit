@@ -1,110 +1,80 @@
 <h1 align="center">RunContext</h1>
 
 <p align="center">
-  <strong>Turn your database into an AI-ready data product.</strong>
+  <strong>Turn your database into an AI-ready semantic plane.</strong>
 </p>
 
 <p align="center">
-  Fill out a Context Brief about your data. RunContext connects to your database, introspects the schema, and builds a <b>semantic plane</b> — a structured metadata layer that tells AI agents what your data means, how to query it safely, and which business rules apply. Serve it to Claude Code, Cursor, Copilot, or any MCP-compatible tool.
-</p>
-
-<p align="center">
-  <a href="https://github.com/RunContext/runcontext/actions/workflows/ci.yml"><img src="https://github.com/RunContext/runcontext/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/Quiet-Victory-Labs/runcontext/actions/workflows/ci.yml"><img src="https://github.com/Quiet-Victory-Labs/runcontext/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://www.npmjs.com/package/@runcontext/cli"><img src="https://img.shields.io/npm/v/@runcontext/cli" alt="npm" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
-  <a href="https://github.com/open-semantic-interchange/OSI"><img src="https://img.shields.io/badge/OSI-Open_Semantic_Interchange-c9a55a" alt="OSI" /></a>
+</p>
+
+<p align="center">
+  Run <code>context setup</code>, connect your database, and RunContext introspects the schema to scaffold a semantic plane — structured metadata that tells AI agents what your data means, how to query it safely, and which business rules apply. Then hand off to your AI agent to curate it to Gold. Serve it via MCP to Claude Code, Cursor, Copilot, or any compatible tool.
 </p>
 
 ---
 
-### Works with
+## Quick Start
 
-`Claude Code` · `Cursor` · `Copilot` · `Windsurf` · `Codex` — any MCP-compatible AI tool.
+```bash
+npx @runcontext/cli setup
+```
+
+A browser wizard opens. Connect your database, fill out the Context Brief, and RunContext scaffolds your semantic plane automatically.
 
 ---
 
 ## How It Works
 
-```
-1. context setup          → Opens a browser wizard
-2. Fill out Context Brief → Name, owner, sensitivity, connect database
-3. Pipeline runs          → Introspect → Scaffold → Enrich → Verify
-4. context serve          → MCP server live — AI agents have full context
-```
+The `context setup` wizard walks you through six steps:
 
-**Step 1 — Context Brief.** Run `context setup` and a 5-step wizard opens in your browser. Name your data product, set an owner, choose a sensitivity level, and connect your database. Upload any existing documentation (SQL files, data dictionaries, markdown) to give the enrichment engine more to work with.
+| Step | What happens |
+|------|-------------|
+| **1. Connect** | Connect to your database |
+| **2. Define** | Name your semantic plane, set owner and sensitivity |
+| **3. Scaffold** | Auto-introspect schema and generate Bronze-tier metadata |
+| **4. Checkpoint** | Review what was built |
+| **5. Curate** | Hand off to your IDE's AI agent to curate metadata to Gold using real data queries |
+| **6. Serve** | Start the MCP server and serve your semantic plane to AI tools |
 
-**Step 2 — Automatic Pipeline.** RunContext introspects your schema, scaffolds Bronze-tier metadata (descriptions, types, ownership), then auto-enriches toward Silver (trust status, glossary, lineage, sample values). The pipeline runs in real time — you watch each stage complete.
-
-**Step 3 — Curate to Gold.** Open the visual studio (`context dev --studio`) to add semantic roles, aggregation rules, guardrail filters, golden queries, and business rules. This is what makes AI agents generate correct SQL instead of guessing. Gold tier requires your business knowledge — and that's where the real value is.
-
-**Step 4 — Serve via MCP.** Run `context serve` and every AI tool in your stack gets access to your semantic plane. Agents can search your metadata, look up business terms, retrieve guardrail filters, and find golden queries — all through the Model Context Protocol.
+The result is a `context/` directory of YAML files following the OSI (Open Semantic Interchange) specification.
 
 ---
 
-## Quickstart
+## Tiers
 
-```bash
-npx create-runcontext my-data
-cd my-data
-context setup
-```
+**Bronze** -- Scaffolded automatically. Every model and field has a description, owner, and type. Your data is discoverable.
 
-The wizard opens in your browser. Fill out the Context Brief, connect your database, and the pipeline handles the rest.
+**Silver** -- Sample values, tags, and richer descriptions. AI agents can interpret the data with confidence.
 
-Or tell your AI agent:
+**Gold** -- Golden queries, guardrails, semantic roles, and business rules. Agents generate correct SQL on the first try.
 
-> *"Install @runcontext/cli and build a semantic layer for my database."*
-
----
-
-## The Tiers
-
-**Bronze — Discoverable.** Every model, field, and dataset has a description, an owner, and a security classification. Achieved automatically via `context introspect`.
-
-**Silver — Trusted.** Adds trust status, glossary links, lineage, sample values, and refresh cadence. Achieved via `context enrich --target silver`. AI can interpret the data but still lacks guardrails.
-
-**Gold — AI-Ready.** Semantic roles, aggregation rules, guardrail filters, golden queries, business rules, and explicit relationships. Curated by you in the visual studio. This is what makes agents generate correct SQL on the first try.
+Check your progress with `context tier`.
 
 ---
 
 ## Commands
 
 ```bash
-# Guided setup
-context setup                    # 5-step browser wizard — database to data product in one flow
-context dev --studio             # Visual editor — curate metadata, see tier updates live
-
-# Build pipeline
-context introspect --db <url>    # Connect database, scaffold Bronze metadata
-context enrich --target silver   # Auto-enrich toward Silver tier
-context enrich --target gold     # Suggest Gold-tier enrichments
-context build                    # Compile semantic plane → manifest JSON
-
-# Quality & validation
-context tier [model]             # Show Bronze/Silver/Gold scorecard
-context lint                     # Run 40 lint rules
-context fix --write              # Auto-fix lint issues
-context verify --db <url>        # Check metadata accuracy against live database
-
-# Serve & export
-context serve --stdio            # MCP server for AI agents (stdio)
-context serve --http --port 3000 # MCP server (HTTP)
-context blueprint [model]        # Export portable AI Blueprint (OSI YAML)
-context site                     # Generate browsable documentation site
+context setup                  # Browser wizard -- database to semantic plane
+context tier [model]           # Bronze/Silver/Gold scorecard
+context serve                  # Start MCP server (stdio for IDE integration)
+context lint                   # Validate metadata
+context fix                    # Auto-fix lint issues
+context verify                 # Check metadata against live database
+context build                  # Compile context layer to manifest
+context dev                    # Watch mode
+context introspect             # Schema introspection
+context explain [term]         # Look up models, terms, or owners
 ```
-
----
-
-## Database Support
-
-PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, Databricks.
 
 ---
 
 ## MCP Server
 
-Add RunContext as an MCP server so AI agents discover your semantic plane automatically:
+Add RunContext to your AI tool's MCP configuration:
 
 ```json
 {
@@ -117,42 +87,56 @@ Add RunContext as an MCP server so AI agents discover your semantic plane automa
 }
 ```
 
-**8 MCP tools:** search, explain, validate, tier, golden-queries, guardrails, list-products, get-product.
+**6 MCP tools available:**
+
+| Tool | Description |
+|------|-------------|
+| `context_search` | Find models, datasets, and fields by keyword |
+| `context_explain` | Get full model details |
+| `context_validate` | Run the linter |
+| `context_tier` | Get tier scorecard |
+| `context_golden_query` | Find validated SQL queries |
+| `context_guardrails` | Get WHERE clauses and access rules for tables |
+
+Works with Claude Code, Cursor, Copilot, Windsurf, Claude Desktop, and any MCP-compatible tool.
 
 ---
 
-## Local-first, Cloud-ready
+## Database Support
 
-RunContext runs entirely on your machine. Connect any database, curate metadata locally, serve via MCP — free and open source.
-
-Need collaboration, hosted MCP, or team workflows? **[RunContext Cloud](https://runcontext.dev)** adds multi-user curation, hosted serving, and managed infrastructure on top of the same open core.
-
----
-
-## Open Semantic Interchange
-
-RunContext metadata follows the [Open Semantic Interchange (OSI)](https://github.com/open-semantic-interchange/OSI) specification — a vendor-neutral format for describing data products. Export your semantic plane as portable YAML. Import it into any OSI-compliant tool. No lock-in.
+| Database | Supported |
+|----------|-----------|
+| PostgreSQL | Yes |
+| DuckDB | Yes |
+| MySQL | Yes |
+| SQL Server | Yes |
+| SQLite | Yes |
+| Snowflake | Yes |
+| BigQuery | Yes |
+| ClickHouse | Yes |
+| Databricks | Yes |
 
 ---
 
 ## Packages
 
 | Package | Description |
-|---|---|
-| [`@runcontext/cli`](https://www.npmjs.com/package/@runcontext/cli) | CLI — setup wizard, introspect, enrich, build, serve |
-| [`@runcontext/core`](https://www.npmjs.com/package/@runcontext/core) | Compiler, linter, tier engine, 40 lint rules |
-| [`@runcontext/mcp`](https://www.npmjs.com/package/@runcontext/mcp) | MCP server — 8 tools for AI agents |
-| [`@runcontext/ui`](https://www.npmjs.com/package/@runcontext/ui) | Browser-based Context Brief wizard and visual studio |
-| [`@runcontext/site`](https://www.npmjs.com/package/@runcontext/site) | Documentation site generator with search and tier badges |
-| [`create-runcontext`](https://www.npmjs.com/package/create-runcontext) | Project scaffolder — `npx create-runcontext` |
+|---------|-------------|
+| [`@runcontext/cli`](https://www.npmjs.com/package/@runcontext/cli) | CLI, setup wizard, and MCP server |
+| [`@runcontext/core`](https://www.npmjs.com/package/@runcontext/core) | Compiler, linter, tier engine, adapters |
+| [`@runcontext/mcp`](https://www.npmjs.com/package/@runcontext/mcp) | MCP protocol implementation |
+| [`@runcontext/ui`](https://www.npmjs.com/package/@runcontext/ui) | Browser-based setup wizard and planes viewer |
+| [`@runcontext/uxd`](https://www.npmjs.com/package/@runcontext/uxd) | Design system components |
+| [`@runcontext/db`](https://www.npmjs.com/package/@runcontext/db) | Database utilities |
+| [`create-runcontext`](https://www.npmjs.com/package/create-runcontext) | Project scaffolder (`npx create-runcontext`) |
 
 ---
 
 ## Links
 
-- [Documentation](https://runcontext.dev)
+- [Documentation](https://docs.runcontext.dev)
+- [GitHub](https://github.com/Quiet-Victory-Labs/runcontext)
 - [npm](https://www.npmjs.com/package/@runcontext/cli)
-- [RunContext Cloud](https://runcontext.dev)
 
 ## License
 

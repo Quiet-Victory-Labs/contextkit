@@ -1,6 +1,6 @@
 ---
 title: Sign Up & Onboarding
-description: "Create a ContextKit Cloud account, set up your organization, publish your first semantic plane, and connect your team's AI tools."
+description: "Create a RunContext Cloud account, set up your organization, publish your first semantic plane, and connect your team's AI tools."
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
@@ -63,7 +63,7 @@ You need a semantic plane built locally first. If you haven't done that yet, sta
    context publish --org my-company
    ```
 
-   This compiles your local semantic plane and uploads it to ContextKit Cloud. The output shows:
+   This compiles your local semantic plane and uploads it to RunContext Cloud. The output shows:
    - How many data products were published
    - The MCP endpoint URL for your organization
    - The dashboard URL to view your published plane
@@ -96,7 +96,7 @@ You need a semantic plane built locally first. If you haven't done that yet, sta
    ```json
    {
      "mcpServers": {
-       "contextkit-cloud": {
+       "runcontext-cloud": {
          "url": "https://api.runcontext.dev/mcp/my-company",
          "headers": {
            "Authorization": "Bearer <their-api-key>"
@@ -118,7 +118,7 @@ You need a semantic plane built locally first. If you haven't done that yet, sta
 
 ## Set Up Guardrailed MCP Connectors
 
-Instead of using generic MCP database tools (which may expose write access), connect your databases through ContextKit's guardrailed connectors. They introspect your schema and serve context to AI agents — strictly read-only, no mutations, no raw data extraction.
+Instead of using generic MCP database tools (which may expose write access), connect your databases through RunContext's guardrailed connectors. They introspect your schema and serve context to AI agents — strictly read-only, no mutations, no raw data extraction.
 
 <Steps>
 
@@ -131,7 +131,7 @@ Instead of using generic MCP database tools (which may expose write access), con
    Select from PostgreSQL, MySQL, Snowflake, BigQuery, ClickHouse, Databricks, or SQL Server. Enter the connection details.
 
    <Aside type="tip">
-   For security, connections use SSL/TLS and credentials are encrypted at rest. We recommend creating a read-only database user specifically for ContextKit.
+   For security, connections use SSL/TLS and credentials are encrypted at rest. We recommend creating a read-only database user specifically for RunContext.
    </Aside>
 
 3. **Configure introspection**

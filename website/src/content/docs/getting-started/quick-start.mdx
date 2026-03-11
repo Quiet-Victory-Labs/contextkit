@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: "Get started with ContextKit in under 5 minutes — create a data product, connect your database, and serve AI-ready metadata via MCP."
+description: "Get started with RunContext in under 5 minutes — create a semantic plane, connect your database, and serve AI-ready metadata via MCP."
 ---
 
 import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
@@ -12,41 +12,29 @@ import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
 1. **Create a new project**
 
    ```bash
-   npx create-runcontext my-data
-   cd my-data
+   npx create-runcontext my-project && cd my-project && context setup
    ```
 
-2. **Run the setup wizard**
+2. **The 6-step wizard runs**
 
-   ```bash
-   context setup
-   ```
+   The setup wizard opens in your browser and walks you through:
 
-   A 5-step wizard opens in your browser:
-   - **Product name** — name your data product (e.g. `sales-analytics`)
-   - **Owner** — name, team, and email
-   - **Sensitivity** — public, internal, confidential, or restricted
-   - **Database** — auto-detected from environment, or enter a connection URL
-   - **Documentation** — optionally upload SQL files, data dictionaries, or markdown
+   1. **Connect** — choose your database (auto-detected from environment, or enter a connection URL)
+   2. **Define** — name your semantic plane (e.g. `sales-analytics`), set owner, choose sensitivity level
+   3. **Scaffold** — RunContext introspects your schema and generates Bronze-tier metadata
+   4. **Checkpoint** — review what was generated (tables, columns, types, initial descriptions)
+   5. **Curate** — enrich toward Silver (sample values, tags, glossary links, lineage)
+   6. **Serve** — MCP server configuration is generated
 
-3. **Watch the pipeline run**
+3. **Curate to Gold**
 
-   The wizard runs the build pipeline in real time:
-   - Introspect schema → scaffold Bronze metadata
-   - Auto-enrich toward Silver (glossary, lineage, sample values)
-   - Lint and verify
+   Gold requires agent-driven curation — your AI agent queries the actual database to add semantic roles, golden queries, guardrails, and business rules. Copy the MCP config into your IDE (Claude Code, Cursor, or Copilot) and paste the curation prompt:
 
-4. **Curate to Gold**
+   > *"Read context/AGENT_INSTRUCTIONS.md and curate this semantic plane to Gold."*
 
-   Open the visual studio to add semantic roles, aggregation rules, guardrails, and golden queries:
+   The agent connects to your database via MCP, inspects real data, and fills in everything needed for Gold: semantic roles on all fields, 3+ golden queries, guardrails, business rules, and hierarchies.
 
-   ```bash
-   context dev --studio
-   ```
-
-   Or tell your AI agent: *"Read context/AGENT_INSTRUCTIONS.md and get this project to Gold."*
-
-5. **Serve to AI agents**
+4. **Serve to AI agents**
 
    ```bash
    context serve --stdio
@@ -57,7 +45,7 @@ import { Steps, Code, Tabs, TabItem } from '@astrojs/starlight/components';
    ```json
    {
      "mcpServers": {
-       "contextkit": {
+       "runcontext": {
          "command": "npx",
          "args": ["@runcontext/cli", "serve", "--stdio"]
        }
@@ -73,7 +61,7 @@ In Claude Code, Cursor, or any agentic coding platform:
 
 > *"Install @runcontext/cli and build a semantic layer for my database."*
 
-The agent runs `context setup`, introspects your database, and starts asking you questions about metrics, ownership, and business rules. It reads the generated `context/AGENT_INSTRUCTIONS.md` and knows exactly what to do.
+The agent runs `context setup`, introspects your database, and queries real data via MCP to curate your semantic plane. It reads the generated `context/AGENT_INSTRUCTIONS.md` and knows exactly what to do — all the way to Gold.
 
 ## Option C: Manual Pipeline
 
@@ -96,14 +84,14 @@ context serve --stdio
 
 ## What Just Happened?
 
-The setup pipeline performed these steps:
+The setup wizard performed these steps:
 
-1. **Connected** to your database (PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, or Databricks)
-2. **Introspected** every table — generated OSI YAML with columns, types, primary keys
-3. **Scaffolded** governance files — ownership, security classification, grain statements
-4. **Enriched** toward Silver — added lineage, sample values, glossary links, trust status
-5. **Linted** the result — flagged anything that still needs attention
-6. **Generated** `AGENT_INSTRUCTIONS.md` — a complete guide for any AI agent to continue curating
+1. **Connect** — connected to your database (PostgreSQL, DuckDB, MySQL, SQL Server, SQLite, Snowflake, BigQuery, ClickHouse, or Databricks)
+2. **Define** — captured your semantic plane's name, owner, and sensitivity level
+3. **Scaffold** — introspected every table, generated OSI YAML with columns, types, primary keys, and governance files (Bronze tier)
+4. **Checkpoint** — presented the scaffolded metadata for your review
+5. **Curate** — enriched toward Silver with sample values, tags, glossary links, and lineage
+6. **Serve** — generated MCP server configuration and `AGENT_INSTRUCTIONS.md` for agent-driven curation to Gold
 
 Your metadata now lives in YAML files under `context/`. Edit them in the visual studio, let AI agents curate them, or modify the YAML directly.
 

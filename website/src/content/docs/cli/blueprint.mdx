@@ -1,11 +1,11 @@
 ---
 title: context blueprint
-description: Export AI Blueprints — portable, Gold-tier data product specifications in OSI YAML.
+description: Export AI Blueprints — portable, Gold-tier semantic plane specifications in OSI YAML.
 ---
 
-The `blueprint` command exports your data products as **AI Blueprints** — self-contained YAML files that capture the complete semantic specification following the Open Semantic Interchange (OSI) v1.0 standard.
+The `blueprint` command exports your semantic planes as **AI Blueprints** — self-contained YAML files that capture the complete semantic specification following the Open Semantic Interchange (OSI) v1.0 standard.
 
-An AI Blueprint is the Gold-tier deliverable. It contains every dataset, field, relationship, metric, business rule, guardrail filter, golden query, and glossary term for a data product in a single portable file.
+An AI Blueprint is the Gold-tier deliverable. It contains every dataset, field, relationship, metric, business rule, guardrail filter, golden query, and glossary term for a semantic plane in a single portable file.
 
 ## Usage
 
@@ -29,7 +29,7 @@ context blueprint [model]
 
 ## Examples
 
-### Export all data products
+### Export all semantic planes
 
 ```bash
 context blueprint
@@ -37,7 +37,7 @@ context blueprint
 
 Writes one `.data-product.osi.yaml` file per model to `./blueprints/`.
 
-### Export a single data product
+### Export a single semantic plane
 
 ```bash
 context blueprint sales-analytics
@@ -114,7 +114,7 @@ semantic_model:
 
 ## How to use AI Blueprints
 
-- **Share them** — hand a blueprint to any team or tool that needs to understand your data
+- **Share them** — hand a blueprint to any team or tool that needs to understand your semantic plane
 - **Serve via MCP** — the `context://data-product/{name}` resource exposes blueprints to AI agents
 - **Import them** — any OSI-compliant tool can consume the YAML directly
 - **Version them** — commit blueprints to git alongside your code
@@ -123,4 +123,4 @@ semantic_model:
 
 - Serve blueprints to agents: [`context serve`](/cli/serve/)
 - Check what's missing for Gold: `context tier`
-- Create more data products: [`context new`](/cli/new/)
+- Create more semantic planes: [`context new`](/cli/new/)

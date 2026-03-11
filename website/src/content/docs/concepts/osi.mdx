@@ -3,7 +3,7 @@ title: OSI Specification
 description: The Open Semantic Interchange standard
 ---
 
-The **Open Semantic Interchange (OSI)** specification is an open standard for describing semantic models in a vendor-neutral format. OSI v1.0 is backed by Snowflake, dbt Labs, Salesforce, and other industry participants. ContextKit reads and validates OSI files natively.
+The **Open Semantic Interchange (OSI)** specification is an open standard for describing semantic models in a vendor-neutral format. OSI v1.0 is backed by Snowflake, dbt Labs, Salesforce, and other industry participants. RunContext reads and validates OSI files natively.
 
 For the full specification, see the [OSI GitHub repository](https://github.com/open-semantic-interchange/OSI).
 
@@ -11,7 +11,7 @@ For the full specification, see the [OSI GitHub repository](https://github.com/o
 
 Before OSI, every semantic layer tool used its own proprietary format. Moving metadata between tools meant writing custom adapters. OSI provides a shared language: if your metadata is in OSI format, any compliant tool can read it.
 
-ContextKit uses OSI as the foundation layer. All schema information -- datasets, fields, relationships, and metrics -- lives in `*.osi.yaml` files. Governance, business rules, and enrichment live in separate companion files, so the OSI files remain portable and standard-compliant.
+RunContext uses OSI as the foundation layer. All schema information -- datasets, fields, relationships, and metrics -- lives in `*.osi.yaml` files. Governance, business rules, and enrichment live in separate companion files, so the OSI files remain portable and standard-compliant.
 
 ## Core schema
 
@@ -195,8 +195,8 @@ ai_context:
 
 The object format is preferred for Gold-tier metadata because it gives AI agents structured, unambiguous guidance. The `synonyms` list helps agents match user questions to the correct field even when the user uses informal language. The `examples` list provides concrete query patterns the agent can follow.
 
-## ContextKit and OSI
+## RunContext and OSI
 
-ContextKit treats OSI files as read-only schema definitions. When you run `context introspect`, ContextKit generates OSI files from your warehouse. When you run `context enrich`, ContextKit writes governance and rules to companion files -- never to the OSI file itself.
+RunContext treats OSI files as read-only schema definitions. When you run `context introspect`, RunContext generates OSI files from your warehouse. When you run `context enrich`, RunContext writes governance and rules to companion files -- never to the OSI file itself.
 
-This means your OSI files remain compliant with the specification and portable across tools. Any enrichment ContextKit adds is stored separately and can be stripped away without affecting the core schema definition.
+This means your OSI files remain compliant with the specification and portable across tools. Any enrichment RunContext adds is stored separately and can be stripped away without affecting the core schema definition.

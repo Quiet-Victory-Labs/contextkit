@@ -1,15 +1,15 @@
 ---
-title: Data Products & AI Blueprints
+title: Semantic Planes & AI Blueprints
 description: Portable YAML blueprints for your data models, built on Open Semantic Interchange.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-A **data product** is a self-contained YAML blueprint that fully describes a data model — its schema, semantics, governance, and AI instructions — in a single portable file. Data products follow the [Open Semantic Interchange (OSI)](/concepts/osi/) specification, so they work with any OSI-compliant tool.
+A **semantic plane** is a self-contained YAML blueprint that fully describes a data model — its schema, semantics, governance, and AI instructions — in a single portable file. You may also hear this called a "data product" — the concepts are synonymous, but RunContext uses "semantic plane" as the primary term. Semantic planes follow the [Open Semantic Interchange (OSI)](/concepts/osi/) specification, so they work with any OSI-compliant tool.
 
-## Why data products?
+## Why semantic planes?
 
-Most teams scatter metadata across wikis, spreadsheets, dbt YAML, BI tool definitions, and tribal knowledge. A data product consolidates everything an AI agent (or a new team member) needs into one file:
+Most teams scatter metadata across wikis, spreadsheets, dbt YAML, BI tool definitions, and tribal knowledge. A semantic plane consolidates everything an AI agent (or a new team member) needs into one file:
 
 - **Schema** — tables, columns, types, expressions
 - **Semantics** — descriptions, business terms, synonyms
@@ -19,16 +19,16 @@ Most teams scatter metadata across wikis, spreadsheets, dbt YAML, BI tool defini
 - **AI context** — golden queries, guardrails, usage instructions
 
 <Aside type="tip">
-Think of a data product YAML as a **portable contract** for your data model. Move it between warehouses, teams, or tools — the meaning travels with the schema.
+Think of a semantic plane YAML as a **portable contract** for your data model. Move it between warehouses, teams, or tools — the meaning travels with the schema.
 </Aside>
 
 ## AI Blueprint
 
-The **AI Blueprint** is the Gold-tier deliverable — a single, portable YAML file that captures the complete semantic specification for a data product. Export it with [`context blueprint`](/cli/blueprint/), serve it via MCP at `context://data-product/{name}`, or share it with any OSI-compliant tool.
+The **AI Blueprint** is the Gold-tier deliverable — a single, portable YAML file that captures the complete semantic specification for a semantic plane. Export it with [`context blueprint`](/cli/blueprint/), serve it via MCP at `context://data-product/{name}`, or share it with any OSI-compliant tool.
 
 ## Blueprint format
 
-A data product YAML follows the OSI `semantic_model` structure, extended with ContextKit governance fields. Here's a complete Gold-tier example using a generic SaaS analytics domain:
+A semantic plane YAML follows the OSI `semantic_model` structure, extended with RunContext governance fields. Here's a complete Gold-tier example using a generic SaaS analytics domain:
 
 ```yaml
 # saas_analytics.data-product.osi.yaml
@@ -376,11 +376,11 @@ semantic_model:
       verified: true
 ```
 
-## Anatomy of a data product
+## Anatomy of a semantic plane
 
 ### Header
 
-Every data product starts with `osi_version` and a `semantic_model` block. The model name, description, owner, and tier establish identity and governance at the top level.
+Every semantic plane starts with `osi_version` and a `semantic_model` block. The model name, description, owner, and tier establish identity and governance at the top level.
 
 ### Glossary
 
@@ -411,9 +411,9 @@ Named, reusable calculations with built-in filters. Metrics prevent AI agents fr
 
 Verified SQL examples that serve as templates. AI agents can adapt these for similar questions, reducing hallucination.
 
-## Using data products
+## Using semantic planes
 
-### Create a new data product
+### Create a new semantic plane
 
 ```bash
 context new sales-analytics --source warehouse
@@ -440,7 +440,7 @@ context blueprint sales-analytics
 context serve --stdio
 ```
 
-The MCP server exposes your data product as structured resources. AI agents receive the full semantic model — descriptions, rules, relationships, metrics — alongside the raw schema.
+The MCP server exposes your semantic plane as structured resources. AI agents receive the full semantic model — descriptions, rules, relationships, metrics — alongside the raw schema.
 
 ### Move between environments
 
@@ -454,23 +454,23 @@ cp -r context/ /path/to/other-project/context/
 context serve --context-dir /shared/data-products/saas-analytics/context
 ```
 
-## Data products and the tier system
+## Semantic planes and the tier system
 
-The [tier system](/concepts/tiers/) measures how complete your data product is:
+The [tier system](/concepts/tiers/) measures how complete your semantic plane is:
 
 | Tier | What's included | How to achieve |
 |---|---|---|
-| **Bronze** | Schema, descriptions, ownership | `context introspect` |
-| **Silver** | + glossary, trust status, lineage, sample values | `context enrich --target silver` |
-| **Gold** | + semantic roles, aggregation rules, guardrails, golden queries | Human curation + `context enrich --target gold` |
+| **Bronze** | Scaffolded metadata — schema, descriptions, ownership | `context setup` or `context introspect` |
+| **Silver** | + sample values, tags, lineage, glossary | `context enrich --target silver` |
+| **Gold** | + semantic roles on all fields, 3+ golden queries, guardrails, business rules, hierarchies, endorsed trust, contactable owner | Agent-driven curation (agent queries real data via MCP) |
 
-A Gold-tier data product gives AI agents everything they need to generate correct SQL without guessing.
+A Gold-tier semantic plane gives AI agents everything they need to generate correct SQL without guessing.
 
 ## OSI compatibility
 
-Data product YAMLs are strict supersets of OSI v1.0. The core `semantic_model`, `datasets`, `fields`, `relationships`, and `metrics` blocks are fully OSI-compliant. ContextKit-specific extensions (`business_rules`, `golden_queries`, `glossary`, governance fields) are stored in companion sections that OSI-compliant tools can safely ignore.
+Semantic plane YAMLs are strict supersets of OSI v1.0. The core `semantic_model`, `datasets`, `fields`, `relationships`, and `metrics` blocks are fully OSI-compliant. RunContext-specific extensions (`business_rules`, `golden_queries`, `glossary`, governance fields) are stored in companion sections that OSI-compliant tools can safely ignore.
 
 This means you can:
-- Import OSI files from other tools and enrich them with ContextKit
-- Export your ContextKit metadata as standard OSI for use elsewhere
-- Mix ContextKit-governed models with plain OSI models in the same project
+- Import OSI files from other tools and enrich them with RunContext
+- Export your RunContext metadata as standard OSI for use elsewhere
+- Mix RunContext-governed models with plain OSI models in the same project

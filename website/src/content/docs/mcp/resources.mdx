@@ -1,6 +1,6 @@
 ---
 title: MCP Resources
-description: Read-only resource URIs exposed by the ContextKit MCP server.
+description: Read-only resource URIs exposed by the RunContext MCP server.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -60,9 +60,9 @@ Tier scorecards reflect the results of `context build`. If you have made changes
 
 ### `context://data-product/template`
 
-Returns a blank AI Blueprint template — an OSI-compliant YAML starting point for a new data product.
+Returns a blank AI Blueprint template — an OSI-compliant YAML starting point for a new semantic plane.
 
-**When to use:** When starting a new data product from scratch. The template includes all OSI sections with comments explaining each field.
+**When to use:** When starting a new semantic plane from scratch. The template includes all OSI sections with comments explaining each field.
 
 ```
 Resource URI: context://data-product/template
@@ -70,9 +70,9 @@ Resource URI: context://data-product/template
 
 ### `context://data-product/{name}`
 
-Returns the **AI Blueprint** for a data product — the complete semantic specification as portable OSI YAML. Includes the model's schema, governance metadata, glossary terms, metrics, relationships, business rules, guardrail filters, and golden queries — everything an AI agent needs to work with this data correctly.
+Returns the **AI Blueprint** for a semantic plane — the complete semantic specification as portable OSI YAML. Includes the model's schema, governance metadata, glossary terms, metrics, relationships, business rules, guardrail filters, and golden queries — everything an AI agent needs to work with this data correctly.
 
-**When to use:** When you need to share a data product with another team, feed it to an AI agent, migrate to a different warehouse, or create a portable backup of your semantic layer.
+**When to use:** When you need to share a semantic plane with another team, feed it to an AI agent, migrate to a different warehouse, or create a portable backup of your semantic layer.
 
 ```
 Resource URI: context://data-product/orders
@@ -83,4 +83,4 @@ Resource URI: context://data-product/customers
 
 Agents typically start by reading `context://manifest` or a specific `context://model/{name}` resource, then use [Tools](/mcp/tools/) like `context_search` or `context_explain` for interactive exploration. The resources provide the foundation; the tools provide the interaction.
 
-For portability, agents can read any data product's AI Blueprint via `context://data-product/{name}`, or scaffold a new one from the blank template at `context://data-product/template`.
+For portability, agents can read any semantic plane's AI Blueprint via `context://data-product/{name}`, or scaffold a new one from the blank template at `context://data-product/template`.

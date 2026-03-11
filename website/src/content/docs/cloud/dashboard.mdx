@@ -1,13 +1,13 @@
 ---
 title: Dashboard
-description: "The ContextKit Cloud dashboard — browse data products, manage your team, configure connectors, and monitor MCP usage from a single web interface."
+description: "The RunContext Cloud dashboard — browse data products, manage your team, configure connectors, and monitor MCP usage from a single web interface."
 ---
 
 import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
 
 ## Overview
 
-The ContextKit Cloud dashboard at [app.runcontext.dev](https://app.runcontext.dev) is where you manage everything about your hosted semantic planes. It's a read-and-manage interface — you still build and curate metadata locally with the CLI, then publish to the cloud.
+The RunContext Cloud dashboard at [app.runcontext.dev](https://app.runcontext.dev) is where you manage everything about your hosted semantic planes. It's a read-and-manage interface — you still build and curate metadata locally with the CLI, then publish to the cloud.
 
 ---
 
@@ -59,9 +59,9 @@ Manage who has access to your organization.
 
 ## Connectors
 
-Guardrailed MCP database connectors — connect your databases through ContextKit instead of exposing them to generic MCP tools.
+Guardrailed MCP database connectors — connect your databases through RunContext instead of exposing them to generic MCP tools.
 
-**Why ContextKit connectors?** Most MCP database connectors give AI agents broad access — including write operations, arbitrary queries, and schema modifications. ContextKit connectors are purpose-built for AI context: they introspect your schema, serve metadata, and help build data products. That's it. No mutations, no raw data extraction, no unrestricted SQL.
+**Why RunContext connectors?** Most MCP database connectors give AI agents broad access — including write operations, arbitrary queries, and schema modifications. RunContext connectors are purpose-built for AI context: they introspect your schema, serve metadata, and help build data products. That's it. No mutations, no raw data extraction, no unrestricted SQL.
 
 **Active connectors** — list of configured databases with their status (connected, error, syncing) and last introspection date.
 

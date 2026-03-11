@@ -1,11 +1,11 @@
 ---
 title: Introduction
-description: "ContextKit turns your database into an AI-ready data product. Fill out a Context Brief, connect your database, and the pipeline builds your semantic plane automatically."
+description: "RunContext turns your database into an AI-ready semantic plane. Connect your database, run the setup wizard, and curate to Gold with your AI agent."
 ---
 
-## Turn Your Database Into an AI-Ready Data Product
+## Turn Your Database Into an AI-Ready Semantic Plane
 
-ContextKit builds a **semantic plane** between your database and your AI tools — a structured metadata layer that captures what your data means, not just what it's named. AI agents use it to generate correct SQL on the first try.
+RunContext builds a **semantic plane** between your database and your AI tools — a structured metadata layer that captures what your data means, not just what it's named. AI agents use it to generate correct SQL on the first try.
 
 ### The Problem
 
@@ -20,19 +20,28 @@ Every query is a guess. And guesses are wrong often enough to be dangerous.
 ### The Solution
 
 ```
-1. context setup          → Browser wizard opens
-2. Fill out Context Brief → Name, owner, sensitivity, database
-3. Pipeline auto-runs     → Introspect → Scaffold → Enrich → Verify
-4. context serve          → MCP server live — agents have full context
+1. context setup          → 6-step wizard opens in your browser
+2. Connect                → Choose your database
+3. Define                 → Name, owner, sensitivity
+4. Scaffold               → Introspect schema → Bronze metadata
+5. Checkpoint             → Review what was generated
+6. Curate                 → Enrich toward Silver
+7. Serve                  → MCP server live — agents have full context
 ```
 
-**Step 1 — Context Brief.** Run `context setup` and a 5-step wizard opens in your browser. Name your data product, set an owner, choose a sensitivity level, and connect your database. Upload any existing documentation (SQL files, data dictionaries, markdown).
+**Step 1 — Connect.** Run `context setup` and a 6-step wizard opens in your browser. Connect your database (auto-detected from environment or enter a connection URL).
 
-**Step 2 — Automatic Pipeline.** ContextKit introspects your schema, scaffolds Bronze-tier metadata, then auto-enriches toward Silver (trust status, glossary, lineage, sample values). You watch each stage complete in the browser.
+**Step 2 — Define.** Name your semantic plane, set an owner, and choose a sensitivity level.
 
-**Step 3 — Curate to Gold.** Open the visual studio (`context dev --studio`) to add semantic roles, aggregation rules, guardrails, golden queries, and business rules. Or tell your AI agent to curate for you — the generated `AGENT_INSTRUCTIONS.md` tells it exactly what to do.
+**Step 3 — Scaffold.** RunContext introspects your schema and scaffolds Bronze-tier metadata automatically.
 
-**Step 4 — Serve via MCP.** Run `context serve` and every AI tool in your stack gets full context. Agents can search metadata, look up business terms, retrieve guardrails, and find golden queries.
+**Step 4 — Checkpoint.** Review what was generated — tables, columns, types, and initial descriptions.
+
+**Step 5 — Curate.** The wizard enriches toward Silver (sample values, tags, glossary links, lineage).
+
+**Step 6 — Serve.** Run `context serve` and every AI tool in your stack gets full context.
+
+**Path to Gold — Agent-Driven Curation.** Gold requires deep domain knowledge: semantic roles on every field, 3+ golden queries, guardrails, business rules, and hierarchies. The fastest path is agent-driven curation — copy the MCP config into your IDE (Claude Code, Cursor, or Copilot), paste the curation prompt, and your AI agent queries the actual database to curate your semantic plane to Gold.
 
 ## Three Ways to Use It
 
@@ -42,7 +51,7 @@ Every query is a guess. And guesses are wrong often enough to be dangerous.
 context setup
 ```
 
-Opens a 5-step form in your browser. Fill out the Context Brief, connect your database, and the pipeline handles the rest.
+Opens a 6-step wizard in your browser: Connect > Define > Scaffold > Checkpoint > Curate > Serve.
 
 ### 2. AI agent runs CLI commands
 
@@ -50,7 +59,7 @@ In Claude Code, Cursor, Windsurf, or any agentic coding platform:
 
 > *"Install @runcontext/cli and build a semantic layer for my database."*
 
-The agent uses CLI commands and reads `AGENT_INSTRUCTIONS.md` to build your semantic plane. It goes back and forth with you — asking about metrics, ownership, and business rules.
+The agent uses CLI commands and reads `AGENT_INSTRUCTIONS.md` to build your semantic plane. It queries your actual database via MCP, going back and forth with you — asking about metrics, ownership, and business rules — to curate all the way to Gold.
 
 ### 3. Visual studio for humans
 
@@ -67,7 +76,7 @@ For agents that need to *query* an existing semantic plane:
 ```json
 {
   "mcpServers": {
-    "contextkit": {
+    "runcontext": {
       "command": "npx",
       "args": ["@runcontext/cli", "serve", "--stdio"]
     }
@@ -85,7 +94,7 @@ One install, everything you need:
 npm install @runcontext/cli
 ```
 
-- **Browser setup wizard** — 5-step Context Brief form with automatic pipeline
+- **Browser setup wizard** — 6-step wizard: Connect > Define > Scaffold > Checkpoint > Curate > Serve
 - **Visual studio editor** — curate metadata in the browser with live tier updates
 - **16 CLI commands** — introspect, enrich, lint, fix, build, tier, blueprint, serve, and more
 - **MCP server with 8 tools** — serve your semantic plane to AI agents via stdio or HTTP

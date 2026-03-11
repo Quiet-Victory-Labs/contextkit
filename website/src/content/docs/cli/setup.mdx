@@ -1,9 +1,9 @@
 ---
 title: context setup
-description: "Browser-based wizard that guides you through creating a data product — fill out a Context Brief, connect your database, and the pipeline builds your semantic plane."
+description: "Browser-based wizard that guides you through creating a semantic plane — fill out a Context Brief, connect your database, and the pipeline builds your semantic plane."
 ---
 
-The `setup` command is the fastest way to get started with ContextKit. It opens a 5-step wizard in your browser that creates a data product from scratch.
+The `setup` command is the fastest way to get started with RunContext. It opens a 6-step wizard in your browser that creates a semantic plane from scratch.
 
 ## Usage
 
@@ -15,41 +15,41 @@ context setup --no-browser     # don't auto-open the browser
 
 ## What it does
 
-The setup wizard opens at `http://localhost:4040/setup` and walks through five steps:
+The setup wizard opens at `http://localhost:4040/setup` and walks through six steps:
 
-### Step 1: Product Definition
+### Step 1: Connect
 
-Name your data product and provide a description. The name becomes the directory under `context/products/`.
+Connect to your database. Data sources are auto-detected from environment variables (`DATABASE_URL`, `POSTGRES_URL`, etc.), local database files (`.duckdb`, `.sqlite`), and MCP configs from your IDE.
 
-### Step 2: Owner Information
+### Step 2: Define
 
-Set the owner name, team, and email. This metadata is used for governance tracking and shows up in the tier scorecard.
+Name your semantic plane and provide a description. Set the owner name, team, and email. Choose a sensitivity level (public, internal, confidential, or restricted). The name becomes the directory under `context/products/`.
 
-### Step 3: Context & Sensitivity
+### Step 3: Scaffold
 
-- **Sensitivity level**: Choose from public, internal (default), confidential, or restricted
-- **Data sources**: Auto-detected from environment variables (`DATABASE_URL`, `POSTGRES_URL`, etc.) and local database files (`.duckdb`, `.sqlite`)
-- **Documentation upload**: Drag-and-drop SQL files, data dictionaries, markdown, CSV, or YAML to give the enrichment engine more context
+Introspect the database schema and generate Bronze-tier OSI YAML files. This reads tables, columns, types, primary keys, and relationships.
 
-### Step 4: Review
+### Step 4: Checkpoint
 
-Review all your inputs before submitting. Edit any field before proceeding.
+Review the scaffolded metadata before enrichment. Edit any field before proceeding.
 
-### Step 5: Build Pipeline
+### Step 5: Curate
 
-The pipeline runs automatically in the browser with real-time progress:
+Agent-driven curation enriches your metadata from Bronze through Silver and Gold:
 
-1. **Introspect** — connect to database, read schema
-2. **Scaffold** — generate Bronze-tier OSI YAML files
-3. **Enrich to Silver** — add glossary, lineage, sample values, trust status
-4. **Enrich to Gold** — suggest semantic roles, aggregation rules, guardrails
-5. **Verify** — lint and validate the result
-6. **Auto-fix** — apply automatic fixes for common issues
-7. **Agent Instructions** — generate `AGENT_INSTRUCTIONS.md` for AI curation
+1. **Enrich to Silver** — add glossary, lineage, sample values, trust status
+2. **Enrich to Gold** — suggest semantic roles, aggregation rules, guardrails
+3. **Verify** — lint and validate the result
+4. **Auto-fix** — apply automatic fixes for common issues
+5. **Agent Instructions** — generate `AGENT_INSTRUCTIONS.md` for AI curation
+
+### Step 6: Serve
+
+Start the MCP server and configure your AI tools to connect. The wizard generates the appropriate config snippets for Claude Code, Cursor, VS Code, and other MCP clients.
 
 ## Output
 
-The wizard saves a **Context Brief** at `context/products/{name}/context-brief.yaml` and scaffolds all associated metadata files.
+The wizard saves a **Context Brief** at `context/products/{name}/context-brief.yaml` and scaffolds all associated metadata files for the semantic plane.
 
 ```yaml
 # context-brief.yaml
@@ -67,11 +67,11 @@ created_at: "2026-03-08T..."
 
 | Scenario | Recommendation |
 |---|---|
-| First time with ContextKit | `context setup` (browser wizard) |
+| First time with RunContext | `context setup` (browser wizard) |
 | Adding a new database source | `context introspect --db <url>` |
 | Upgrading existing context to Gold | `context dev --studio` (visual editor) |
 | CI/CD pipeline | `context lint && context build` |
-| Let an AI agent build it | Tell the agent: *"Install @runcontext/cli and build a semantic layer"* |
+| Let an AI agent build it | Tell the agent: *"Install @runcontext/cli and build a semantic plane"* |
 
 ## Next steps
 

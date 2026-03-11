@@ -1,9 +1,9 @@
 ---
 title: context new
-description: Scaffold a new data product inside your existing context directory.
+description: Scaffold a new semantic plane inside your existing context directory.
 ---
 
-The `new` command scaffolds a new data product — an OSI model with companion governance and rules files — inside your existing project.
+The `new` command scaffolds a new semantic plane — an OSI model with companion governance and rules files — inside your existing project.
 
 ## Usage
 
@@ -15,7 +15,7 @@ context new <name>
 
 | Argument | Description |
 |---|---|
-| `name` | Name for the data product (e.g. `sales-analytics`, `inventory`) |
+| `name` | Name for the semantic plane (e.g. `sales-analytics`, `inventory`) |
 
 ## Options
 
@@ -26,7 +26,7 @@ context new <name>
 
 ## Examples
 
-### Scaffold a new data product
+### Scaffold a new semantic plane
 
 ```bash
 context new sales-analytics
@@ -58,9 +58,9 @@ data_sources:
     connection: postgres://localhost:5432/warehouse
 ```
 
-## Multiple data products
+## Multiple semantic planes
 
-A single ContextKit project can contain multiple data products. Each is an independent model with its own governance, rules, and tier score:
+A single RunContext project can contain multiple semantic planes. Each is an independent model with its own governance, rules, and tier score:
 
 ```bash
 context new sales-analytics --source crm
@@ -68,7 +68,7 @@ context new inventory --source warehouse
 context new marketing-attribution --source analytics-db
 ```
 
-All data products compile together and are served through the same MCP server. Run `context tier` to see the scorecard for each, or `context blueprint` to export their AI Blueprints.
+All semantic planes compile together and are served through the same MCP server. Run `context tier` to see the scorecard for each, or `context blueprint` to export their AI Blueprints.
 
 ## Next steps
 

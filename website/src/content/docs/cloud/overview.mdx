@@ -1,5 +1,5 @@
 ---
-title: ContextKit Cloud
+title: RunContext Cloud
 description: "Hosted semantic planes for teams. Publish your data products, share an MCP endpoint, and manage metadata together — without running any infrastructure."
 ---
 
@@ -7,14 +7,14 @@ import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
 
 ## Why Cloud?
 
-The ContextKit CLI is powerful for solo work — you build a semantic plane on your machine and serve it locally. But when your team needs to share that context, things get complicated:
+The RunContext CLI is powerful for solo work — you build a semantic plane on your machine and serve it locally. But when your team needs to share that context, things get complicated:
 
 - **Who runs the MCP server?** Someone has to keep it up 24/7
 - **How do you share updates?** Git works, but agents need a live endpoint
 - **Who can edit what?** No access controls on local YAML files
 - **Which version is live?** Multiple people editing the same metadata
 
-ContextKit Cloud solves all of this. Publish your semantic plane to a hosted endpoint, and every team member's AI tools connect to the same source of truth.
+RunContext Cloud solves all of this. Publish your semantic plane to a hosted endpoint, and every team member's AI tools connect to the same source of truth.
 
 ---
 
@@ -31,7 +31,7 @@ ContextKit Cloud solves all of this. Publish your semantic plane to a hosted end
     Invite teammates by email. Everyone connects their AI tools to the same hosted endpoint. When someone publishes an updated semantic plane, every agent on the team gets the latest context immediately.
   </Card>
   <Card title="Guardrailed MCP Connectors" icon="laptop">
-    Connect databases through ContextKit's managed MCP connectors — PostgreSQL, Snowflake, BigQuery, and more. Unlike generic MCP database tools that may expose write access or unrestricted queries, ContextKit connectors are strictly read-only. They introspect your schema and serve context to AI agents, nothing else. No mutations, no data extraction, no risk.
+    Connect databases through RunContext's managed MCP connectors — PostgreSQL, Snowflake, BigQuery, and more. Unlike generic MCP database tools that may expose write access or unrestricted queries, RunContext connectors are strictly read-only. They introspect your schema and serve context to AI agents, nothing else. No mutations, no data extraction, no risk.
   </Card>
 </CardGrid>
 
@@ -41,13 +41,13 @@ ContextKit Cloud solves all of this. Publish your semantic plane to a hosted end
 
 ### 1. Build locally, publish to cloud
 
-You still use the ContextKit CLI to build your semantic plane. Nothing changes about your local workflow. When you're ready to share, publish:
+You still use the RunContext CLI to build your semantic plane. Nothing changes about your local workflow. When you're ready to share, publish:
 
 ```bash
 context publish --org my-team
 ```
 
-This uploads your compiled semantic plane to ContextKit Cloud. Your metadata is now hosted and available to your whole team.
+This uploads your compiled semantic plane to RunContext Cloud. Your metadata is now hosted and available to your whole team.
 
 ### 2. Connect your AI tools
 
@@ -56,7 +56,7 @@ Every team member adds the cloud MCP endpoint to their tool config:
 ```json
 {
   "mcpServers": {
-    "contextkit-cloud": {
+    "runcontext-cloud": {
       "url": "https://api.runcontext.dev/mcp/my-team",
       "headers": {
         "Authorization": "Bearer <your-api-key>"
@@ -101,7 +101,7 @@ When you sign in, you'll see:
 ## Getting Started with Cloud
 
 <Aside type="tip">
-You don't need a cloud account to use ContextKit. The CLI is free and runs entirely on your machine. Cloud is for teams that want shared access and managed infrastructure.
+You don't need a cloud account to use RunContext. The CLI is free and runs entirely on your machine. Cloud is for teams that want shared access and managed infrastructure.
 </Aside>
 
 1. **Sign up** at [app.runcontext.dev](https://app.runcontext.dev) — create an account with your email or GitHub

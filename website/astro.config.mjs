@@ -18,7 +18,7 @@ export default defineConfig({
       favicon: '/favicon.svg',
       description: 'RunContext documentation — CLI reference, MCP server, semantic plane concepts, and RunContext Cloud.',
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/RunContext/runcontext' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/Quiet-Victory-Labs/runcontext' },
       ],
       components: {
         SiteTitle: './src/components/SiteTitle.astro',
