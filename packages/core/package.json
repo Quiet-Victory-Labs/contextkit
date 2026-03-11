@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/core",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Compiler, linter, and tier engine for AI-ready semantic metadata. 40 lint rules, Bronze/Silver/Gold scoring, and OSI-compliant data product validation.",
   "license": "MIT",
   "author": "Eric Kittelson",

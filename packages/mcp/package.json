@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/mcp",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "MCP server that serves semantic metadata to AI agents. Connect your data catalog to Claude Code, Cursor, Copilot, Windsurf, and any MCP-compatible tool.",
   "license": "MIT",
   "author": "Eric Kittelson",
