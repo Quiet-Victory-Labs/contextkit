@@ -4,6 +4,7 @@ import { Connect } from './steps/Connect';
 import { Define } from './steps/Define';
 import { Enrich } from './steps/Enrich';
 import { Scaffold } from './steps/Scaffold';
+import { Serve } from './steps/Serve';
 
 function StepContent() {
   switch (currentStep.value) {
@@ -12,7 +13,7 @@ function StepContent() {
     case 3: return <Scaffold />;
     case 4: return <Checkpoint />;
     case 5: return <Enrich />;
-    case 6: return <div>Serve step (coming soon)</div>;
+    case 6: return <Serve />;
     default: return null;
   }
 }
