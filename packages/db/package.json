@@ -1,6 +1,6 @@
 {
   "name": "@runcontext/db",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "description": "Read-only, guardrailed database connector MCP server. Connect any database to AI agents with automatic safety constraints.",
   "license": "MIT",
   "author": "Eric Kittelson",
