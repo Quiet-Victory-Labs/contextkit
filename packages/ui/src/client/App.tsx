@@ -1,4 +1,5 @@
 import { currentStep } from './state';
+import { Checkpoint } from './steps/Checkpoint';
 import { Connect } from './steps/Connect';
 import { Define } from './steps/Define';
 import { Scaffold } from './steps/Scaffold';
@@ -8,7 +9,7 @@ function StepContent() {
     case 1: return <Connect />;
     case 2: return <Define />;
     case 3: return <Scaffold />;
-    case 4: return <div>Checkpoint step (coming soon)</div>;
+    case 4: return <Checkpoint />;
     case 5: return <div>Enrich step (coming soon)</div>;
     case 6: return <div>Serve step (coming soon)</div>;
     default: return null;
