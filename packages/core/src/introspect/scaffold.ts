@@ -1,6 +1,6 @@
 import * as yaml from 'yaml';
 import type { TableInfo, ColumnInfo } from '../adapters/types.js';
-import { inferTableType, inferGrain } from './heuristics.js';
+import { inferTableType, inferGrain, inferRelationships, inferGuardrails } from './heuristics.js';
 
 export interface ScaffoldInput {
   modelName: string;
@@ -28,20 +28,54 @@ export function scaffoldFromSchema(input: ScaffoldInput): ScaffoldResult {
     const cols = columns[table.name] ?? [];
     const pkCols = cols.filter((c) => c.is_primary_key).map((c) => c.name);
 
-    return {
-      name: table.name,
-      description: `${table.type === 'view' ? 'View' : 'Table'}: ${table.name} (${table.row_count.toLocaleString()} rows)`,
-      source: `${dataSourceName}.main.${table.name}`,
-      data_source: dataSourceName,
-      ...(pkCols.length > 0 ? { primary_key: pkCols } : {}),
-      fields: cols.map((col) => ({
+    // Build field metadata from rich column info
+    const fields = cols.map((col) => {
+      const field: Record<string, any> = {
         name: col.name,
-        description: col.name,
+        description: col.comment || col.name,
         expression: {
           dialects: [{ dialect: 'ANSI_SQL', expression: col.name }],
         },
-      })),
+      };
+
+      // Add FK relationship info
+      if (col.is_foreign_key && col.referenced_table) {
+        field.references = `${col.referenced_table}.${col.referenced_column}`;
+      }
+
+      // Add enum values as allowed_values
+      if (col.enum_values && col.enum_values.length > 0) {
+        field.allowed_values = col.enum_values;
+      }
+
+      return field;
+    });
+
+    const dataset: Record<string, any> = {
+      name: table.name,
+      description: table.comment || `${table.type === 'view' ? 'View' : 'Table'}: ${table.name} (${table.row_count.toLocaleString()} rows)`,
+      source: `${dataSourceName}.${table.schema ?? 'main'}.${table.name}`,
+      data_source: dataSourceName,
+      ...(pkCols.length > 0 ? { primary_key: pkCols } : {}),
+      fields,
     };
+
+    // Add relationships derived from FKs
+    const relationships = inferRelationships(table.name, cols);
+    if (relationships.length > 0) {
+      dataset.relationships = relationships.map((r) => ({
+        field: r.column,
+        references: `${r.references}.${r.referenced_column}`,
+        type: 'many_to_one',
+      }));
+    }
+
+    // Add partition info if available
+    if (table.partition_key) {
+      dataset.partition_key = table.partition_key;
+    }
+
+    return dataset;
   });
 
   const osiDoc = {
@@ -59,10 +93,27 @@ export function scaffoldFromSchema(input: ScaffoldInput): ScaffoldResult {
   const govDatasets: Record<string, any> = {};
   for (const table of tables) {
     const cols = columns[table.name] ?? [];
-    govDatasets[table.name] = {
+    const govEntry: Record<string, any> = {
       grain: inferGrain(table.name, cols),
       table_type: inferTableType(table.name, table.type, cols),
     };
+
+    // Add guardrails from check constraints and enums
+    const guardrails = inferGuardrails(table, cols);
+    if (guardrails.length > 0) {
+      govEntry.guardrails = guardrails;
+    }
+
+    // Add indexes info for query optimization hints
+    if (table.indexes && table.indexes.length > 0) {
+      govEntry.indexes = table.indexes.map((idx) => ({
+        name: idx.name,
+        columns: idx.columns,
+        unique: idx.is_unique,
+      }));
+    }
+
+    govDatasets[table.name] = govEntry;
   }
 
   const govDoc = {

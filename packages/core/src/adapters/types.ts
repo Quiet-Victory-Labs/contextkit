@@ -1,8 +1,31 @@
+export interface ForeignKeyInfo {
+  column: string;
+  referenced_table: string;
+  referenced_column: string;
+  constraint_name?: string;
+}
+
+export interface IndexInfo {
+  name: string;
+  columns: string[];
+  is_unique: boolean;
+}
+
+export interface CheckConstraintInfo {
+  name: string;
+  expression: string;
+}
+
 export interface TableInfo {
   name: string;
   type: 'table' | 'view';
   schema?: string;
   row_count: number;
+  comment?: string;
+  foreign_keys?: ForeignKeyInfo[];
+  indexes?: IndexInfo[];
+  check_constraints?: CheckConstraintInfo[];
+  partition_key?: string;
 }
 
 export interface ColumnInfo {
@@ -10,6 +33,16 @@ export interface ColumnInfo {
   data_type: string;
   nullable: boolean;
   is_primary_key: boolean;
+  comment?: string;
+  default_value?: string;
+  enum_values?: string[];
+  is_unique?: boolean;
+  is_foreign_key?: boolean;
+  referenced_table?: string;
+  referenced_column?: string;
+  character_maximum_length?: number;
+  numeric_precision?: number;
+  numeric_scale?: number;
 }
 
 export interface QueryResult {

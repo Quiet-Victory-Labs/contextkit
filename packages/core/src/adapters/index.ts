@@ -1,4 +1,4 @@
-export type { DataAdapter, DataSourceConfig, AdapterType, TableInfo, ColumnInfo, QueryResult } from './types.js';
+export type { DataAdapter, DataSourceConfig, AdapterType, TableInfo, ColumnInfo, QueryResult, ForeignKeyInfo, IndexInfo, CheckConstraintInfo } from './types.js';
 export { MissingDriverError, getDriverPackage } from './errors.js';
 
 import type { DataAdapter, DataSourceConfig } from './types.js';
