@@ -53,7 +53,7 @@ describe('UI Server', () => {
       expect(html).toContain('RunContext');
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('setup.css');
-      expect(html).toContain('setup.js');
+      expect(html).toContain('app.js');
     });
   });
 

@@ -44,7 +44,7 @@ export const authCommand = new Command('auth')
         console.error(chalk.red('Invalid selection'));
         process.exit(1);
       }
-      providerId = providers[idx].id;
+      providerId = providers[idx]!.id;
     }
 
     const provider = registry.get(providerId);
@@ -113,20 +113,21 @@ export const authCommand = new Command('auth')
         id: host,
         name,
         host,
-        adapter: provider.adapters[0],
+        adapter: provider.adapters[0]!,
+        metadata: {},
       };
     }
 
     // Inject token into metadata for connection string building
-    selectedDb.metadata = { ...selectedDb.metadata, token: authResult.token };
+    (selectedDb as any).metadata = { ...(selectedDb as any).metadata, token: authResult.token };
 
     // Test connection
     console.log(`\n  Testing connection...`);
-    const connStr = await provider.getConnectionString(selectedDb);
+    const connStr = await provider.getConnectionString(selectedDb as any);
     try {
       const { createAdapter } = await import('@runcontext/core');
       const adapter = await createAdapter({
-        adapter: selectedDb.adapter,
+        adapter: selectedDb.adapter!,
         connection: connStr,
       });
       await adapter.connect();

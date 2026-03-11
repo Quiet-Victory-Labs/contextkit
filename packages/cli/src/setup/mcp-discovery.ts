@@ -446,6 +446,7 @@ const ADAPTER_LABELS: Record<AdapterType, string> = {
   clickhouse: 'ClickHouse',
   databricks: 'Databricks',
   mssql: 'SQL Server',
+  mongodb: 'MongoDB',
 };
 
 function buildLabel(

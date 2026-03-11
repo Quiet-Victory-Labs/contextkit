@@ -42,7 +42,7 @@ describe('CredentialStore', () => {
     });
 
     expect(mockFs.writeFileSync).toHaveBeenCalled();
-    const writeCall = mockFs.writeFileSync.mock.calls[0];
+    const writeCall = mockFs.writeFileSync.mock.calls[0]!;
     expect(String(writeCall[0])).toContain('credentials.json');
     const written = JSON.parse(String(writeCall[1]));
     expect(written.databases['neon:test-db'].token).toBe('secret');
@@ -78,7 +78,7 @@ describe('CredentialStore', () => {
 
     await store.remove('neon:test-db');
 
-    const writeCall = mockFs.writeFileSync.mock.calls[0];
+    const writeCall = mockFs.writeFileSync.mock.calls[0]!;
     const written = JSON.parse(String(writeCall[1]));
     expect(written.databases['neon:test-db']).toBeUndefined();
   });

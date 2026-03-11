@@ -38,7 +38,7 @@ export class DatabricksProvider implements AuthProvider {
       if (fs.existsSync(DATABRICKS_CFG_PATH)) {
         const config = fs.readFileSync(DATABRICKS_CFG_PATH, 'utf-8');
         const tokenMatch = config.match(/token\s*=\s*(.+)/);
-        if (tokenMatch) {
+        if (tokenMatch?.[1]) {
           return { ok: true, provider: 'databricks', token: tokenMatch[1].trim() };
         }
       }
@@ -50,7 +50,7 @@ export class DatabricksProvider implements AuthProvider {
       if (fs.existsSync(DATABRICKS_CFG_PATH)) {
         const config = fs.readFileSync(DATABRICKS_CFG_PATH, 'utf-8');
         const tokenMatch = config.match(/token\s*=\s*(.+)/);
-        if (tokenMatch) {
+        if (tokenMatch?.[1]) {
           return { ok: true, provider: 'databricks', token: tokenMatch[1].trim() };
         }
       }
