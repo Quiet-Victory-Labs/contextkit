@@ -56,7 +56,7 @@
     "@preact/signals": "^2.8.2",
     "@runcontext/core": "workspace:^",
     "@runcontext/uxd": "workspace:^",
-    "hono": "^4.12.5",
+    "hono": "^4.12.7",
     "preact": "^10.29.0",
     "ws": "^8.19.0",
     "yaml": "^2.7.0"
