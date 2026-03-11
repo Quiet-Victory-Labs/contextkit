@@ -73,6 +73,7 @@ const error = signal<string | null>(null);
 const connUrl = signal('');
 const connLoading = signal(false);
 const connError = signal<string | null>(null);
+const loaded = signal(false);
 
 // --- Sidebar status helper ---
 
@@ -209,7 +210,8 @@ function backToProviders() {
 
 export function Connect() {
   // Load data on first render
-  if (providers.value.length === 0 && detectedSources.value.length === 0) {
+  if (!loaded.value) {
+    loaded.value = true;
     loadProviders();
     loadSources();
   }

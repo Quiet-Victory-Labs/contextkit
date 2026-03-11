@@ -1,3 +1,4 @@
+import { Fragment } from 'preact';
 import { currentStep, STEP_LABELS } from '../state';
 
 export function Stepper() {
@@ -9,7 +10,7 @@ export function Stepper() {
         const stepNum = i + 1;
         const cls = stepNum < step ? 'step-completed' : stepNum === step ? 'step-active' : 'step-future';
         return (
-          <>
+          <Fragment key={label}>
             <span
               class={cls}
               onClick={stepNum < step ? () => { currentStep.value = stepNum; } : undefined}
@@ -18,7 +19,7 @@ export function Stepper() {
               {label}
             </span>
             {stepNum < STEP_LABELS.length && <span class="step-separator">{'>'}</span>}
-          </>
+          </Fragment>
         );
       })}
     </>

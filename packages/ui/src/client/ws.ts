@@ -4,6 +4,11 @@ let ws: WebSocket | null = null;
 
 export function connectWebSocket(sid: string) {
   sessionId.value = sid;
+  if (ws) {
+    ws.onclose = null; // prevent triggering reconnect
+    ws.close();
+    ws = null;
+  }
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
   ws = new WebSocket(`${protocol}//${location.host}/ws?session=${encodeURIComponent(sid)}&role=wizard`);
 

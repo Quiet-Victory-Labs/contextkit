@@ -88,6 +88,7 @@ function retry() {
   enrichProgress.value = {};
   enrichLogs.value = [];
   errorMsg.value = '';
+  startEnrichment();
 }
 
 function toggleReq(key: string) {
