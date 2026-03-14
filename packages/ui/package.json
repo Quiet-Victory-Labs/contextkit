@@ -56,7 +56,7 @@
     "@preact/signals": "^2.8.2",
     "@runcontext/core": "workspace:^",
     "@runcontext/uxd": "workspace:^",
-    "hono": "^4.12.5",
+    "hono": "^4.12.8",
     "preact": "^10.29.0",
     "ws": "^8.19.0",
     "yaml": "^2.7.0"
@@ -67,7 +67,7 @@
     "@types/ws": "^8.18.1",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0",
-    "vite": "^7.3.1",
+    "vite": "^8.0.0",
     "vitest": "^3.2.0"
   }
 }
