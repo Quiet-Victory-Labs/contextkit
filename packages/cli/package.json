@@ -54,11 +54,11 @@
     "@runcontext/ui": "workspace:^",
     "@runcontext/uxd": "workspace:^",
     "chalk": "^5.4.0",
-    "chokidar": "^4.0.0",
+    "chokidar": "^5.0.0",
     "commander": "^14.0.0",
-    "ws": "^8.19.0",
-    "pg": "^8.19.0",
-    "yaml": "^2.7.0"
+    "ws": "^8.20.0",
+    "pg": "^8.20.0",
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
